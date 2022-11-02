@@ -41,7 +41,7 @@ data_fr
 
 ```
 
-# On essaie de faire une grosse base pour la France
+# Pour $merge$ deux bases sur deux années consécutives en France
 ```{r}
 
 liste_annees <- 1998:2018
@@ -59,27 +59,27 @@ data_concat <- read_csv(liste_pathes_2[1],
                      locale = locale(encoding ="UTF-8"),
                     show_col_types = FALSE
                      )
-str(data_concat)
-
 data_concat <- as.data.table(data_concat)
-setkey(data_concat,'QHHNUM')
 
 
 path <- liste_pathes_2[2]
-
 data_loc <- read_csv(path, 
                    locale = locale(encoding ="UTF-8"),
                   show_col_types = FALSE
                    )
-
-str(data_loc)
 data_loc <- as.data.table(data_loc)
-setkey(data_loc,'QHHNUM')
 
 
-colnames(data_concat)
+suffixe_ajoute <- paste("_", as.character(1998 + 2), sep = "")
 
-data_concat2 <- merge(data_concat, data_loc, all.x = TRUE, allow.cartesian=FALSE)
+
+
+data_concat2 <- merge(data_concat, data_loc,
+                      all.x = FALSE, 
+                      all.y = FALSE, 
+                      by = 'QHHNUM', 
+                      allow.cartesian=TRUE, 
+                      suffixes = c("", suffixe_ajoute))
   
 data_concat2
 
