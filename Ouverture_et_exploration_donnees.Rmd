@@ -42,6 +42,19 @@ data_fr
 ```
 
 # Pour $merge$ deux bases sur deux années consécutives en France
+
+## Explications :
+- Il faut joindre sur deux variables :
+  - 'QHHNUM'= L'identifiant du ménage
+  - 'HHSEQNUM'= L'identifiant au sein du ménage
+  
+
+## Attention sur l'importation :
+
+- Quarterly datasets containing only the quarterly variables.
+- Yearly datasets containing all variables of the core LFS survey, the quarterly and the structural ones.
+
+
 ```{r}
 
 liste_annees <- 1998:2018
@@ -77,13 +90,15 @@ suffixe_ajoute <- paste("_", as.character(1998 + 2), sep = "")
 data_concat2 <- merge(data_concat, data_loc,
                       all.x = FALSE, 
                       all.y = FALSE, 
-                      by = 'QHHNUM', 
+                      by = c('QHHNUM', 'HHSEQNUM'), 
                       allow.cartesian=TRUE, 
                       suffixes = c("", suffixe_ajoute))
   
 data_concat2
 
 
+df_loc <- data_loc[QHHNUM == 'Q1003100']
+df_loc
 
 ###########################################
 
@@ -129,6 +144,50 @@ data_concat_dt <- as.data.table(data_concat)
 
 
 ```
+# Colonnes à conserver ?
+
+HHSEQNUM
+HHLINK
+HHSPOU
+SEX
+YEARBIR
+MARSTAT
+NATIONAL
+YEARESID
+SIZEFIRM
+COUNTRYW
+REGIONW
+YSTARTWK
+FTPT
+FTPTREAS
+TEMP
+TEMPREAS
+TEMPDUR
+HWUSUAL
+WISHMORE
+HWWISH
+HOMEWK
+EXISTPR
+YEARPR
+SEEKDUR
+COURLEN
+COURPURP
+COURFILD
+HATLEVEL
+HATYEAR
+HATFIELD
+WSTAT1Y
+STAPRO1Y
+INCDECIL
+REFYEAR
+DEGURBA
+QHHNUM
+HHTYPE
+AGE
+LEAVCLAS
+HATLEV1D
+
+
 
 ## R Markdown
 
