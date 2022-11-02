@@ -41,6 +41,85 @@ data_fr
 
 ```
 
+# On essaie de faire une grosse base pour la France
+```{r}
+
+liste_annees <- 1998:2018
+
+liste_pathes <- paste("C:/Users/Benjamin/Desktop/Ensae/Projet_statapp/Repo_codes/Data/YearlyFiles_1998_2018/FR", liste_annees, sep = "")
+liste_pathes_2 <- paste(liste_pathes, "y.csv", sep = "_")
+
+# path <- "C:/Users/Benjamin/Desktop/Ensae/Projet_statapp/Repo_codes/Data/YearlyFiles_1998_2018/FR2015_y.csv"
+
+library(data.table)
+
+
+data_concat <- read_csv(liste_pathes_2[1], 
+                     locale = locale(encoding ="UTF-8"),
+                    show_col_types = FALSE
+                     )
+data_concat <- as.data.table(data_concat)
+
+
+path <- liste_pathes_2[2]
+
+data_loc <- read_csv(path, 
+                   locale = locale(encoding ="UTF-8"),
+                  show_col_types = FALSE
+                   )
+data_loc <- as.data.table(data_loc)
+
+
+data_concat <- merge(data_concat, data_loc, all = TRUE, by = 'QHHNUM')
+  
+
+
+
+
+###########################################
+
+
+for (path in liste_pathes_2[c(-1)]){
+  data_loc <- read_csv(path, 
+                     locale = locale(encoding ="UTF-8"),
+                    show_col_types = FALSE
+                     )
+  data_loc <- as.data.table(data_loc)
+
+  
+  data_concat <- merge(data_concat, data_loc, all = TRUE, by = 'QHHNUM')
+  
+  # data_concat <- rbindlist(list(data_concat, data_loc))    
+}
+
+
+data_concat_dt <- as.data.table(data_concat)
+
+# 
+# for (year in c(2010,2011,2012,2013,2014,2015)){
+#   print(paste("The year is", year))
+# }
+# 
+# 
+# data_fr <- read_csv(liste_pathes_2[1], 
+#                      locale = locale(encoding ="UTF-8"),
+#                     show_col_types = FALSE
+#                      )
+# data_fr_dt <- as.data.table(data_fr)
+# 
+# data_fr2 <- read_csv(liste_pathes_2[2], 
+#                      locale = locale(encoding ="UTF-8"),
+#                     show_col_types = FALSE
+#                      )
+# data_fr_dt2 <- as.data.table(data_fr2)
+# 
+# 
+# 
+# data_concat <- rbindlist(list(data_fr_dt, data_fr_dt2))    
+# data_concat                                  
+
+
+```
 
 ## R Markdown
 
