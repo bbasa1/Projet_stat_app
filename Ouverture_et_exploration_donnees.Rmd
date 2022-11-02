@@ -52,13 +52,17 @@ liste_pathes_2 <- paste(liste_pathes, "y.csv", sep = "_")
 # path <- "C:/Users/Benjamin/Desktop/Ensae/Projet_statapp/Repo_codes/Data/YearlyFiles_1998_2018/FR2015_y.csv"
 
 library(data.table)
+library(readr)
 
 
 data_concat <- read_csv(liste_pathes_2[1], 
                      locale = locale(encoding ="UTF-8"),
                     show_col_types = FALSE
                      )
+str(data_concat)
+
 data_concat <- as.data.table(data_concat)
+setkey(data_concat,'QHHNUM')
 
 
 path <- liste_pathes_2[2]
@@ -67,12 +71,17 @@ data_loc <- read_csv(path,
                    locale = locale(encoding ="UTF-8"),
                   show_col_types = FALSE
                    )
+
+str(data_loc)
 data_loc <- as.data.table(data_loc)
+setkey(data_loc,'QHHNUM')
 
 
-data_concat <- merge(data_concat, data_loc, all = TRUE, by = 'QHHNUM')
+colnames(data_concat)
+
+data_concat2 <- merge(data_concat, data_loc, all.x = TRUE, allow.cartesian=FALSE)
   
-
+data_concat2
 
 
 
