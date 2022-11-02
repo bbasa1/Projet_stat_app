@@ -1,7 +1,7 @@
 ---
 title: "Ouverture_et_exploration_donnees"
 output: pdf_document
-date: "2022-10-31"
+date: "date..."
 ---
 
 ```{r setup, include=FALSE}
@@ -19,6 +19,25 @@ library(readr)
 data <- readr::read_csv(file = unzip(paste(path, 'FR_YEAR_1998_onwards.zip', sep="/"), "FR2018_y.csv"),
                         show_col_types = FALSE)
 
+
+```
+
+
+# Quand on a extraît les fichiers RAR...
+
+```{r}
+library(readr)
+path <- "C:/Users/Benjamin/Desktop/Ensae/Projet_statapp/Repo_codes/Data/YearlyFiles_1998_2018/FR2015_y.csv"
+
+
+data_fr <- read_csv(path, 
+                     locale = locale(encoding ="UTF-8"),
+                     # col_types = cols(com = col_character(),
+                     #                  reg = col_integer()),
+                    show_col_types = FALSE
+                     )
+
+data_fr
 
 ```
 
