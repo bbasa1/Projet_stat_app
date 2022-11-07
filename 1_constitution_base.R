@@ -90,11 +90,11 @@ data_1999 <- read_csv(path,
 data_1999 <- as.data.table(data_1999)
 
 
-suffixe_ajoute <- paste("_", as.character(1998 + 2), sep = "")
+suffixe_ajoute <- paste("_", as.character(1998 + 1), sep = "")
 
 
 # Deux types de jointures
-faire_outer_join <- FALSE
+faire_outer_join <- TRUE
 
 if(faire_outer_join == FALSE){
   data_merged <- merge(data_1998, data_1999,
@@ -110,7 +110,7 @@ if(faire_outer_join == FALSE){
                         by = c('QHHNUM', 'HHSEQNUM'), 
                         allow.cartesian=TRUE, 
                         suffixes = c("", suffixe_ajoute))
-  data_merged <- data_merged[is.na(SEX_2000) | is.na(SEX)]
+  data_merged <- data_merged[is.na(SEX_1999) | is.na(SEX)]
   
 }
 
@@ -128,3 +128,62 @@ outer<- 137931
 
 2*inner + outer
 nrow(data_1998) + nrow(data_1999)
+
+
+######## PARTIE 2 : Boucle sur le France entre 1998 et 2018. Uniquement
+
+liste_annees <- 1998:2018
+liste_pathes <- paste("C:/Users/Benjamin/Desktop/Ensae/Projet_statapp/Repo_codes/Data/YearlyFiles_1998_2018/FR", liste_annees, sep = "")
+liste_pathes_2 <- paste(liste_pathes, "y.csv", sep = "_")
+
+faire_outer_join <- TRUE
+
+
+# Première importation
+
+data_merged <- read_csv(liste_pathes_2[1], 
+                      locale = locale(encoding ="UTF-8"),
+                      show_col_types = FALSE
+)
+data_merged <- as.data.table(data_merged)
+
+
+# Boucle
+for (indice in seq_along(liste_pathes_2)[c(-1)]){
+  path <- liste_pathes_2[indice]
+  annee <- liste_annees[indice]
+  
+  print(paste("Année =", annee, "| path = ", path, sep = " "))
+  data_loc <- read_csv(path,
+                       locale = locale(encoding ="UTF-8"),
+                       show_col_types = FALSE
+  )
+  data_loc <- as.data.table(data_loc)
+
+
+  suffixe_ajoute <- paste("_", as.character(1998 + indice -1), sep = "")
+  
+  
+  # Deux types de jointures
+  if(faire_outer_join == FALSE){
+    data_merged <- merge(copy(data_merged), data_loc,
+                         all.x = FALSE, 
+                         all.y = FALSE, 
+                         by = c('QHHNUM', 'HHSEQNUM'), 
+                         allow.cartesian=TRUE, 
+                         suffixes = c("", suffixe_ajoute))
+  }else{
+    data_merged <- merge(copy(data_merged), data_loc,
+                         all.x = TRUE, 
+                         all.y = TRUE, 
+                         by = c('QHHNUM', 'HHSEQNUM'), 
+                         allow.cartesian=TRUE, 
+                         suffixes = c("", suffixe_ajoute))
+    nom_col <- paste0("SEX_", as.character(1998 + indice - 1), sep = "")
+    # colnames(nom_col)
+    data_merged <- data_merged[ is.na(data_merged[[nom_col]]) | is.na(SEX)]
+    
+  }
+  
+}
+
