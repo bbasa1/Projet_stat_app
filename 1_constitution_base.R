@@ -17,6 +17,8 @@ small <- data.table(
 small
 big
 
+a <- 2
+
 
 
 ### Inner join, par deux méthodes
