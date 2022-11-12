@@ -17,7 +17,6 @@ small <- data.table(
 small
 big
 
-a <- 2
 
 
 
