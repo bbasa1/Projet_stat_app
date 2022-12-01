@@ -9,7 +9,8 @@ library(viridis)
 
 
 
-liste_annees <- 1998:2018
+# liste_annees <- 1998:2018
+liste_annees <- 1998:2010
 liste_pathes <- paste("C:/Users/Benjamin/Desktop/Ensae/Projet_statapp/Repo_codes/Data/YearlyFiles_1998_2018/FR", liste_annees, sep = "")
 liste_pathes_2 <- paste(liste_pathes, "y.csv", sep = "_")
 
@@ -84,8 +85,9 @@ ggplot(data = df_plot) +
 
 ############# SELECTION VARIABLES ######################
 liste_variables <- c('QHHNUM', #Identifiant ménage
-                     'COEFFY', #Yearly weighting factor,
-                     'COEFFH', #Yearly weighting factor of the sample for household characteristics
+                     # 'COEFFY', #Yearly weighting factor,
+                     # 'COEFFH', #Yearly weighting factor of the sample for household characteristics
+                     'COEFF',
                      'COUNTRY',
                      'SEX',
                      'YEAR',
