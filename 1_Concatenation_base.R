@@ -3,7 +3,7 @@ library(data.table)
 library(ggplot2)
 # install.packages('viridis')
 library(viridis)
-
+library(dplyr)
 
 ######## Boucle sur le France entre 1998 et 2018
 
@@ -123,10 +123,42 @@ liste_variables <- c('QHHNUM', #Identifiant ménage
                     'HHNBCH14' # Number of children [12,14] years in the household
                     )
 
-  data_merged <- data_merged[,..liste_variables]
+data_merged <- data_merged[,..liste_variables]
+
+# data_merged[ , mean, by = ILOSTAT]
+
+data_merged[["COEFF"]] #### C'est quoi ce coeff ? Pas dans les notices en tout cas...
+
+
+calculs_sexe <- data_merged %>% 
+  group_by(SEX) %>% 
+  summarize( population = sum(COEFF),
+             population_active = sum( COEFF * (ILOSTAT %in% c("1","2"))),
+             population_emplois = sum( COEFF * (ILOSTAT==1))) %>% 
+  dplyr::mutate(tx_activite = round(population_active/population , 3),
+                tx_emploi = round(population_emplois/population , 3),
+                population = round(population / 1000 , 2),
+                population_active = round(population_active / 1000 , 2),
+                population_emplois = round(population_emplois / 1000 , 2))
+
+
+
+calculs_sexe
 
 
 
 
+calculs_age <- data_merged %>% 
+  group_by(AGE,SEX) %>% 
+  summarize( population = sum(COEFF),
+             population_active = sum( COEFF * (ILOSTAT %in% c("1","2"))),
+             population_emplois = sum( COEFF * (ILOSTAT==1))) %>% 
+  dplyr::mutate(tx_activite = round(population_active/population , 3),
+                tx_emploi = round(population_emplois/population , 3),
+                population = round(population / 1000 , 2),
+                population_active = round(population_active / 1000 , 2),
+                population_emplois = round(population_emplois / 1000 , 2))
+
+calculs_age
 
 
