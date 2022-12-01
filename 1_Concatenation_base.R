@@ -124,6 +124,50 @@ liste_variables <- c('QHHNUM', #Identifiant ménage
                     )
 
 data_merged <- data_merged[,..liste_variables]
+data_merged <- copy(data_merged_copy)
+
+
+######### Renaming des variables conservées ######################
+setnames(data_merged,'QHHNUM',"Identifiant_menage")
+# setnames(data_merged,'HHNUM',"Pondération du ménage")
+setnames(data_merged,'COUNTRY',"Pays")
+setnames(data_merged,'SEX',"Sexe_(1H_2F)")
+setnames(data_merged,'YEAR',"Annee_enquete")
+setnames(data_merged,'AGE',"Age_en_tranche")
+setnames(data_merged,'YSTARTWK',"Debut_de_l_emploi_actuel")
+
+setnames(data_merged,'ILOSTAT',"Statut_dans_l_emploi_(1emploi)")
+setnames(data_merged,'WSTATOR',"Statut_durant_la_semaine")
+setnames(data_merged,'WANTWORK',"Souhaite_travailler")
+setnames(data_merged,'WISHMORE',"Souhaite_davantage_travailler")
+setnames(data_merged,'AVAILBLE',"Disponible_pour_travailler")
+setnames(data_merged,'SEEKWORK',"Recherche_un_emploi")
+setnames(data_merged,'SEEKREAS',"Raison_de_l_absence_de_recherche")
+setnames(data_merged,'STAPRO',"Statut_dans_l_emploi")
+setnames(data_merged,'FTPT',"Temps_partiel")
+
+setnames(data_merged,'ISCO3D',"CSP")
+setnames(data_merged,'TEMP',"Perennite_de_l_emploi")
+setnames(data_merged,'TEMPDUR',"Duree_du_contrat")
+setnames(data_merged,'HWWISH',"Volume_de_travail_souhaite")
+setnames(data_merged,'HWUSUAL',"Volume_de_travail_habituel")
+setnames(data_merged,'INCDECIL',"Decile_de_salaire")
+
+setnames(data_merged,'HATLEV1D',"Niveau_d_education")
+setnames(data_merged,'HATFIELD',"Domaine_d_education")
+
+setnames(data_merged,'HHNBCH2',"Nombre_d_enfants_de_moins_de_2_ans")
+setnames(data_merged,'HHNBCH5',"Nombre_d_enfants_entre_3_et_5_ans")
+setnames(data_merged,'HHNBCH8',"Nombre_d_enfants_entre_6_et_8_ans")
+setnames(data_merged,'HHNBCH11',"Nombre_d_enfants_entre_9_et_11_ans")
+setnames(data_merged,'HHNBCH14',"Nombred_enfants_entre_11_et_14_ans")
+
+
+data_merged
+
+
+########### Les calculs d'Henri A DISCUTER == LA VARIABLE COEFF #############
+
 
 # data_merged[ , mean, by = ILOSTAT]
 
