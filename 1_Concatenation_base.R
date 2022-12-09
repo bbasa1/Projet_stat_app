@@ -1,11 +1,25 @@
 library(readr)
 # install.packages("data.table")
 library(data.table)
+# install.packages("ggplot2")
 library(ggplot2)
 # install.packages('viridis')
 library(viridis)
 library(dplyr)
-# install.packages("data.table", repos="http://R-Forge.R-project.org")
+# install.packages("ggpmisc")
+library(ggpmisc)
+# install.packages("tibble")
+library(magrittr) # needs to be run every time you start R and want to use %>%
+# install.packages("broom")
+# install.packages("ggpubr")
+library(ggpmisc)
+library(tibble)
+library(dplyr)
+library(quantreg)
+# install.packages("tidyverse")
+library(tidyverse) 
+library(broom)
+library(ggpubr)
 
 
 
@@ -98,7 +112,7 @@ ggplot(data = df_plot) +
 ################################################################################
 ################### PREPARATION GENERALE DE LA BASE ############################
 ################################################################################
-
+# data_merged
 liste_variables <- c('QHHNUM', #Identifiant ménage
                      # 'COEFFY', #Yearly weighting factor,
                      # 'COEFFH', #Yearly weighting factor of the sample for household characteristics
@@ -268,7 +282,6 @@ calculs_age[, Age_tranche:= factor(
 setnames(calculs_age,'Sexe_1H_2F',"SEXE")
 
 
-
 ##### Les taux d'activité
 titre = paste("Taux d'activité par âge et par sexe,\n moyenne entre", toString(liste_annees[1]), "et", toString(tail(liste_annees, n=1)))
 
@@ -304,3 +317,163 @@ p
 ggsave(paste(url_sorties_graphiques, "Taux_emploi_age_sexe.pdf", sep ='/'), p ,  width = 297, height = 210, units = "mm")
 
 
+
+
+
+################################################################################
+##################### COMPARAISON ENTRE LES ANNEES #############################
+################################################################################
+calculs_annee <- data_merged %>% 
+  group_by(Sexe_1H_2F, Annee_enquete) %>% 
+  summarize( population = sum(COEFF),
+             population_active = sum( COEFF * (Statut_emploi_1_emploi %in% c("1","2"))),
+             population_emplois = sum( COEFF * (Statut_emploi_1_emploi==1))) %>% 
+  dplyr::mutate(tx_activite = round(100 * population_active/population , 3),
+                tx_emploi = round(100 * population_emplois/population , 3),
+                population = round(population / 1000 , 2),
+                population_active = round(population_active / 1000 , 2),
+                population_emplois = round(population_emplois / 1000 , 2))
+
+calculs_annee <- as.data.table(calculs_annee)
+calculs_annee
+calculs_annee[, Sexe_1H_2F:= factor(
+  fcase(
+    Sexe_1H_2F == 1, "Hommes",
+    Sexe_1H_2F == 2, "Femmes"
+  )
+)
+]
+
+
+
+setnames(calculs_annee,'Sexe_1H_2F',"SEXE")
+
+titre = "Taux d'activité par année d'enquête et par an"
+
+p <- ggplot(data = calculs_annee, aes(x = Annee_enquete, y = tx_activite, fill = SEXE)) + 
+  geom_bar(stat="identity", position=position_dodge()) + 
+  labs(title=titre,
+       x="Année d'enquête",
+       y="Taux d'activité") + 
+  scale_y_continuous(limits = c(0, 100), labels = function(y) format(y, scientific = FALSE)) + 
+  scale_fill_discrete() +
+  scale_color_viridis() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))
+
+p
+
+
+
+################################################################################
+##################### LIEN ENTRE ANNEE D'ENQUÊTE ET AGE ########################
+################################################################################
+
+calculs_annee <- data_merged %>% 
+  group_by(Sexe_1H_2F, Annee_enquete, Age_tranche) %>% 
+  summarize( population = sum(COEFF),
+             population_active = sum( COEFF * (Statut_emploi_1_emploi %in% c("1","2"))),
+             population_emplois = sum( COEFF * (Statut_emploi_1_emploi==1))) %>% 
+  dplyr::mutate(tx_activite = round(100 * population_active/population , 3),
+                tx_emploi = round(100 * population_emplois/population , 3),
+                population = round(population / 1000 , 2),
+                population_active = round(population_active / 1000 , 2),
+                population_emplois = round(population_emplois / 1000 , 2))
+
+calculs_annee <- as.data.table(calculs_annee)
+
+
+calculs_annee[, indice_bar := Age_tranche] #Pour pouvoir ordonner facilement les barres entre elles
+calculs_annee[, Sexe_1H_2F:= factor(
+  fcase(
+    Sexe_1H_2F == 1, "Hommes",
+    Sexe_1H_2F == 2, "Femmes"
+  )
+)
+]
+calculs_annee[, Age_tranche:= factor(
+  fcase(
+    Age_tranche == 2, "0-4 ans",
+    Age_tranche == 7, "5-9 ans",
+    Age_tranche == 12, "10-14 ans",
+    Age_tranche == 17, "15-19 ans",
+    Age_tranche == 22, "20-24 ans",
+    Age_tranche == 27, "25-29 ans",
+    Age_tranche == 32, "30-34 ans",
+    Age_tranche == 37, "35-39 ans",
+    Age_tranche == 42, "40-44 ans",
+    Age_tranche == 47, "45-49 ans",
+    Age_tranche == 52, "50-54 ans",
+    Age_tranche == 57, "55-59 ans",
+    Age_tranche == 62, "60-64 ans",
+    Age_tranche == 67, "65-69 ans",
+    Age_tranche == 72, "70-74 ans",
+    Age_tranche == 77, "75-79 ans",
+    Age_tranche == 82, "80-84 ans",
+    Age_tranche == 87, "85-89 ans",
+    Age_tranche == 92, "90-94 ans",
+    Age_tranche == 97, "95-99 ans"
+    
+  )
+)
+]
+
+setnames(calculs_annee,'Sexe_1H_2F',"SEXE")
+
+sous_calculs_annee <- calculs_annee[Age_tranche %in% c("20-24 ans",
+                                                       "25-29 ans", "30-34 ans",
+                                                       "35-39 ans", "40-44 ans",
+                                                       "45-49 ans", "50-54 ans",
+                                                       "55-59 ans"
+                                                       )]
+
+
+titre = "Taux d'emploi par année d'enquête et par an,\n ventilé par classe d'âge"
+
+p <- ggplot(data = sous_calculs_annee, aes(x = Annee_enquete, y = tx_emploi, fill = SEXE, color = SEXE)) + 
+  geom_bar(stat="identity", position=position_dodge()) + 
+  labs(title=titre,
+       x="Année d'enquête",
+       y="Taux d'activité") + 
+  scale_y_continuous(limits = c(0, 100), labels = function(y) format(y, scientific = FALSE)) + 
+  scale_fill_discrete() +
+  scale_color_discrete() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1)) +
+  facet_wrap(~ Age_tranche , scales = 'free')
+
+
+p
+ggsave(paste(url_sorties_graphiques, "Taux_activite_annee_enquete_ventile_age_sans_RL.pdf", sep ='/'), p ,  width = 297, height = 210, units = "mm")
+
+
+
+p <- ggplot(data = sous_calculs_annee, aes(x = Annee_enquete, y = tx_emploi, fill = SEXE, color = SEXE)) + 
+  geom_bar(stat="identity", position=position_dodge()) + 
+  labs(title=titre,
+       x="Année d'enquête",
+       y="Taux d'activité") + 
+  scale_y_continuous(limits = c(0, 100), labels = function(y) format(y, scientific = FALSE)) + 
+  scale_fill_discrete() +
+  scale_color_discrete() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1)) +
+  facet_wrap(~ Age_tranche , scales = 'free') +
+  geom_smooth(method = "lm") +
+  stat_poly_eq(aes(label = paste(after_stat(eq.label),
+                                 after_stat(rr.label), sep = "*\", \"*")))
+
+
+
+p
+ggsave(paste(url_sorties_graphiques, "Taux_activite_annee_enquete_ventile_age_avec_RL.pdf", sep ='/'), p ,  width = 297, height = 210, units = "mm")
+
+# On observe une augmentation du tx d'emploi avec l'année d'enquête. On peut se demander s'il y a un lien avec la classe d'âge ?
+# Note : Cette augmentation est moins marquée si on prend le tx d'activité.
+
+
+##### Régression linéaire #####
+sous_calculs_annee
+
+sous_calculs_annee_lm <- lm(tx_emploi ~ Age_tranche + Annee_enquete , data = sous_calculs_annee)
+
+summary(sous_calculs_annee_lm)
+### Les p-val sont petites ==> On peut rejeter l'hypithèse nulle : les tranches d'âges et l'année d'enquête ont des coefficients significatifs. 
+## A discuter...
