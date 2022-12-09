@@ -210,8 +210,8 @@ calculs_age <- data_merged %>%
   summarize( population = sum(COEFF),
              population_active = sum( COEFF * (Statut_emploi_1_emploi %in% c("1","2"))),
              population_emplois = sum( COEFF * (Statut_emploi_1_emploi==1))) %>% 
-  dplyr::mutate(tx_activite = round(population_active/population , 3),
-                tx_emploi = round(population_emplois/population , 3),
+  dplyr::mutate(tx_activite = round(100 * population_active/population , 3),
+                tx_emploi = round(100 * population_emplois/population , 3),
                 population = round(population / 1000 , 2),
                 population_active = round(population_active / 1000 , 2),
                 population_emplois = round(population_emplois / 1000 , 2))
@@ -265,7 +265,6 @@ calculs_age[, Age_tranche:= factor(
 )
 ]
 
-
 setnames(calculs_age,'Sexe_1H_2F',"SEXE")
 
 
@@ -278,12 +277,12 @@ p <- ggplot(data = calculs_age, aes(x = reorder(Age_tranche, indice_bar), y = tx
   labs(title=titre,
        x="Tranche d'âge",
        y="Taux d'activité") + 
-  scale_y_continuous(labels = function(y) format(y, scientific = FALSE)) + 
+  scale_y_continuous(limits = c(0, 100), labels = function(y) format(y, scientific = FALSE)) + 
   scale_fill_discrete() +
   scale_color_viridis() +
   theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))
 
-
+p
 ggsave(paste(url_sorties_graphiques, "Taux_activite_age_sexe.pdf", sep ='/'), p ,  width = 297, height = 210, units = "mm")
 
 
@@ -296,12 +295,12 @@ p <- ggplot(data = calculs_age, aes(x = reorder(Age_tranche, indice_bar), y = tx
   labs(title=titre,
        x="Tranche d'âge",
        y="Taux d'emploi") + 
-  scale_y_continuous(labels = function(y) format(y, scientific = FALSE)) + 
+  scale_y_continuous(limits = c(0, 100), labels = function(y) format(y, scientific = FALSE)) + 
   scale_fill_discrete() +
   scale_color_viridis() +
   theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))
 
-
+p
 ggsave(paste(url_sorties_graphiques, "Taux_emploi_age_sexe.pdf", sep ='/'), p ,  width = 297, height = 210, units = "mm")
 
 
