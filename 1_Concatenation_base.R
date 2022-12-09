@@ -1,22 +1,35 @@
 library(readr)
+# install.packages("data.table")
 library(data.table)
 library(ggplot2)
 # install.packages('viridis')
 library(viridis)
 library(dplyr)
-
-######## Boucle sur le France entre 1998 et 2018
-
+# install.packages("data.table", repos="http://R-Forge.R-project.org")
 
 
-# liste_annees <- 1998:2018
+
+################################################################################
+################### PARAMETRES DIVERS ET VARIES ################################
+################################################################################
+
+
+url_sorties_graphiques <- "C:/Users/Benjamin/Desktop/Ensae/Projet_statapp/Sorties_graphiques"
+
+
+# liste_annees <- 1998:2018 #La liste complète. Peut faire crash le PC car trop lourd en RAM
 liste_annees <- 1998:2010
 liste_pathes <- paste("C:/Users/Benjamin/Desktop/Ensae/Projet_statapp/Repo_codes/Data/YearlyFiles_1998_2018/FR", liste_annees, sep = "")
 liste_pathes_2 <- paste(liste_pathes, "y.csv", sep = "_")
 
 
-# Première importation
 
+
+################################################################################
+########################### CREATION DE LA BASE ################################
+################################################################################
+
+# Première importation
 data_merged <- read_csv(liste_pathes_2[1], 
                         locale = locale(encoding ="UTF-8"),
                         show_col_types = FALSE)
@@ -27,7 +40,7 @@ data_merged <- as.data.table(data_merged)
 liste_longeurs <- list(nrow(data_merged))
 
 
-# Boucle
+# Boucle sur les années
 for (indice in seq_along(liste_pathes_2)[c(-1)]){
   # Pour situer dans la boucle :
   path <- liste_pathes_2[indice]
@@ -51,7 +64,7 @@ for (indice in seq_along(liste_pathes_2)[c(-1)]){
 }
 
 
-
+# Une copie de la liste. On ne sait jamais (et ça ne manche pas de pain !)
 liste_longeurs_list <- copy(liste_longeurs)
 
 
@@ -82,8 +95,10 @@ ggplot(data = df_plot) +
 
 
 
+################################################################################
+################### PREPARATION GENERALE DE LA BASE ############################
+################################################################################
 
-############# SELECTION VARIABLES ######################
 liste_variables <- c('QHHNUM', #Identifiant ménage
                      # 'COEFFY', #Yearly weighting factor,
                      # 'COEFFH', #Yearly weighting factor of the sample for household characteristics
@@ -131,78 +146,162 @@ data_merged <- copy(data_merged_copy)
 setnames(data_merged,'QHHNUM',"Identifiant_menage")
 # setnames(data_merged,'HHNUM',"Pondération du ménage")
 setnames(data_merged,'COUNTRY',"Pays")
-setnames(data_merged,'SEX',"Sexe_(1H_2F)")
+setnames(data_merged,'SEX',"Sexe_1H_2F")
 setnames(data_merged,'YEAR',"Annee_enquete")
-setnames(data_merged,'AGE',"Age_en_tranche")
-setnames(data_merged,'YSTARTWK',"Debut_de_l_emploi_actuel")
+setnames(data_merged,'AGE',"Age_tranche")
+setnames(data_merged,'YSTARTWK',"Debut_emploi_actuel")
 
-setnames(data_merged,'ILOSTAT',"Statut_dans_l_emploi_(1emploi)")
-setnames(data_merged,'WSTATOR',"Statut_durant_la_semaine")
+setnames(data_merged,'ILOSTAT',"Statut_emploi_1_emploi")
+setnames(data_merged,'WSTATOR',"Statut_semaine")
 setnames(data_merged,'WANTWORK',"Souhaite_travailler")
 setnames(data_merged,'WISHMORE',"Souhaite_davantage_travailler")
 setnames(data_merged,'AVAILBLE',"Disponible_pour_travailler")
 setnames(data_merged,'SEEKWORK',"Recherche_un_emploi")
-setnames(data_merged,'SEEKREAS',"Raison_de_l_absence_de_recherche")
-setnames(data_merged,'STAPRO',"Statut_dans_l_emploi")
+setnames(data_merged,'SEEKREAS',"Raison_absence_recherche")
+setnames(data_merged,'STAPRO',"Statut_dans_emploi")
 setnames(data_merged,'FTPT',"Temps_partiel")
 
 setnames(data_merged,'ISCO3D',"CSP")
-setnames(data_merged,'TEMP',"Perennite_de_l_emploi")
-setnames(data_merged,'TEMPDUR',"Duree_du_contrat")
-setnames(data_merged,'HWWISH',"Volume_de_travail_souhaite")
-setnames(data_merged,'HWUSUAL',"Volume_de_travail_habituel")
-setnames(data_merged,'INCDECIL',"Decile_de_salaire")
+setnames(data_merged,'TEMP',"Perennite_emploi")
+setnames(data_merged,'TEMPDUR',"Duree_contrat")
+setnames(data_merged,'HWWISH',"Volume_travail_souhaite")
+setnames(data_merged,'HWUSUAL',"Volume_travail_habituel")
+setnames(data_merged,'INCDECIL',"Decile_salaire")
 
-setnames(data_merged,'HATLEV1D',"Niveau_d_education")
-setnames(data_merged,'HATFIELD',"Domaine_d_education")
+setnames(data_merged,'HATLEV1D',"Niveau_education")
+setnames(data_merged,'HATFIELD',"Domaine_education")
 
-setnames(data_merged,'HHNBCH2',"Nombre_d_enfants_de_moins_de_2_ans")
-setnames(data_merged,'HHNBCH5',"Nombre_d_enfants_entre_3_et_5_ans")
-setnames(data_merged,'HHNBCH8',"Nombre_d_enfants_entre_6_et_8_ans")
-setnames(data_merged,'HHNBCH11',"Nombre_d_enfants_entre_9_et_11_ans")
-setnames(data_merged,'HHNBCH14',"Nombred_enfants_entre_11_et_14_ans")
+setnames(data_merged,'HHNBCH2',"Nb_enfants_moins_2_ans")
+setnames(data_merged,'HHNBCH5',"Nb_enfants_entre_3_5_ans")
+setnames(data_merged,'HHNBCH8',"Nb_enfants_entre_6_8_ans")
+setnames(data_merged,'HHNBCH11',"Nb_enfants_entre_9_11_ans")
+setnames(data_merged,'HHNBCH14',"Nb_enfants_entre_11_14_ans")
 
 
 data_merged
 
 
-########### Les calculs d'Henri A DISCUTER == LA VARIABLE COEFF #############
 
 
-# data_merged[ , mean, by = ILOSTAT]
+################################################################################
+################### UN PREMIER CALCUL DE TAUX D'EMPLOI #########################
+################################################################################
 
-data_merged[["COEFF"]] #### C'est quoi ce coeff ? Pas dans les notices en tout cas...
-
-
+#Juste par sexe
 calculs_sexe <- data_merged %>% 
-  group_by(SEX) %>% 
+  group_by(Sexe_1H_2F) %>% 
   summarize( population = sum(COEFF),
-             population_active = sum( COEFF * (ILOSTAT %in% c("1","2"))),
-             population_emplois = sum( COEFF * (ILOSTAT==1))) %>% 
+             population_active = sum( COEFF * (Statut_emploi_1_emploi %in% c("1","2"))),
+             population_emplois = sum( COEFF * (Statut_emploi_1_emploi==1))) %>% 
   dplyr::mutate(tx_activite = round(population_active/population , 3),
                 tx_emploi = round(population_emplois/population , 3),
                 population = round(population / 1000 , 2),
                 population_active = round(population_active / 1000 , 2),
                 population_emplois = round(population_emplois / 1000 , 2))
 
-
-
-calculs_sexe
+calculs_sexe <- as.data.table(calculs_sexe)
 
 
 
 
+#Par sexe et par age
 calculs_age <- data_merged %>% 
-  group_by(AGE,SEX) %>% 
+  group_by(Age_tranche, Sexe_1H_2F) %>% 
   summarize( population = sum(COEFF),
-             population_active = sum( COEFF * (ILOSTAT %in% c("1","2"))),
-             population_emplois = sum( COEFF * (ILOSTAT==1))) %>% 
+             population_active = sum( COEFF * (Statut_emploi_1_emploi %in% c("1","2"))),
+             population_emplois = sum( COEFF * (Statut_emploi_1_emploi==1))) %>% 
   dplyr::mutate(tx_activite = round(population_active/population , 3),
                 tx_emploi = round(population_emplois/population , 3),
                 population = round(population / 1000 , 2),
                 population_active = round(population_active / 1000 , 2),
                 population_emplois = round(population_emplois / 1000 , 2))
 
-calculs_age
+calculs_age <- as.data.table(calculs_age)
+
+
+
+
+
+########## PLOTS TAUX D'ACTIVITE ET D'EMPLOI PAR AGE ET SEXE ###############
+calculs_age[, indice_bar := Age_tranche] #Pour pouvoir ordonner facilement les barres entre elles
+
+
+calculs_age <- calculs_age[ , Sexe_1H_2F := as.character(Sexe_1H_2F)]
+calculs_age <- calculs_age[ , Age_tranche := as.integer(Age_tranche)]
+
+
+calculs_age[, Sexe_1H_2F:= factor(
+  fcase(
+    Sexe_1H_2F == 1, "Hommes",
+    Sexe_1H_2F == 2, "Femmes"
+  )
+)
+]
+
+calculs_age[, Age_tranche:= factor(
+  fcase(
+    Age_tranche == 2, "0-4 ans",
+    Age_tranche == 7, "5-9 ans",
+    Age_tranche == 12, "10-14 ans",
+    Age_tranche == 17, "15-19 ans",
+    Age_tranche == 22, "20-24 ans",
+    Age_tranche == 27, "25-29 ans",
+    Age_tranche == 32, "30-34 ans",
+    Age_tranche == 37, "35-39 ans",
+    Age_tranche == 42, "40-44 ans",
+    Age_tranche == 47, "45-49 ans",
+    Age_tranche == 52, "50-54 ans",
+    Age_tranche == 57, "55-59 ans",
+    Age_tranche == 62, "60-64 ans",
+    Age_tranche == 67, "65-69 ans",
+    Age_tranche == 72, "70-74 ans",
+    Age_tranche == 77, "75-79 ans",
+    Age_tranche == 82, "80-84 ans",
+    Age_tranche == 87, "85-89 ans",
+    Age_tranche == 92, "90-94 ans",
+    Age_tranche == 97, "95-99 ans"
+    
+  )
+)
+]
+
+
+setnames(calculs_age,'Sexe_1H_2F',"SEXE")
+
+
+
+##### Les taux d'activité
+titre = paste("Taux d'activité par âge et par sexe,\n moyenne entre", toString(liste_annees[1]), "et", toString(tail(liste_annees, n=1)))
+
+p <- ggplot(data = calculs_age, aes(x = reorder(Age_tranche, indice_bar), y = tx_activite, fill = SEXE)) + 
+  geom_bar(stat="identity", position=position_dodge()) + 
+  labs(title=titre,
+       x="Tranche d'âge",
+       y="Taux d'activité") + 
+  scale_y_continuous(labels = function(y) format(y, scientific = FALSE)) + 
+  scale_fill_discrete() +
+  scale_color_viridis() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))
+
+
+ggsave(paste(url_sorties_graphiques, "Taux_activite_age_sexe.pdf", sep ='/'), p ,  width = 297, height = 210, units = "mm")
+
+
+
+##### Et les taux d'emploi
+titre = paste("Taux d'empoi par âge et par sexe,\n moyenne entre", toString(liste_annees[1]), "et", toString(tail(liste_annees, n=1)))
+
+p <- ggplot(data = calculs_age, aes(x = reorder(Age_tranche, indice_bar), y = tx_emploi, fill = SEXE)) + 
+  geom_bar(stat="identity", position=position_dodge()) + 
+  labs(title=titre,
+       x="Tranche d'âge",
+       y="Taux d'emploi") + 
+  scale_y_continuous(labels = function(y) format(y, scientific = FALSE)) + 
+  scale_fill_discrete() +
+  scale_color_viridis() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))
+
+
+ggsave(paste(url_sorties_graphiques, "Taux_emploi_age_sexe.pdf", sep ='/'), p ,  width = 297, height = 210, units = "mm")
 
 
