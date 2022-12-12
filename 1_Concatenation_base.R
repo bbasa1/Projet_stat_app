@@ -530,3 +530,4 @@ p
 ggsave(paste(url_sorties_graphiques, "Taux_emploi_annee_naissance_ventile_age_avec_RL.pdf", sep ='/'), p ,  width = 297, height = 210, units = "mm")
 
 
+
