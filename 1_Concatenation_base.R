@@ -120,6 +120,7 @@ liste_variables <- c('QHHNUM', #Identifiant ménage
                      'COUNTRY',
                      'SEX',
                      'YEAR',
+                     # 'YEARBIR', #Année de naissance
                      'AGE',
                      'YSTARTWK', # Year in which person started working for this employer or as self-employed. 9999 not applicable
                     'ILOSTAT', # ILO working status. 1 = employed. 2 = Unemployed. 3 = inactive. 4 = Compulsory military service. 5 = persons < 15 years old
@@ -153,7 +154,7 @@ liste_variables <- c('QHHNUM', #Identifiant ménage
                     )
 
 data_merged <- data_merged[,..liste_variables]
-data_merged <- copy(data_merged_copy)
+# data_merged <- copy(data_merged_copy)
 
 
 ######### Renaming des variables conservées ######################
@@ -335,6 +336,8 @@ calculs_annee <- data_merged %>%
                 population_emplois = round(population_emplois / 1000 , 2))
 
 calculs_annee <- as.data.table(calculs_annee)
+calculs_annee <- calculs_annee[ , Annee_enquete := as.integer(Annee_enquete)]
+
 calculs_annee
 calculs_annee[, Sexe_1H_2F:= factor(
   fcase(
@@ -380,7 +383,7 @@ calculs_annee <- data_merged %>%
                 population_emplois = round(population_emplois / 1000 , 2))
 
 calculs_annee <- as.data.table(calculs_annee)
-
+calculs_annee <- calculs_annee[ , Annee_enquete := as.integer(Annee_enquete)]
 
 calculs_annee[, indice_bar := Age_tranche] #Pour pouvoir ordonner facilement les barres entre elles
 calculs_annee[, Sexe_1H_2F:= factor(
@@ -427,13 +430,13 @@ sous_calculs_annee <- calculs_annee[Age_tranche %in% c("20-24 ans",
                                                        )]
 
 
-titre = "Taux d'emploi par année d'enquête et par an,\n ventilé par classe d'âge"
+titre = "Taux d'emploi par année d'enquête et par sexe,\n ventilé par classe d'âge"
 
 p <- ggplot(data = sous_calculs_annee, aes(x = Annee_enquete, y = tx_emploi, fill = SEXE, color = SEXE)) + 
   geom_bar(stat="identity", position=position_dodge()) + 
   labs(title=titre,
        x="Année d'enquête",
-       y="Taux d'activité") + 
+       y="Taux d'emploi") + 
   scale_y_continuous(limits = c(0, 100), labels = function(y) format(y, scientific = FALSE)) + 
   scale_fill_discrete() +
   scale_color_discrete() +
@@ -442,7 +445,7 @@ p <- ggplot(data = sous_calculs_annee, aes(x = Annee_enquete, y = tx_emploi, fil
 
 
 p
-ggsave(paste(url_sorties_graphiques, "Taux_activite_annee_enquete_ventile_age_sans_RL.pdf", sep ='/'), p ,  width = 297, height = 210, units = "mm")
+ggsave(paste(url_sorties_graphiques, "Taux_emploi_annee_enquete_ventile_age_sans_RL.pdf", sep ='/'), p ,  width = 297, height = 210, units = "mm")
 
 
 
@@ -450,7 +453,7 @@ p <- ggplot(data = sous_calculs_annee, aes(x = Annee_enquete, y = tx_emploi, fil
   geom_bar(stat="identity", position=position_dodge()) + 
   labs(title=titre,
        x="Année d'enquête",
-       y="Taux d'activité") + 
+       y="Taux d'emploi") + 
   scale_y_continuous(limits = c(0, 100), labels = function(y) format(y, scientific = FALSE)) + 
   scale_fill_discrete() +
   scale_color_discrete() +
@@ -463,7 +466,7 @@ p <- ggplot(data = sous_calculs_annee, aes(x = Annee_enquete, y = tx_emploi, fil
 
 
 p
-ggsave(paste(url_sorties_graphiques, "Taux_activite_annee_enquete_ventile_age_avec_RL.pdf", sep ='/'), p ,  width = 297, height = 210, units = "mm")
+ggsave(paste(url_sorties_graphiques, "Taux_emploi_annee_enquete_ventile_age_avec_RL.pdf", sep ='/'), p ,  width = 297, height = 210, units = "mm")
 
 # On observe une augmentation du tx d'emploi avec l'année d'enquête. On peut se demander s'il y a un lien avec la classe d'âge ?
 # Note : Cette augmentation est moins marquée si on prend le tx d'activité.
@@ -477,3 +480,53 @@ sous_calculs_annee_lm <- lm(tx_emploi ~ Age_tranche + Annee_enquete , data = sou
 summary(sous_calculs_annee_lm)
 ### Les p-val sont petites ==> On peut rejeter l'hypithèse nulle : les tranches d'âges et l'année d'enquête ont des coefficients significatifs. 
 ## A discuter...
+
+
+
+
+###################################### On calcule une année de naissance ########################
+sous_calculs_annee[, Annee_naissance_sup := Annee_enquete - indice_bar + 2]
+sous_calculs_annee[, Annee_naissance_inf := Annee_enquete - indice_bar - 2]
+sous_calculs_annee[, Annee_naissance_moy := Annee_enquete - indice_bar]
+sous_calculs_annee[, Annee_naissance := paste(Annee_naissance_inf,"-", Annee_naissance_sup, sep = "")]
+sous_calculs_annee
+
+
+titre = "Taux d'emploi par année de naissance et par sexe,\n ventilé par classe d'âge"
+
+p <- ggplot(data = sous_calculs_annee, aes(x = Annee_naissance, y = tx_emploi, fill = SEXE, color = SEXE)) + 
+  geom_bar(stat="identity", position=position_dodge()) + 
+  labs(title=titre,
+       x="Année de naissance",
+       y="Taux d'emploi") + 
+  scale_y_continuous(limits = c(0, 100), labels = function(y) format(y, scientific = FALSE)) + 
+  scale_fill_discrete() +
+  scale_color_discrete() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1)) +
+  facet_wrap(~ Age_tranche , scales = 'free')
+
+ggsave(paste(url_sorties_graphiques, "Taux_emploi_annee_naissance_ventile_age_sans_RL.pdf", sep ='/'), p ,  width = 297, height = 210, units = "mm")
+
+
+
+
+p <- ggplot(data = sous_calculs_annee, aes(x = Annee_naissance_moy, y = tx_emploi, fill = SEXE, color = SEXE)) + 
+  geom_bar(stat="identity", position=position_dodge()) + 
+  labs(title=titre,
+       x="Année de naissance moyenne",
+       y="Taux d'emploi") + 
+  scale_y_continuous(limits = c(0, 100), labels = function(y) format(y, scientific = FALSE)) + 
+  scale_fill_discrete() +
+  scale_color_discrete() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1)) +
+  facet_wrap(~ Age_tranche , scales = 'free') +
+  geom_smooth( method = "lm") +
+  stat_poly_eq(aes(label = paste(after_stat(eq.label),
+                                 after_stat(rr.label), sep = "*\", \"*")))
+
+
+
+p
+ggsave(paste(url_sorties_graphiques, "Taux_emploi_annee_naissance_ventile_age_avec_RL.pdf", sep ='/'), p ,  width = 297, height = 210, units = "mm")
+
+
