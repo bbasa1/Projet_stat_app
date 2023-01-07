@@ -31,6 +31,8 @@ repo_data <- paste(repgen, "Data" , sep = "/")
 
 repo_inter <- paste(repgen, "bases_intermediaires" , sep = "/")
 
+rep_html <- paste(repgen, "pages_html" , sep="/")
+
 
 liste_variables <- c('QHHNUM', #Identifiant ménage
                      # 'COEFFY', #Yearly weighting factor,
@@ -99,21 +101,28 @@ if(creer_base){
 
 source(paste(repo_prgm , "03_nettoyage.R" , sep = "/"))
 
+
+
 ################################################################################
-#            II. CALCULS TAUX D'EMPLOIS ET ACTIVITE PAR ÂGE ET SEXE  ===============================
+#            III. CALCULS TAUX D'EMPLOIS ET ACTIVITE PAR ÂGE ET SEXE  ===============================
 ################################################################################
 
-#            II.A Préparation               ------------------
+#            III.A Préparation               ------------------
 
 # On récupère les fonctions
 source(paste(repo_prgm , "04_calculs_tables.R" , sep = "/"))
+
+# On initialise une liste de graphes vides
+list_graph <- list()
+longueur_liste <- 0
 
 # On calcule les taux d'activités et d'emplois par âge et sexe
 liste_var <- c("Age_tranche", "Sexe_1H_2F")
 calculs_age <- calcul_taux_emplois_activite(liste_var_groupby = liste_var)
 
 
-#            II.B CONSTRUCTION GRAPHIQUES               ------------------
+
+#            III.B CONSTRUCTION GRAPHIQUES               ------------------
 source(paste(repo_prgm , "05_sorties_graphiques.R" , sep = "/"))
 
 
@@ -134,7 +143,10 @@ fill <- "Sexe"
 xlabel <-"Tranche d'âge"
 ylabel <-"Taux d'activité"
 
-trace_barplot(calculs_age, x, sortby_x, y, fill, xlabel, ylabel, titre, titre_save)
+graph <- trace_barplot(calculs_age, x, sortby_x, y, fill, xlabel, ylabel, titre, titre_save)
+list_graph[[longueur_liste + 1]] <- graph # Il faut faire ça pour stacker les ggplot et ensuite les sauvegarder
+longueur_liste <- longueur_liste + 1
+
 
 
 # Second tracé 
@@ -147,16 +159,18 @@ fill <- "Sexe"
 xlabel <-"Tranche d'âge"
 ylabel <-"Taux d'emploi"
 
-trace_barplot(calculs_age, x, sortby_x, y, fill, xlabel, ylabel, titre, titre_save)
+graph <- trace_barplot(calculs_age, x, sortby_x, y, fill, xlabel, ylabel, titre, titre_save)
+list_graph[[longueur_liste + 1]] <- graph
+longueur_liste <- longueur_liste + 1
 
 
 
 
 ################################################################################
-#            III. CALCULS TAUX D'EMPLOIS ET ACTIVITE PAR ÂGE, SEXE & ANNEE D'ENQUETE  ===============================
+#            IV. CALCULS TAUX D'EMPLOIS ET ACTIVITE PAR ÂGE, SEXE & ANNEE D'ENQUETE  ===============================
 ################################################################################
 
-#            II.A Préparation               ------------------
+#            IV.A Préparation               ------------------
 
 
 # On calcule les taux d'activités et d'emplois par âge et sexe
@@ -164,7 +178,7 @@ liste_var <- c("Age_tranche", "Sexe_1H_2F", "Annee_enquete")
 calculs_annee <- calcul_taux_emplois_activite(liste_var_groupby = liste_var)
 
 
-#            II.B CONSTRUCTION GRAPHIQUES               ------------------
+#            IV.B CONSTRUCTION GRAPHIQUES               ------------------
 
 # Phase de nettoyage
 calculs_annee <- nettoyage_tranche_age(calculs_annee)
@@ -188,7 +202,12 @@ xlabel <-"Année d'enquête"
 ylabel <-"Taux d'activité"
 facet <- "Age_tranche"
 
-trace_barplot_avec_facet(sous_calculs_annee, x, sortby_x, y, fill, xlabel, ylabel, titre, titre_save, facet)
+graph <- trace_barplot_avec_facet(sous_calculs_annee, x, sortby_x, y, fill, xlabel, ylabel, titre, titre_save, facet)
+list_graph[[longueur_liste + 1]] <- graph
+longueur_liste <- longueur_liste + 1
+
+
+
 
 # Second tracé 
 titre <- "Taux d'emploi par âge, sexe et année d'enquête"
@@ -201,7 +220,17 @@ xlabel <-"Année d'enquête"
 ylabel <-"Taux d'emploi"
 facet <- "Age_tranche"
 
-trace_barplot_avec_facet(sous_calculs_annee, x, sortby_x, y, fill, xlabel, ylabel, titre, titre_save, facet)
+graph <- trace_barplot_avec_facet(sous_calculs_annee, x, sortby_x, y, fill, xlabel, ylabel, titre, titre_save, facet)
+list_graph[[longueur_liste + 1]] <- graph
+longueur_liste <- longueur_liste + 1
 
 
+
+################################################################################
+#            V. SORTIES HTML  ===============================
+################################################################################
+
+
+source(paste(repo_prgm,"06_page_html.R",sep="/") , 
+       encoding = "UTF-8" )
 
