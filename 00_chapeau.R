@@ -234,3 +234,77 @@ longueur_liste <- longueur_liste + 1
 source(paste(repo_prgm,"06_page_html.R",sep="/") , 
        encoding = "UTF-8" )
 
+
+
+
+################################################################################
+#         VI. Brouillon à mettre en forme ========================
+################################################################################
+
+liste_var <- c("Decile_salaire", "Niveau_education", "Sexe_1H_2F", "COEFF", "Identifiant_menage")
+
+pop_en_emploi <- data_merged[(Statut_emploi_1_emploi == 1) & Decile_salaire != '99',]
+pop_en_emploi <- pop_en_emploi[,..liste_var]
+nrow(pop_en_emploi)
+
+
+sapply(pop_en_emploi, class) # Check classes of data table columns
+pop_en_emploi <- pop_en_emploi[ , Decile_salaire := as.numeric(Decile_salaire)]
+
+pop_en_emploi
+sous_pop <- pop_en_emploi[, .("Decile_mean" = mean(Decile_salaire, na.rm = TRUE),
+                              "Decile_med" = median(Decile_salaire, na.rm = TRUE)),
+              by = .(Niveau_education, Sexe_1H_2F)]
+
+sous_pop[, Niveau_education_chiffre := factor(
+  fcase(
+    Niveau_education == "L", -1,
+    Niveau_education == "M", 0,
+    Niveau_education == "H", 1
+  )
+)
+]
+
+sous_pop[, Sexe_1H_2F := factor(
+  fcase(
+    Sexe_1H_2F == 1, "Hommes",
+    Sexe_1H_2F == 2, "Femmes"
+    )
+)
+]
+
+
+sous_pop
+sous_pop_melted <- melt(sous_pop, measure.vars = c("Decile_med", "Decile_mean"),
+                        variable.name = "Mesure") 
+
+sapply(sous_pop_melted, class) # Check classes of data table columns
+sous_pop_melted <- sous_pop_melted[ , value := as.numeric(value)]
+sous_pop_melted <- sous_pop_melted[ , Niveau_education_chiffre := as.numeric(Niveau_education_chiffre)]
+sous_pop_melted <- sous_pop_melted[ , Sexe_1H_2F := as.factor(Sexe_1H_2F )]
+
+setnames(sous_pop_melted,'Sexe_1H_2F',"Sexe")
+sous_pop_melted[, Mesure := factor(
+  fcase(
+    Mesure == "Decile_mean", "Décile de salaire moyen",
+    Mesure == "Decile_med", "Décile de salaire médian"
+  )
+)
+]
+
+
+sous_pop_melted
+
+
+p <- ggplot(data = sous_pop_melted, aes(x = reorder(Niveau_education, Niveau_education_chiffre), y = value, fill = Sexe)) +
+  geom_bar(stat="identity", position=position_dodge()) + 
+  labs(title= 'Salaires en fonction du sexe et du niveau d\'études',
+       x= 'Niveau d\'études',
+       y= 'Décile de salaire') + 
+  scale_y_continuous(limits = c(0, 10), labels = function(y) format(y, scientific = FALSE)) + 
+  scale_fill_discrete() +
+  scale_color_viridis() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1)) +
+  facet_wrap(~Mesure)
+
+p
