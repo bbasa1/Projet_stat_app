@@ -2,10 +2,10 @@
 ########### FONCTIONS ################################
 ################################################################################
 
-calcul_taux_emplois_activite <- function(liste_var_groupby){
+calcul_taux_emplois_activite <- function(liste_var_groupby, data_loc){
   
   dots <- lapply(liste_var_groupby, as.symbol) #Penser à bien convertir pour ne pas avoir de problèmes...
-  df_groupby <- data_merged %>% 
+  df_groupby <- data_loc %>% 
     group_by(.dots = dots) %>% 
     summarize( population = sum(COEFF),
                population_active = sum( COEFF * (Statut_emploi_1_emploi %in% c("1","2"))),
