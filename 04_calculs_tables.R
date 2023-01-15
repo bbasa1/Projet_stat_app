@@ -63,12 +63,10 @@ nettoyage_tranche_age <- function(data_loc){
 
 
 
-
-
 nettoyage_sexe <- function(data_loc){
   ### Cette fonction renome les sexes pour faire des graphiques
   
-  data_loc <- data_loc[ , Sexe_1H_2F := as.character(Sexe_1H_2F)]
+  # data_loc <- data_loc[ , Sexe_1H_2F := as.character(Sexe_1H_2F)]
   data_loc[, Sexe_1H_2F:= factor(
     fcase(
       Sexe_1H_2F == 1, "Hommes",
@@ -79,5 +77,36 @@ nettoyage_sexe <- function(data_loc){
   setnames(data_loc,'Sexe_1H_2F',"Sexe")
   
   return(data_loc)
+}
+
+
+
+nettoyage_niveau_education <- function(data_loc){
+  ### Cette fonction renome les niveaux d'éducation pour faire des graphiques
   
+  data_loc <- data_loc[ , Niveau_education := as.character(Niveau_education)]
+
+  data_loc[, Indice_educ := factor( #Pour pouvoir ordonner facilement les barres entre elles
+    fcase(
+      Niveau_education == "L", 0,
+      Niveau_education == "M", 1,
+      Niveau_education == "H", 2,
+      Niveau_education == 9 , -1
+      
+    )
+  )
+  ]
+  
+  data_loc[, Niveau_education := factor(
+    fcase(
+      Niveau_education == "L", "Bas",
+      Niveau_education == "M", "Moyen",
+      Niveau_education == "H", "Elevé",
+      Niveau_education == 9 , "Âge <= 15 ans"
+      
+    )
+  )
+  ]
+  
+  return(data_loc)
 }

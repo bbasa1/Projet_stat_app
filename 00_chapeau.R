@@ -201,8 +201,10 @@ fill <- "Sexe"
 xlabel <-"Année d'enquête"
 ylabel <-"Taux d'activité"
 facet <- "Age_tranche"
+ordre_facet <- c()
 
-graph <- trace_barplot_avec_facet(sous_calculs_annee, x, sortby_x, y, fill, xlabel, ylabel, titre, titre_save, facet)
+
+graph <- trace_barplot_avec_facet(sous_calculs_annee, x, sortby_x, y, fill, xlabel, ylabel, titre, titre_save, facet, ordre_facet)
 list_graph[[longueur_liste + 1]] <- graph
 longueur_liste <- longueur_liste + 1
 
@@ -219,8 +221,41 @@ fill <- "Sexe"
 xlabel <-"Année d'enquête"
 ylabel <-"Taux d'emploi"
 facet <- "Age_tranche"
+ordre_facet <- c()
 
-graph <- trace_barplot_avec_facet(sous_calculs_annee, x, sortby_x, y, fill, xlabel, ylabel, titre, titre_save, facet)
+
+graph <- trace_barplot_avec_facet(sous_calculs_annee, x, sortby_x, y, fill, xlabel, ylabel, titre, titre_save, facet, ordre_facet)
+list_graph[[longueur_liste + 1]] <- graph
+longueur_liste <- longueur_liste + 1
+
+
+################################################################################
+#            VI. QUID DU NIVEAU D'EDUCATION ?  ===============================
+################################################################################
+
+# On calcule les taux d'activités et d'emplois par âge et sexe
+liste_var <- c("Niveau_education", "Sexe_1H_2F", "Annee_enquete")
+calculs_annee <- calcul_taux_emplois_activite(liste_var_groupby = liste_var)
+# Phase de nettoyage
+calculs_annee <- nettoyage_niveau_education(calculs_annee)
+calculs_annee <- nettoyage_sexe(calculs_annee)
+sous_calculs_annee <- calculs_annee[Niveau_education %in% c("Bas","Moyen", "Elevé")]
+
+
+
+# Puis de tracé
+titre <- "Taux d'activité par niveau d'éducation,\n sexe et année d'enquête"
+titre_save <- paste(repo_sorties, "Taux_activite_educ_sexe_annee_enqu.pdf", sep ='/')
+x <-"Annee_enquete"
+sortby_x <- "Annee_enquete"
+y <- "tx_activite"
+fill <- "Sexe"
+xlabel <-"Année d'enquête"
+ylabel <-"Taux d'activité"
+facet <- "Niveau_education"
+ordre_facet <- c("Bas", "Moyen", "Elevé")
+
+graph <- trace_barplot_avec_facet(sous_calculs_annee, x, sortby_x, y, fill, xlabel, ylabel, titre, titre_save, facet, ordre_facet)
 list_graph[[longueur_liste + 1]] <- graph
 longueur_liste <- longueur_liste + 1
 
@@ -238,7 +273,7 @@ source(paste(repo_prgm,"06_page_html.R",sep="/") ,
 
 
 ################################################################################
-#         VI. Brouillon à mettre en forme ========================
+#         VII. Brouillon à mettre en forme ========================
 ################################################################################
 
 liste_var <- c("Decile_salaire", "Niveau_education", "Sexe_1H_2F", "COEFF", "Identifiant_menage")
