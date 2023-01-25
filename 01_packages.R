@@ -24,4 +24,5 @@ library(quantreg)
 library(tidyverse) 
 library(broom)
 library(ggpubr)
-
+# install.packages("finalfit")
+library(finalfit)

@@ -74,6 +74,9 @@ liste_variables <- c('QHHNUM', #Identifiant ménage
                      'HHNBCH14' # Number of children [12,14] years in the household
 )
 
+age_min <- 20
+age_max <- 59
+
 
 ################################################################################
 #            B. PACKAGES              -------------------------------
@@ -127,7 +130,7 @@ source(paste(repo_prgm , "05_sorties_graphiques.R" , sep = "/"))
 
 
 # Phase de nettoyage
-calculs_age <- nettoyage_tranche_age(calculs_age)
+calculs_age <- nettoyage_tranche_age(calculs_age, age_min, age_max)
 calculs_age <- nettoyage_sexe(calculs_age)
 calculs_age
 # calculs_age <- as.data.table(calculs_age)
@@ -177,19 +180,12 @@ longueur_liste <- longueur_liste + 1
 liste_var <- c("Age_tranche", "Sexe_1H_2F", "Annee_enquete")
 calculs_annee <- calcul_taux_emplois_activite(liste_var_groupby = liste_var, data_loc = data_merged)
 
-
 #            IV.B CONSTRUCTION GRAPHIQUES               ------------------
-
+calculs_annee
 # Phase de nettoyage
-calculs_annee <- nettoyage_tranche_age(calculs_annee)
+calculs_annee <- nettoyage_tranche_age(calculs_annee, age_min, age_max)
 calculs_annee <- nettoyage_sexe(calculs_annee)
 
-sous_calculs_annee <- calculs_annee[Age_tranche %in% c("20-24 ans",
-                                                       "25-29 ans", "30-34 ans",
-                                                       "35-39 ans", "40-44 ans",
-                                                       "45-49 ans", "50-54 ans",
-                                                       "55-59 ans"
-)]
 
 # Puis de tracé
 titre <- "Taux d'activité par âge, sexe et année d'enquête"
@@ -204,7 +200,7 @@ facet <- "Age_tranche"
 ordre_facet <- c()
 
 
-graph <- trace_barplot_avec_facet(sous_calculs_annee, x, sortby_x, y, fill, xlabel, ylabel, titre, titre_save, facet, ordre_facet)
+graph <- trace_barplot_avec_facet(calculs_annee, x, sortby_x, y, fill, xlabel, ylabel, titre, titre_save, facet, ordre_facet)
 list_graph[[longueur_liste + 1]] <- graph
 longueur_liste <- longueur_liste + 1
 
@@ -224,7 +220,7 @@ facet <- "Age_tranche"
 ordre_facet <- c()
 
 
-graph <- trace_barplot_avec_facet(sous_calculs_annee, x, sortby_x, y, fill, xlabel, ylabel, titre, titre_save, facet, ordre_facet)
+graph <- trace_barplot_avec_facet(calculs_annee, x, sortby_x, y, fill, xlabel, ylabel, titre, titre_save, facet, ordre_facet)
 list_graph[[longueur_liste + 1]] <- graph
 longueur_liste <- longueur_liste + 1
 
@@ -236,18 +232,20 @@ longueur_liste <- longueur_liste + 1
 # On calcule les taux d'activités et d'emplois par âge et sexe
 liste_var <- c("Niveau_education", "Sexe_1H_2F", "Annee_enquete")
 
-sous_data_merged <- data_merged[Age_tranche %in% c(22, 27, 32, 37, 42, 47, 52, 57)]
+# sous_data_merged <- data_merged[Age_tranche %in% c(22, 27, 32, 37, 42, 47, 52, 57)]
+sous_data_merged <- data_merged[Age_tranche - 2 >= age_min, ]
+sous_data_merged <- sous_data_merged[Age_tranche + 2 <= age_max, ]
 
 calculs_annee <- calcul_taux_emplois_activite(liste_var_groupby = liste_var, data_loc = sous_data_merged)
 # Phase de nettoyage
 calculs_annee <- nettoyage_niveau_education(calculs_annee)
 calculs_annee <- nettoyage_sexe(calculs_annee)
 sous_calculs_annee <- calculs_annee[Niveau_education %in% c("Bas","Moyen", "Elevé")]
-
+sous_calculs_annee <- ff_interaction(sous_calculs_annee, Niveau_education, Sexe)
 
 
 # Puis de tracé
-titre <- "Taux d'activité par niveau d'éducation,\n sexe et année d'enquête (entre 20 et 59 ans)"
+titre <- paste("Taux d'activité par niveau d'éducation,\n sexe et année d'enquête (entre", age_min, "et", age_max, "ans)", sep = " ")
 titre_save <- paste(repo_sorties, "Taux_activite_educ_sexe_annee_enqu.pdf", sep ='/')
 x <-"Annee_enquete"
 sortby_x <- "Annee_enquete"
@@ -256,6 +254,7 @@ fill <- "Sexe"
 xlabel <-"Année d'enquête"
 ylabel <-"Taux d'activité"
 facet <- "Niveau_education"
+ligne <- "Niveau_education_Sexe"
 ordre_facet <- c("Bas", "Moyen", "Elevé")
 
 graph <- trace_barplot_avec_facet(sous_calculs_annee, x, sortby_x, y, fill, xlabel, ylabel, titre, titre_save, facet, ordre_facet)
@@ -264,7 +263,7 @@ longueur_liste <- longueur_liste + 1
 
 
 
-titre <- "Taux d'emploi par niveau d'éducation,\n sexe et année d'enquête (entre 20 et 59 ans)"
+titre <- paste("Taux d'emploi par niveau d'éducation,\n sexe et année d'enquête (entre", age_min, "et", age_max, "ans)", sep = " ")
 titre_save <- paste(repo_sorties, "Taux_emploi_educ_sexe_annee_enqu.pdf", sep ='/')
 x <-"Annee_enquete"
 sortby_x <- "Annee_enquete"
@@ -273,11 +272,65 @@ fill <- "Sexe"
 xlabel <-"Année d'enquête"
 ylabel <-"Taux d'emploi"
 facet <- "Niveau_education"
+ligne <- "Niveau_education_Sexe"
 ordre_facet <- c("Bas", "Moyen", "Elevé")
 
 graph <- trace_barplot_avec_facet(sous_calculs_annee, x, sortby_x, y, fill, xlabel, ylabel, titre, titre_save, facet, ordre_facet)
 list_graph[[longueur_liste + 1]] <- graph
 longueur_liste <- longueur_liste + 1
+
+
+
+################################################################################
+#      On passe en version graphique à lignes ----------------------------------
+################################################################################
+
+
+# On calcule les taux d'activités et d'emplois par âge et sexe
+liste_var <- c("Niveau_education", "Sexe_1H_2F", "Annee_enquete")
+
+sous_data_merged <- data_merged[Age_tranche - 2 >= age_min, ]
+sous_data_merged <- sous_data_merged[Age_tranche + 2 <= age_max, ]
+
+calculs_annee <- calcul_taux_emplois_activite(liste_var_groupby = liste_var, data_loc = sous_data_merged)
+# Phase de nettoyage
+calculs_annee <- nettoyage_niveau_education(calculs_annee)
+calculs_annee <- nettoyage_sexe(calculs_annee)
+sous_calculs_annee <- calculs_annee[Niveau_education %in% c("Bas","Moyen", "Elevé")]
+sous_calculs_annee <- ff_interaction(sous_calculs_annee, Niveau_education, Sexe)
+
+
+# Puis de tracé
+titre <- paste("Taux d'activité par niveau d'éducation,\n sexe et année d'enquête (entre", age_min, "et", age_max, "ans)", sep = " ")
+titre_save <- paste(repo_sorties, "Taux_activite_educ_sexe_annee_enqu.pdf", sep ='/')
+x <-"Annee_enquete"
+sortby_x <- "Annee_enquete"
+y <- "tx_activite"
+fill <- "Sexe"
+xlabel <-"Année d'enquête"
+ylabel <-"Taux d'activité"
+ligne <- "Niveau_education_Sexe"
+
+graph <- trace_point_lines(sous_calculs_annee, x, sortby_x, y, fill, xlabel, ylabel, titre, titre_save, ligne)
+list_graph[[longueur_liste + 1]] <- graph
+longueur_liste <- longueur_liste + 1
+
+
+
+titre <- paste("Taux d'emploi par niveau d'éducation,\n sexe et année d'enquête (entre", age_min, "et", age_max, "ans)", sep = " ")
+titre_save <- paste(repo_sorties, "Taux_emploi_educ_sexe_annee_enqu.pdf", sep ='/')
+x <-"Annee_enquete"
+sortby_x <- "Annee_enquete"
+y <- "tx_emploi"
+fill <- "Sexe"
+xlabel <-"Année d'enquête"
+ylabel <-"Taux d'emploi"
+ligne <- "Niveau_education_Sexe"
+
+graph <- trace_point_lines(sous_calculs_annee, x, sortby_x, y, fill, xlabel, ylabel, titre, titre_save, ligne)
+list_graph[[longueur_liste + 1]] <- graph
+longueur_liste <- longueur_liste + 1
+
 
 
 ################################################################################

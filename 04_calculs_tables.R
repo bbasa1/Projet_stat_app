@@ -27,11 +27,15 @@ calcul_taux_emplois_activite <- function(liste_var_groupby, data_loc){
 
 
 
-nettoyage_tranche_age <- function(data_loc){
+nettoyage_tranche_age <- function(data_loc, age_min, age_max){
   ### Cette fonction renome les tranches d'âges pour faire des graphiques
   
   data_loc <- data_loc[ , Age_tranche := as.integer(Age_tranche)]
   data_loc[, Indice_ages := Age_tranche] #Pour pouvoir ordonner facilement les barres entre elles
+  
+  data_loc <- data_loc[Age_tranche - 2 >= age_min, ]
+  data_loc <- data_loc[Age_tranche + 2 <= age_max, ]
+  
   data_loc[, Age_tranche:= factor(
     fcase(
       Age_tranche == 2, "0-4 ans",
