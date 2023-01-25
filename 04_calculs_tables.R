@@ -9,12 +9,14 @@ calcul_taux_emplois_activite <- function(liste_var_groupby, data_loc){
     group_by(.dots = dots) %>% 
     summarize( population = sum(COEFF),
                population_active = sum( COEFF * (Statut_emploi_1_emploi %in% c("1","2"))),
-               population_emplois = sum( COEFF * (Statut_emploi_1_emploi==1))) %>% 
+               population_emplois = sum( COEFF * (Statut_emploi_1_emploi==1)), population_emplois_etp =sum(Poids_final * (Statut_emploi_1_emploi==1)) ) %>% 
     dplyr::mutate(tx_activite = round(100 * population_active/population , 3),
                   tx_emploi = round(100 * population_emplois/population , 3),
+                  tx_emploi_etp = round(100 * population_emplois_etp/population , 3),
                   population = round(population / 1000 , 2),
                   population_active = round(population_active / 1000 , 2),
-                  population_emplois = round(population_emplois / 1000 , 2))
+                  population_emplois = round(population_emplois / 1000 , 2),
+                  population_emplois_etp = round(population_emplois_etp / 1000 , 2))
   
   df_groupby <- as.data.table(df_groupby)
   
@@ -114,3 +116,5 @@ nettoyage_niveau_education <- function(data_loc){
   
   return(data_loc)
 }
+
+
