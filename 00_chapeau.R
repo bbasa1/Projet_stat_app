@@ -168,6 +168,20 @@ longueur_liste <- longueur_liste + 1
 
 
 
+# Troisième
+titre <- paste("Taux d'emploi ETP par âge et par sexe,\n moyenne entre", toString(liste_annees[1]), "et", toString(tail(liste_annees, n=1)))
+titre_save <- paste(repo_sorties, "Taux_emploi_etp_age_sexe.pdf", sep ='/')
+x <-"Age_tranche"
+sortby_x <- "Indice_ages"
+y <- "tx_emploi_etp"
+fill <- "Sexe"
+xlabel <-"Tranche d'âge"
+ylabel <-"Taux d'emploi"
+
+graph <- trace_barplot(calculs_age, x, sortby_x, y, fill, xlabel, ylabel, titre, titre_save)
+list_graph[[longueur_liste + 1]] <- graph
+longueur_liste <- longueur_liste + 1
+
 
 ################################################################################
 #            IV. CALCULS TAUX D'EMPLOIS ET ACTIVITE PAR ÂGE, SEXE & ANNEE D'ENQUETE  ===============================
@@ -225,6 +239,23 @@ list_graph[[longueur_liste + 1]] <- graph
 longueur_liste <- longueur_liste + 1
 
 
+# Troisième tracé 
+titre <- "Taux d'emploi ETP par âge, sexe et année d'enquête"
+titre_save <- paste(repo_sorties, "Taux_emploi_etp_age_sexe_annee_enqu.pdf", sep ='/')
+x <-"Annee_enquete"
+sortby_x <- "Annee_enquete"
+y <- "tx_emploi_etp"
+fill <- "Sexe"
+xlabel <-"Année d'enquête"
+ylabel <-"Taux d'emploi"
+facet <- "Age_tranche"
+ordre_facet <- c()
+
+
+graph <- trace_barplot_avec_facet(calculs_annee, x, sortby_x, y, fill, xlabel, ylabel, titre, titre_save, facet, ordre_facet)
+list_graph[[longueur_liste + 1]] <- graph
+longueur_liste <- longueur_liste + 1
+
 ################################################################################
 #            VI. QUID DU NIVEAU D'EDUCATION ?  ===============================
 ################################################################################
@@ -281,6 +312,23 @@ longueur_liste <- longueur_liste + 1
 
 
 
+
+titre <- paste("Taux d'emploi ETP par niveau d'éducation,\n sexe et année d'enquête (entre", age_min, "et", age_max, "ans)", sep = " ")
+titre_save <- paste(repo_sorties, "Taux_emploi_educ_sexe_annee_enqu.pdf", sep ='/')
+x <-"Annee_enquete"
+sortby_x <- "Annee_enquete"
+y <- "tx_emploi_etp"
+fill <- "Sexe"
+xlabel <-"Année d'enquête"
+ylabel <-"Taux d'emploi"
+facet <- "Niveau_education"
+ligne <- "Niveau_education_Sexe"
+ordre_facet <- c("Bas", "Moyen", "Elevé")
+
+graph <- trace_barplot_avec_facet(sous_calculs_annee, x, sortby_x, y, fill, xlabel, ylabel, titre, titre_save, facet, ordre_facet)
+list_graph[[longueur_liste + 1]] <- graph
+longueur_liste <- longueur_liste + 1
+
 ################################################################################
 #      On passe en version graphique à lignes ----------------------------------
 ################################################################################
@@ -331,6 +379,20 @@ graph <- trace_point_lines(sous_calculs_annee, x, sortby_x, y, fill, xlabel, yla
 list_graph[[longueur_liste + 1]] <- graph
 longueur_liste <- longueur_liste + 1
 
+
+titre <- paste("Taux d'emploi ETP par niveau d'éducation,\n sexe et année d'enquête (entre", age_min, "et", age_max, "ans)", sep = " ")
+titre_save <- paste(repo_sorties, "Taux_emploi_educ_sexe_annee_enqu.pdf", sep ='/')
+x <-"Annee_enquete"
+sortby_x <- "Annee_enquete"
+y <- "tx_emploi_etp"
+fill <- "Sexe"
+xlabel <-"Année d'enquête"
+ylabel <-"Taux d'emploi"
+ligne <- "Niveau_education_Sexe"
+
+graph <- trace_point_lines(sous_calculs_annee, x, sortby_x, y, fill, xlabel, ylabel, titre, titre_save, ligne)
+list_graph[[longueur_liste + 1]] <- graph
+longueur_liste <- longueur_liste + 1
 
 
 ################################################################################
