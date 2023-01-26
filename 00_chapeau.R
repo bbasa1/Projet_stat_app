@@ -123,7 +123,7 @@ longueur_liste <- 0
 liste_var <- c("Age_tranche", "Sexe_1H_2F")
 calculs_age <- calcul_taux_emplois_activite(liste_var_groupby = liste_var, data_loc = data_merged)
 
-
+calculs_age
 
 #            III.B CONSTRUCTION GRAPHIQUES               ------------------
 source(paste(repo_prgm , "05_sorties_graphiques.R" , sep = "/"))

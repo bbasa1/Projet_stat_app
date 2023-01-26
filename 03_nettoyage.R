@@ -42,6 +42,10 @@ setnames(data_merged,'HHNBCH14',"Nb_enfants_entre_11_14_ans")
 # Passage en df pour les calculs
 
 df_merged<- as.data.frame(data_merged)
+
+# 100*table(df_merged$Volume_travail_habituel)/nrow(df_merged)
+
+
 df_merged <- df_merged %>%
   mutate(Temps_partiel_clean = ifelse(Temps_partiel ==2, 0, Temps_partiel)) %>% 
   mutate(Temps_partiel_clean = ifelse(Temps_partiel ==9, is.na(Temps_partiel_clean), Temps_partiel_clean)) %>% # Création de TP égale à 1 si temps plein, 0 si temps partiel
@@ -52,12 +56,17 @@ df_merged <- df_merged %>%
   group_by(Annee_enquete) %>% 
   mutate(mediane_h = max(mediane_h, na.rm = TRUE)) # création de la médiane des heures travaillées par les individus à plein temps pour chaque année
 
+# summary(df_merged$EQTP)
+
 df_merged <- df_merged %>%
   mutate(EQTP = Volume_travail_habituel/mediane_h) %>% # création du coefficient d'équivalent temps plein (linéaire: variable continue)
   mutate(EQTP = ifelse(EQTP>1, 1, EQTP))%>%
   mutate(EQTP = ifelse(is.na(heures_clean), NA_real_, EQTP))
 
-summary(df_merged$EQTP)
+#### Il y a des NAN dans EQTP ssi Volume_travail_habituel = NAN ssi Volume_travail_habituel == 99 ou 0
+
+# summary(df_merged$EQTP)
+
 
 df_merged <- df_merged %>%
   mutate(Poids_final = EQTP*COEFF) # création du poids final égal au coeff initial de l'enquête x le coeff d'ETP
