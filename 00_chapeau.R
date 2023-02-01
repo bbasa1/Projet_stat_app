@@ -14,8 +14,9 @@
 ################################################################################
 #            A. PARAMETRES              -------------------------------
 ################################################################################
+repgen <- "C:/Users/Benjamin/Desktop/Ensae/Projet_statapp"#BB
+repgen <- "C:/Users/Lenovo/Desktop/statapp22"#LP
 
-repgen <- "C:/Users/Benjamin/Desktop/Ensae/Projet_statapp"
 
 liste_annees <- 1998:2018
 pays <- "FR"
@@ -362,4 +363,3 @@ p <- ggplot(data = sous_pop_melted, aes(x = reorder(Niveau_education, Niveau_edu
   facet_wrap(~Mesure)
 
 p
-
