@@ -51,3 +51,20 @@ trace_barplot_avec_facet <- function(data_loc, x, sortby_x, y, fill, xlabel, yla
   # ggsave(titre_save, p ,  width = 297, height = 210, units = "mm")
   print(p)
 }
+
+
+
+trace_point_lines <- function(data_loc, x, sortby_x, y, fill, xlabel, ylabel, titre, titre_save, ligne){
+  
+  p <- ggplot(data = data_loc, aes(x = reorder(.data[[x]], .data[[sortby_x]]), y = .data[[y]], color = .data[[fill]], shape = .data[[facet]], group = .data[[ligne]])) +
+    geom_point(size=2) +
+    geom_line() +
+    labs(title=titre,
+         x= xlabel,
+         y= ylabel) + 
+    scale_y_continuous(limits = c(0, 100), labels = function(y) format(y, scientific = FALSE)) + 
+    scale_fill_discrete() +
+    theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))
+  
+  print(p)
+}
