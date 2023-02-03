@@ -392,3 +392,7 @@ data_merged<- as.data.table(df_merged)
 # table(data_merged[is.na(COEFF), ]$Statut_emploi_1_emploi)
 # table(data_merged[is.na(COEFF), ]$Annee_enquete)
 # data_merged[is.na(COEFF), ]
+
+100 * nrow(data_merged[is.na(COEFF), ])/nrow(data_merged)
+data_merged <- data_merged[is.na(COEFF), COEFF := 0, ]
+100 * nrow(data_merged[is.na(COEFF), ])/nrow(data_merged)
