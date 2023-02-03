@@ -44,6 +44,8 @@ setnames(data_merged,'HHNBCH14',"Nb_enfants_entre_11_14_ans")
 df_merged<- as.data.frame(data_merged)
 
 # 100*table(df_merged$Volume_travail_habituel)/nrow(df_merged)
+# 100*table(df_merged$Statut_semaine)/nrow(df_merged)
+# 100*table(df_merged$Statut_emploi_1_emploi)/nrow(df_merged)
 
 
 df_merged <- df_merged %>%
