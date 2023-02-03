@@ -4,8 +4,6 @@
 
 # Ce chapeau contient l ensemble des programmes du statp
 
-
-
 ################################################################################
  #                      PREAMBULE               ===============================
 ################################################################################
@@ -51,11 +49,11 @@ repgen <- "C:/Users/Benjamin/Desktop/Ensae/Projet_statapp"#BB
 
 
 liste_annees <- 1998:2018
-pays <- "DE"
+pays <- "AT"
 
 nom_fichier_html <- paste("Taux_activite", pays, sep = "_")
 
-creer_base <- TRUE
+creer_base <- FALSE
 
 
 repo_prgm <- paste(repgen, "programmes/Projet_stat_app" , sep = "/")

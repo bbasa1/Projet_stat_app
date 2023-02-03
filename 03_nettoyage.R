@@ -331,7 +331,7 @@ data_merged <- data_merged[is.na(Domaine_education_c), Domaine_education_c := "9
 # summary(sous_data_merged$Nb_enfants_entre_11_14_ans)
 
 ################################################################################
-#         3 . Equivalent temps plein  ========================
+#         4 . Equivalent temps plein  ========================
 ################################################################################
 
 ## Création de poids d'équivalent temps plein
@@ -377,3 +377,18 @@ df_merged <- df_merged %>%
 
 
 data_merged<- as.data.table(df_merged)
+
+
+
+
+
+################################################################################
+#              5 . Exploration pbm NAN dans COEFF       ========================
+################################################################################
+ 
+# summary(is.na(data_merged$COEFF))
+# 100*table(data_merged$COEFF)/nrow(data_merged)
+# 100 * nrow(data_merged[is.na(COEFF), ])/nrow(data_merged)
+# table(data_merged[is.na(COEFF), ]$Statut_emploi_1_emploi)
+# table(data_merged[is.na(COEFF), ]$Annee_enquete)
+# data_merged[is.na(COEFF), ]
