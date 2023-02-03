@@ -29,8 +29,6 @@ genere_html <- function(rep , mardown , nom_html){
 
 setwd(dir = repo_prgm )
 
-nom_fichier_html <- "Taux_activite"
-
 genere_html( rep_html , 
              "visualisation.Rmd",
              paste(nom_fichier_html,"html" , sep ="."))
