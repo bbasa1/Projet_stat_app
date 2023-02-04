@@ -49,11 +49,12 @@ repgen <- "C:/Users/Benjamin/Desktop/Ensae/Projet_statapp"#BB
 
 
 liste_annees <- 1998:2018
-pays <- "DK"
+pays <- "BE"
 
 nom_fichier_html <- paste("Taux_activite", pays, sep = "_")
 
 creer_base <- FALSE
+mettre_coeffs_nan_a_zero <- FALSE
 
 
 repo_prgm <- paste(repgen, "programmes/Projet_stat_app" , sep = "/")
@@ -137,6 +138,7 @@ if(creer_base){
 ################################################################################
 
 source(paste(repo_prgm , "03_nettoyage.R" , sep = "/"))
+100 * nrow(data_merged[is.na(COEFF), ])/nrow(data_merged)
 
 
 

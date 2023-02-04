@@ -388,11 +388,29 @@ data_merged<- as.data.table(df_merged)
  
 # summary(is.na(data_merged$COEFF))
 # 100*table(data_merged$COEFF)/nrow(data_merged)
-# 100 * nrow(data_merged[is.na(COEFF), ])/nrow(data_merged)
-# table(data_merged[is.na(COEFF), ]$Statut_emploi_1_emploi)
-# table(data_merged[is.na(COEFF), ]$Annee_enquete)
+
+
+100 * nrow(data_merged[is.na(COEFF), ])/nrow(data_merged)
+table(data_merged[is.na(COEFF), ]$Statut_emploi_1_emploi)
+table(data_merged[is.na(COEFF), ]$Annee_enquete)
 # data_merged[is.na(COEFF), ]
 
 100 * nrow(data_merged[is.na(COEFF), ])/nrow(data_merged)
-data_merged <- data_merged[is.na(COEFF), COEFF := 0, ]
+sous_data <- data_merged %>% 
+  group_by(Annee_enquete) %>% 
+  summarise(somme_coeff = sum(COEFF, na.rm = TRUE))
+
+titre <- paste("Somme des coefficients par année en", pays, sep = " ")
+
+ggplot(data = sous_data, aes(x = Annee_enquete, y = somme_coeff)) +
+  geom_point() +
+  labs(title = titre,
+       x = "Année d'enquête",
+       y = "Somme des coefficients")
+
+
+
+
+100 * nrow(data_merged[is.na(COEFF), ])/nrow(data_merged)
+if(mettre_coeffs_nan_a_zero){data_merged <- data_merged[is.na(COEFF), COEFF := 0, ]}
 100 * nrow(data_merged[is.na(COEFF), ])/nrow(data_merged)
