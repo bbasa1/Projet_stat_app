@@ -24,7 +24,7 @@
 # GR Grèce
 # HR Croatie
 # HU Hongrie
-# IE Irelande
+# IE Irlande
 # IS Islande
 # IT Italie
 # LT Lituanie
@@ -44,16 +44,17 @@
 ################################################################################
 #            A. PARAMETRES              -------------------------------
 ################################################################################
-repgen <- "C:/Users/Benjamin/Desktop/Ensae/Projet_statapp"#BB
+#repgen <- "C:/Users/Benjamin/Desktop/Ensae/Projet_statapp"#BB
 # repgen <- "C:/Users/Lenovo/Desktop/statapp22"#LP
+repgen <- "/Users/charlottecombier/Desktop/ENSAE/Projet_statapp"
 
 
 liste_annees <- 1998:2018
-pays <- "BE"
+pays <- "FI"
 
 nom_fichier_html <- paste("Taux_activite", pays, sep = "_")
 
-creer_base <- FALSE
+creer_base <- TRUE
 mettre_coeffs_nan_a_zero <- FALSE
 
 
