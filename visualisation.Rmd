@@ -18,14 +18,21 @@ output:
     toc_float:
       collapsed: true
       smooth_scroll: false
-
 ---
-
-
 
 # Taux d'activité par âge et par années {.tabset .tabset-fade .tabset-pills}
 
 
+Commentaire...
+
+```{r echo=FALSE, results='asis'}
+
+list_graph
+
+```
+
+
+# section 2 {.tabset .tabset-fade .tabset-pills}
 
 ```{r echo=FALSE, results='asis'}
 
