@@ -386,16 +386,17 @@ data_merged<- as.data.table(df_merged)
 #              5 . Exploration pbm NAN dans COEFF       ========================
 ################################################################################
  
-# summary(is.na(data_merged$COEFF))
+summary(data_merged$COEFF)
 # 100*table(data_merged$COEFF)/nrow(data_merged)
 
 
-100 * nrow(data_merged[is.na(COEFF), ])/nrow(data_merged)
-table(data_merged[is.na(COEFF), ]$Statut_emploi_1_emploi)
-table(data_merged[is.na(COEFF), ]$Annee_enquete)
+100 * nrow(data_merged[is.na(COEFF), ])/nrow(data_merged) #Donne le % de NAN dans COEFF
+table(data_merged[is.na(COEFF), ]$Statut_emploi_1_emploi) #Donne le détail des NAN qui sont dans COEFF par statut d'emploi
+table(data_merged[is.na(COEFF), ]$Annee_enquete) #Idem par année d'enquête
 # data_merged[is.na(COEFF), ]
 
 100 * nrow(data_merged[is.na(COEFF), ])/nrow(data_merged)
+
 sous_data <- data_merged %>% 
   group_by(Annee_enquete) %>% 
   summarise(somme_coeff = sum(COEFF, na.rm = TRUE))
@@ -406,7 +407,7 @@ ggplot(data = sous_data, aes(x = Annee_enquete, y = somme_coeff)) +
   geom_point() +
   labs(title = titre,
        x = "Année d'enquête",
-       y = "Somme des coefficients")
+       y = "Somme des coefficients") # Trace la somme des COEFFS par année, pour voir s'il y a un décrochage à cause des NAN
 
 
 

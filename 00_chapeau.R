@@ -44,17 +44,17 @@
 ################################################################################
 #            A. PARAMETRES              -------------------------------
 ################################################################################
-#repgen <- "C:/Users/Benjamin/Desktop/Ensae/Projet_statapp"#BB
+repgen <- "C:/Users/Benjamin/Desktop/Ensae/Projet_statapp"#BB
 # repgen <- "C:/Users/Lenovo/Desktop/statapp22"#LP
-repgen <- "/Users/charlottecombier/Desktop/ENSAE/Projet_statapp"
+# repgen <- "/Users/charlottecombier/Desktop/ENSAE/Projet_statapp"
 
 
 liste_annees <- 1998:2018
-pays <- "FI"
+pays <- "ES"
 
 nom_fichier_html <- paste("Taux_activite", pays, sep = "_")
 
-creer_base <- TRUE
+creer_base <- FALSE
 mettre_coeffs_nan_a_zero <- FALSE
 
 
@@ -139,7 +139,7 @@ if(creer_base){
 ################################################################################
 
 source(paste(repo_prgm , "03_nettoyage.R" , sep = "/"))
-100 * nrow(data_merged[is.na(COEFF), ])/nrow(data_merged)
+# 100 * nrow(data_merged[is.na(COEFF), ])/nrow(data_merged)
 
 
 
