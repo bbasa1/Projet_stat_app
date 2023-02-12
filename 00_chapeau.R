@@ -50,7 +50,7 @@ repgen <- "C:/Users/Benjamin/Desktop/Ensae/Projet_statapp"#BB
 
 
 liste_annees <- 1998:2018
-pays <- "BE"
+pays <- "FR"
 
 nom_fichier_html <- paste("Taux_activite", pays, sep = "_")
 
@@ -68,6 +68,7 @@ repo_inter <- paste(repgen, "bases_intermediaires" , sep = "/")
 
 rep_html <- paste(repgen, "pages_html" , sep="/")
 
+nrow(data_merged)
 
 liste_variables <- c('QHHNUM', #Identifiant ménage
                      # 'COEFFY', #Yearly weighting factor,
@@ -175,7 +176,8 @@ calculs_age
 
 # Puis de tracé
 titre <- paste("Taux d'activité par âge et par sexe,\n moyenne entre", toString(liste_annees[1]), "et", toString(tail(liste_annees, n=1)))
-titre_save <- paste(repo_sorties, "Taux_activite_age_sexe.pdf", sep ='/')
+titre_save <- paste(pays, "Taux_activite_age_sexe.pdf", sep ='_')
+titre_save <- paste(repo_sorties, titre_save, sep ='/')
 x <-"Age_tranche"
 sortby_x <- "Indice_ages"
 y <- "tx_activite"
@@ -191,7 +193,8 @@ longueur_liste <- longueur_liste + 1
 
 # Second tracé 
 titre <- paste("Taux d'emploi par âge et par sexe,\n moyenne entre", toString(liste_annees[1]), "et", toString(tail(liste_annees, n=1)))
-titre_save <- paste(repo_sorties, "Taux_emploi_age_sexe.pdf", sep ='/')
+titre_save <- paste(pays, "Taux_emploi_age_sexe.pdf", sep ='_')
+titre_save <- paste(repo_sorties, titre_save, sep ='/')
 x <-"Age_tranche"
 sortby_x <- "Indice_ages"
 y <- "tx_emploi"
@@ -207,7 +210,8 @@ longueur_liste <- longueur_liste + 1
 
 # Troisième
 titre <- paste("Taux d'emploi ETP par âge et par sexe,\n moyenne entre", toString(liste_annees[1]), "et", toString(tail(liste_annees, n=1)))
-titre_save <- paste(repo_sorties, "Taux_emploi_etp_age_sexe.pdf", sep ='/')
+titre_save <- paste(pays, "Taux_emploi_etp_age_sexe.pdf", sep ='_')
+titre_save <- paste(repo_sorties, titre_save, sep ='/')
 x <-"Age_tranche"
 sortby_x <- "Indice_ages"
 y <- "tx_emploi_etp"
@@ -240,7 +244,8 @@ calculs_annee <- nettoyage_sexe(calculs_annee)
 
 # Puis de tracé
 titre <- "Taux d'activité par âge, sexe et année d'enquête"
-titre_save <- paste(repo_sorties, "Taux_activite_age_sexe_annee_enqu.pdf", sep ='/')
+titre_save <- paste(pays, "Taux_activite_age_sexe_annee_enqu.pdf", sep ='_')
+titre_save <- paste(repo_sorties, titre_save, sep ='/')
 x <-"Annee_enquete"
 sortby_x <- "Annee_enquete"
 y <- "tx_activite"
@@ -260,7 +265,8 @@ longueur_liste <- longueur_liste + 1
 
 # Second tracé 
 titre <- "Taux d'emploi par âge, sexe et année d'enquête"
-titre_save <- paste(repo_sorties, "Taux_emploi_age_sexe_annee_enqu.pdf", sep ='/')
+titre_save <- paste(pays, "Taux_emploi_age_sexe_annee_enqu.pdf", sep ='_')
+titre_save <- paste(repo_sorties, titre_save, sep ='/')
 x <-"Annee_enquete"
 sortby_x <- "Annee_enquete"
 y <- "tx_emploi"
@@ -278,7 +284,8 @@ longueur_liste <- longueur_liste + 1
 
 # Troisième tracé 
 titre <- "Taux d'emploi ETP par âge, sexe et année d'enquête"
-titre_save <- paste(repo_sorties, "Taux_emploi_etp_age_sexe_annee_enqu.pdf", sep ='/')
+titre_save <- paste(pays, "Taux_emploi_etp_age_sexe_annee_enqu.pdf", sep ='_')
+titre_save <- paste(repo_sorties, titre_save, sep ='/')
 x <-"Annee_enquete"
 sortby_x <- "Annee_enquete"
 y <- "tx_emploi_etp"
@@ -314,7 +321,8 @@ sous_calculs_annee <- ff_interaction(sous_calculs_annee, Niveau_education, Sexe)
 
 # Puis de tracé
 titre <- paste("Taux d'activité par niveau d'éducation,\n sexe et année d'enquête (entre", age_min, "et", age_max, "ans)", sep = " ")
-titre_save <- paste(repo_sorties, "Taux_activite_educ_sexe_annee_enqu.pdf", sep ='/')
+titre_save <- paste(pays, "Taux_activite_educ_sexe_annee_enqu.pdf", sep ='_')
+titre_save <- paste(repo_sorties, titre_save, sep ='/')
 x <-"Annee_enquete"
 sortby_x <- "Annee_enquete"
 y <- "tx_activite"
@@ -332,7 +340,8 @@ longueur_liste <- longueur_liste + 1
 
 
 titre <- paste("Taux d'emploi par niveau d'éducation,\n sexe et année d'enquête (entre", age_min, "et", age_max, "ans)", sep = " ")
-titre_save <- paste(repo_sorties, "Taux_emploi_educ_sexe_annee_enqu.pdf", sep ='/')
+titre_save <- paste(pays, "Taux_emploi_educ_sexe_annee_enqu.pdf", sep ='_')
+titre_save <- paste(repo_sorties, titre_save, sep ='/')
 x <-"Annee_enquete"
 sortby_x <- "Annee_enquete"
 y <- "tx_emploi"
@@ -351,7 +360,8 @@ longueur_liste <- longueur_liste + 1
 
 
 titre <- paste("Taux d'emploi ETP par niveau d'éducation,\n sexe et année d'enquête (entre", age_min, "et", age_max, "ans)", sep = " ")
-titre_save <- paste(repo_sorties, "Taux_emploi_educ_sexe_annee_enqu.pdf", sep ='/')
+titre_save <- paste(pays, "Taux_emploi_educ_sexe_annee_enqu.pdf", sep ='_')
+titre_save <- paste(repo_sorties, titre_save, sep ='/')
 x <-"Annee_enquete"
 sortby_x <- "Annee_enquete"
 y <- "tx_emploi_etp"
@@ -369,68 +379,69 @@ longueur_liste <- longueur_liste + 1
 ################################################################################
 #      On passe en version graphique à lignes ----------------------------------
 ################################################################################
-
-
-# On calcule les taux d'activités et d'emplois par âge et sexe
-liste_var <- c("Niveau_education", "Sexe_1H_2F", "Annee_enquete")
-
-sous_data_merged <- data_merged[Age_tranche - 2 >= age_min, ]
-sous_data_merged <- sous_data_merged[Age_tranche + 2 <= age_max, ]
-
-calculs_annee <- calcul_taux_emplois_activite(liste_var_groupby = liste_var, data_loc = sous_data_merged)
-# Phase de nettoyage
-calculs_annee <- nettoyage_niveau_education(calculs_annee)
-calculs_annee <- nettoyage_sexe(calculs_annee)
-sous_calculs_annee <- calculs_annee[Niveau_education %in% c("Bas","Moyen", "Elevé")]
-sous_calculs_annee <- ff_interaction(sous_calculs_annee, Niveau_education, Sexe)
-
-
-# Puis de tracé
-titre <- paste("Taux d'activité par niveau d'éducation,\n sexe et année d'enquête (entre", age_min, "et", age_max, "ans)", sep = " ")
-titre_save <- paste(repo_sorties, "Taux_activite_educ_sexe_annee_enqu.pdf", sep ='/')
-x <-"Annee_enquete"
-sortby_x <- "Annee_enquete"
-y <- "tx_activite"
-fill <- "Sexe"
-xlabel <-"Année d'enquête"
-ylabel <-"Taux d'activité"
-ligne <- "Niveau_education_Sexe"
-
-graph <- trace_point_lines(sous_calculs_annee, x, sortby_x, y, fill, xlabel, ylabel, titre, titre_save, ligne)
-list_graph[[longueur_liste + 1]] <- graph
-longueur_liste <- longueur_liste + 1
-
-
-
-titre <- paste("Taux d'emploi par niveau d'éducation,\n sexe et année d'enquête (entre", age_min, "et", age_max, "ans)", sep = " ")
-titre_save <- paste(repo_sorties, "Taux_emploi_educ_sexe_annee_enqu.pdf", sep ='/')
-x <-"Annee_enquete"
-sortby_x <- "Annee_enquete"
-y <- "tx_emploi"
-fill <- "Sexe"
-xlabel <-"Année d'enquête"
-ylabel <-"Taux d'emploi"
-ligne <- "Niveau_education_Sexe"
-
-graph <- trace_point_lines(sous_calculs_annee, x, sortby_x, y, fill, xlabel, ylabel, titre, titre_save, ligne)
-list_graph[[longueur_liste + 1]] <- graph
-longueur_liste <- longueur_liste + 1
-
-
-titre <- paste("Taux d'emploi ETP par niveau d'éducation,\n sexe et année d'enquête (entre", age_min, "et", age_max, "ans)", sep = " ")
-titre_save <- paste(repo_sorties, "Taux_emploi_educ_sexe_annee_enqu.pdf", sep ='/')
-x <-"Annee_enquete"
-sortby_x <- "Annee_enquete"
-y <- "tx_emploi_etp"
-fill <- "Sexe"
-xlabel <-"Année d'enquête"
-ylabel <-"Taux d'emploi"
-ligne <- "Niveau_education_Sexe"
-
-graph <- trace_point_lines(sous_calculs_annee, x, sortby_x, y, fill, xlabel, ylabel, titre, titre_save, ligne)
-list_graph[[longueur_liste + 1]] <- graph
-longueur_liste <- longueur_liste + 1
-
+# 
+# 
+# # On calcule les taux d'activités et d'emplois par âge et sexe
+# liste_var <- c("Niveau_education", "Sexe_1H_2F", "Annee_enquete")
+# 
+# sous_data_merged <- data_merged[Age_tranche - 2 >= age_min, ]
+# sous_data_merged <- sous_data_merged[Age_tranche + 2 <= age_max, ]
+# 
+# calculs_annee <- calcul_taux_emplois_activite(liste_var_groupby = liste_var, data_loc = sous_data_merged)
+# # Phase de nettoyage
+# calculs_annee <- nettoyage_niveau_education(calculs_annee)
+# calculs_annee <- nettoyage_sexe(calculs_annee)
+# sous_calculs_annee <- calculs_annee[Niveau_education %in% c("Bas","Moyen", "Elevé")]
+# sous_calculs_annee <- ff_interaction(sous_calculs_annee, Niveau_education, Sexe)
+# 
+# 
+# # Puis de tracé
+# titre <- paste("Taux d'activité par niveau d'éducation,\n sexe et année d'enquête (entre", age_min, "et", age_max, "ans)", sep = " ")
+# titre_save <- paste(pays, "Taux_activite_educ_sexe_annee_enqu.pdf", sep ='_')
+# titre_save <- paste(repo_sorties, titre_save, sep ='/')
+# x <-"Annee_enquete"
+# sortby_x <- "Annee_enquete"
+# y <- "tx_activite"
+# fill <- "Sexe"
+# xlabel <-"Année d'enquête"
+# ylabel <-"Taux d'activité"
+# ligne <- "Niveau_education_Sexe"
+# 
+# graph <- trace_point_lines(sous_calculs_annee, x, sortby_x, y, fill, xlabel, ylabel, titre, titre_save, ligne)
+# list_graph[[longueur_liste + 1]] <- graph
+# longueur_liste <- longueur_liste + 1
+# 
+# 
+# 
+# titre <- paste("Taux d'emploi par niveau d'éducation,\n sexe et année d'enquête (entre", age_min, "et", age_max, "ans)", sep = " ")
+# titre_save <- paste(repo_sorties, "Taux_emploi_educ_sexe_annee_enqu.pdf", sep ='/')
+# x <-"Annee_enquete"
+# sortby_x <- "Annee_enquete"
+# y <- "tx_emploi"
+# fill <- "Sexe"
+# xlabel <-"Année d'enquête"
+# ylabel <-"Taux d'emploi"
+# ligne <- "Niveau_education_Sexe"
+# 
+# graph <- trace_point_lines(sous_calculs_annee, x, sortby_x, y, fill, xlabel, ylabel, titre, titre_save, ligne)
+# list_graph[[longueur_liste + 1]] <- graph
+# longueur_liste <- longueur_liste + 1
+# 
+# 
+# titre <- paste("Taux d'emploi ETP par niveau d'éducation,\n sexe et année d'enquête (entre", age_min, "et", age_max, "ans)", sep = " ")
+# titre_save <- paste(repo_sorties, "Taux_emploi_educ_sexe_annee_enqu.pdf", sep ='/')
+# x <-"Annee_enquete"
+# sortby_x <- "Annee_enquete"
+# y <- "tx_emploi_etp"
+# fill <- "Sexe"
+# xlabel <-"Année d'enquête"
+# ylabel <-"Taux d'emploi"
+# ligne <- "Niveau_education_Sexe"
+# 
+# graph <- trace_point_lines(sous_calculs_annee, x, sortby_x, y, fill, xlabel, ylabel, titre, titre_save, ligne)
+# list_graph[[longueur_liste + 1]] <- graph
+# longueur_liste <- longueur_liste + 1
+# 
 
 ################################################################################
 #            V. SORTIES HTML  ===============================
