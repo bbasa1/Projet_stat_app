@@ -94,7 +94,7 @@ liste_variables <- c('QHHNUM', #Identifiant ménage
                      'ISCO3D',
                      'TEMP', # 1 = CDI. 2 = CDD
                      'TEMPDUR', # Total duration of temporary job or work contract of limited duration. 1 = Less than one month. 2 =1 to 3 months. 3 = 4 to 6 months. 4 = 7 to 12 months = 17. 5 = 13 to 18 months. 6 = 19 to 24 months. 7 = 25 to 36 months. 8 = More than 3 years
-                     'FTPTREAS', # Reasons for the part-time work. 1 = Person is undergoing school education or training. 2 = Of own illness or disability. 3 =Looking after children or incapacitated adults. 4 = Other family or personal reasons (from 2006). 5 = Person could not find a full-time job. 6 = Other
+                     'FTPTREAS', # Reasons for the part-time job 1 = Person is undergoing school education or training. 2 = Of own illness or disability. 3 =Looking after children or incapacitated adults. 4 = Other family or personal reasons (from 2006). 5 = Person could not find a full-time job. 6 = Other
                      'HWWISH', # Number of hours that the person would like to work in total
                      'HWUSUAL', # Number of hours per week usually worked in the main job
                      'HWACTUAL', # Number of hours actually worked during the reference week in the main job
@@ -107,7 +107,12 @@ liste_variables <- c('QHHNUM', #Identifiant ménage
                      'HHNBCH5', # Number of children  [3,5] years in the household
                      'HHNBCH8', # Number of children [6,8] years in the household
                      'HHNBCH11', # Number of children [9,11] years in the household
-                     'HHNBCH14' # Number of children [12,14] years in the household
+                     'HHNBCH14', # Number of children [12,14] years in the household
+                     'SEEKREAS', # Reasons for looking for another job
+                     'NOWKREAS', # Reasons for not working while having a job (includes maternity and parentality leaves)
+                     'LEAVREAS', # Reasons for leaving last job
+                     'AVAIREAS' # Reasons for not being available within the two next weeks to come
+                     
 )
 
 age_min <- 20
