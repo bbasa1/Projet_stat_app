@@ -26,3 +26,39 @@ library(broom)
 library(ggpubr)
 #install.packages("finalfit")
 library(finalfit)
+
+
+### Liste des pays possibles (dico sur https://www.iban.com/country-codes )###
+dico_pays <- c(
+  "FR" ="France",
+  "AT" ="Autriche",
+  "BE" ="Belgique",
+  "BG" ="Bulgarie",
+  "CH" ="Suisse",
+  "CY" ="Chypre",
+  "CZ" ="République Tchèque",
+  "DE" ="Allemagne",
+  "DK" ="Dannemark",
+  "EE" ="Estonie",
+  "ES" ="Espagne",
+  "FI" ="Finlande",
+  "GR" ="Grèce",
+  "HR" ="Croatie",
+  "HU" ="Hongrie",
+  "IE" ="Irlande",
+  "IS" ="Islande",
+  "IT" ="Italie",
+  "LT" ="Lituanie",
+  "LU" ="Luxembourg",
+  "LV" ="Lettonie",
+  "MT" ="Malte",
+  "NL" ="Pays-bas",
+  "NO" ="Norvège",
+  "PL" ="Pologne",
+  "PT" ="Portugal",
+  "RO" ="Roumanie",
+  "SE" ="Suisse",
+  "SI" ="Slovénie",
+  "SK" ="Slovakie",
+  "UK" ="Royaume-Unis"
+)

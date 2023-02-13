@@ -41,10 +41,10 @@ setnames(data_merged,'HHNBCH11',"Nb_enfants_entre_9_11_ans")
 setnames(data_merged,'HHNBCH14',"Nb_enfants_entre_11_14_ans")
 
 setnames(data_merged,'FTPTREAS',"Raisons_temps_partiel")
-setnames(data_merged,'SEEKREAS',"Raisons_recherche_emploi")
-setnames(data_merged,'NOWKREAS',"Raisons_emploi_mais_pas_travail")
-setnames(data_merged,'LEAVREAS',"Raisons_démission")
-setnames(data_merged,'AVAIREAS',"Raisons_indisponibilité_travail")
+# setnames(data_merged,'SEEKREAS',"Raisons_recherche_emploi")
+# setnames(data_merged,'NOWKREAS',"Raisons_emploi_mais_pas_travail")
+# setnames(data_merged,'LEAVREAS',"Raisons_démission")
+# setnames(data_merged,'AVAIREAS',"Raisons_indisponibilité_travail")
 
 
 ######### Recoder les variables avec des modalités NA et non concerné ######################
@@ -137,21 +137,21 @@ data_merged <- data_merged[, Domaine_education_c := Domaine_education]
 data_merged <- data_merged[Domaine_education == "999", Domaine_education_c := "9999"]
 data_merged <- data_merged[is.na(Domaine_education_c), Domaine_education_c := "9999"]
 
-data_merged <- data_merged[, Raisons_emploi_mais_pas_travail_c := Raisons_emploi_mais_pas_travail]
-data_merged <- data_merged[Raisons_emploi_mais_pas_travail == "99", Raisons_emploi_mais_pas_travail_c := "9999"]
-data_merged <- data_merged[is.na(Raisons_emploi_mais_pas_travail_c), Raisons_emploi_mais_pas_travail_c := "9999"]
-
-data_merged <- data_merged[, Raisons_démission_c := Raisons_démission]
-data_merged <- data_merged[Raisons_démission == "99", Raisons_démission_c := "9999"]
-data_merged <- data_merged[is.na(Raisons_démission_c), Raisons_démission_c := "9999"]
-
-data_merged <- data_merged[, Raisons_indisponibilité_travail_c := Raisons_indisponibilité_travail]
-data_merged <- data_merged[Raisons_indisponibilité_travail == "99", Raisons_indisponibilité_travail_c := "9999"]
-data_merged <- data_merged[is.na(Raisons_indisponibilité_travail_c), Raisons_indisponibilité_travail_c := "9999"]
-
-data_merged <- data_merged[, Raisons_recherche_emploi_c := Raisons_recherche_emploi]
-data_merged <- data_merged[Raisons_recherche_emploi == "99", Raisons_recherche_emploi_c := "9999"]
-data_merged <- data_merged[is.na(Raisons_recherche_emploi_c), Raisons_recherche_emploi_c := "9999"]
+# data_merged <- data_merged[, Raisons_emploi_mais_pas_travail_c := Raisons_emploi_mais_pas_travail]
+# data_merged <- data_merged[Raisons_emploi_mais_pas_travail == "99", Raisons_emploi_mais_pas_travail_c := "9999"]
+# data_merged <- data_merged[is.na(Raisons_emploi_mais_pas_travail_c), Raisons_emploi_mais_pas_travail_c := "9999"]
+# 
+# data_merged <- data_merged[, Raisons_démission_c := Raisons_démission]
+# data_merged <- data_merged[Raisons_démission == "99", Raisons_démission_c := "9999"]
+# data_merged <- data_merged[is.na(Raisons_démission_c), Raisons_démission_c := "9999"]
+# 
+# data_merged <- data_merged[, Raisons_indisponibilité_travail_c := Raisons_indisponibilité_travail]
+# data_merged <- data_merged[Raisons_indisponibilité_travail == "99", Raisons_indisponibilité_travail_c := "9999"]
+# data_merged <- data_merged[is.na(Raisons_indisponibilité_travail_c), Raisons_indisponibilité_travail_c := "9999"]
+# 
+# data_merged <- data_merged[, Raisons_recherche_emploi_c := Raisons_recherche_emploi]
+# data_merged <- data_merged[Raisons_recherche_emploi == "99", Raisons_recherche_emploi_c := "9999"]
+# data_merged <- data_merged[is.na(Raisons_recherche_emploi_c), Raisons_recherche_emploi_c := "9999"]
 
 
 ################################################################################

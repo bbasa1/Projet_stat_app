@@ -8,38 +8,6 @@
  #                      PREAMBULE               ===============================
 ################################################################################
 
-### Liste des pays possibles (dico sur https://www.iban.com/country-codes )###
-# FR FRANCE
-# AT Autriche
-# BE Belgique
-# BG Bulgarie
-# CH Suisse
-# CY Chypre
-# CZ République Tchèque
-# DE Allemagne
-# DK Dannemark
-# EE Estonie
-# ES Espagne
-# FI Finlande
-# GR Grèce
-# HR Croatie
-# HU Hongrie
-# IE Irlande
-# IS Islande
-# IT Italie
-# LT Lituanie
-# LU Luxembourg
-# LV Lettonie
-# MT Malte
-# NL Pays-bas
-# NO Norvège
-# PL Pologne
-# PT Portugal
-# RO Roumanie
-# SE Suisse
-# SI Slovénie
-# SK Slovakie
-# UK Royaume-Unis
 
 ################################################################################
 #            A. PARAMETRES              -------------------------------
@@ -67,8 +35,6 @@ repo_data <- paste(repgen, "Data" , sep = "/")
 repo_inter <- paste(repgen, "bases_intermediaires" , sep = "/")
 
 rep_html <- paste(repgen, "pages_html" , sep="/")
-
-nrow(data_merged)
 
 liste_variables <- c('QHHNUM', #Identifiant ménage
                      # 'COEFFY', #Yearly weighting factor,
@@ -180,7 +146,7 @@ calculs_age
 
 
 # Puis de tracé
-titre <- paste("Taux d'activité par âge et par sexe,\n moyenne entre", toString(liste_annees[1]), "et", toString(tail(liste_annees, n=1)))
+titre <- paste("Taux d'activité par âge et par sexe,\n moyenne entre", toString(liste_annees[1]), "et", toString(tail(liste_annees, n=1)), "\n (", dico_pays[pays], ")")
 titre_save <- paste(pays, "Taux_activite_age_sexe.pdf", sep ='_')
 titre_save <- paste(repo_sorties, titre_save, sep ='/')
 x <-"Age_tranche"
@@ -197,7 +163,7 @@ longueur_liste <- longueur_liste + 1
 
 
 # Second tracé 
-titre <- paste("Taux d'emploi par âge et par sexe,\n moyenne entre", toString(liste_annees[1]), "et", toString(tail(liste_annees, n=1)))
+titre <- paste("Taux d'emploi par âge et par sexe,\n moyenne entre", toString(liste_annees[1]), "et", toString(tail(liste_annees, n=1)), "\n (", dico_pays[pays], ")")
 titre_save <- paste(pays, "Taux_emploi_age_sexe.pdf", sep ='_')
 titre_save <- paste(repo_sorties, titre_save, sep ='/')
 x <-"Age_tranche"
@@ -214,7 +180,7 @@ longueur_liste <- longueur_liste + 1
 
 
 # Troisième
-titre <- paste("Taux d'emploi ETP par âge et par sexe,\n moyenne entre", toString(liste_annees[1]), "et", toString(tail(liste_annees, n=1)))
+titre <- paste("Taux d'emploi ETP par âge et par sexe,\n moyenne entre", toString(liste_annees[1]), "et", toString(tail(liste_annees, n=1)), "\n (", dico_pays[pays], ")")
 titre_save <- paste(pays, "Taux_emploi_etp_age_sexe.pdf", sep ='_')
 titre_save <- paste(repo_sorties, titre_save, sep ='/')
 x <-"Age_tranche"
@@ -248,7 +214,7 @@ calculs_annee <- nettoyage_sexe(calculs_annee)
 
 
 # Puis de tracé
-titre <- "Taux d'activité par âge, sexe et année d'enquête"
+titre <- paste("Taux d'activité par âge, sexe et année d'enquête", "\n (", dico_pays[pays], ")")
 titre_save <- paste(pays, "Taux_activite_age_sexe_annee_enqu.pdf", sep ='_')
 titre_save <- paste(repo_sorties, titre_save, sep ='/')
 x <-"Annee_enquete"
@@ -269,7 +235,7 @@ longueur_liste <- longueur_liste + 1
 
 
 # Second tracé 
-titre <- "Taux d'emploi par âge, sexe et année d'enquête"
+titre <- paste("Taux d'emploi par âge, sexe et année d'enquête", "\n (", dico_pays[pays], ")")
 titre_save <- paste(pays, "Taux_emploi_age_sexe_annee_enqu.pdf", sep ='_')
 titre_save <- paste(repo_sorties, titre_save, sep ='/')
 x <-"Annee_enquete"
@@ -288,7 +254,7 @@ longueur_liste <- longueur_liste + 1
 
 
 # Troisième tracé 
-titre <- "Taux d'emploi ETP par âge, sexe et année d'enquête"
+titre <- paste("Taux d'emploi ETP par âge, sexe et année d'enquête", "\n (", dico_pays[pays], ")")
 titre_save <- paste(pays, "Taux_emploi_etp_age_sexe_annee_enqu.pdf", sep ='_')
 titre_save <- paste(repo_sorties, titre_save, sep ='/')
 x <-"Annee_enquete"
@@ -325,7 +291,7 @@ sous_calculs_annee <- ff_interaction(sous_calculs_annee, Niveau_education, Sexe)
 
 
 # Puis de tracé
-titre <- paste("Taux d'activité par niveau d'éducation,\n sexe et année d'enquête (entre", age_min, "et", age_max, "ans)", sep = " ")
+titre <- paste("Taux d'activité par niveau d'éducation,\n sexe et année d'enquête (entre", age_min, "et", age_max, "ans)", "\n (", dico_pays[pays], ")", sep = " ")
 titre_save <- paste(pays, "Taux_activite_educ_sexe_annee_enqu.pdf", sep ='_')
 titre_save <- paste(repo_sorties, titre_save, sep ='/')
 x <-"Annee_enquete"
@@ -344,7 +310,7 @@ longueur_liste <- longueur_liste + 1
 
 
 
-titre <- paste("Taux d'emploi par niveau d'éducation,\n sexe et année d'enquête (entre", age_min, "et", age_max, "ans)", sep = " ")
+titre <- paste("Taux d'emploi par niveau d'éducation,\n sexe et année d'enquête (entre", age_min, "et", age_max, "ans)", "\n (", dico_pays[pays], ")", sep = " ")
 titre_save <- paste(pays, "Taux_emploi_educ_sexe_annee_enqu.pdf", sep ='_')
 titre_save <- paste(repo_sorties, titre_save, sep ='/')
 x <-"Annee_enquete"
@@ -364,7 +330,7 @@ longueur_liste <- longueur_liste + 1
 
 
 
-titre <- paste("Taux d'emploi ETP par niveau d'éducation,\n sexe et année d'enquête (entre", age_min, "et", age_max, "ans)", sep = " ")
+titre <- paste("Taux d'emploi ETP par niveau d'éducation,\n sexe et année d'enquête (entre", age_min, "et", age_max, "ans)", "\n (", dico_pays[pays], ")", sep = " ")
 titre_save <- paste(pays, "Taux_emploi_educ_sexe_annee_enqu.pdf", sep ='_')
 titre_save <- paste(repo_sorties, titre_save, sep ='/')
 x <-"Annee_enquete"
