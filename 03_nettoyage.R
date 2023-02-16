@@ -20,7 +20,7 @@ setnames(data_merged,'WANTWORK',"Souhaite_travailler")
 setnames(data_merged,'WISHMORE',"Souhaite_davantage_travailler")
 setnames(data_merged,'AVAILBLE',"Disponible_pour_travailler")
 setnames(data_merged,'SEEKWORK',"Recherche_un_emploi")
-setnames(data_merged,'SEEKREAS',"Raison_absence_recherche")
+# setnames(data_merged,'SEEKREAS',"Raison_absence_recherche")
 setnames(data_merged,'STAPRO',"Statut_dans_emploi")
 setnames(data_merged,'FTPT',"Temps_partiel")
 
@@ -65,9 +65,9 @@ data_merged <- data_merged[, Recherche_un_emploi_c := Recherche_un_emploi]
 data_merged <- data_merged[Recherche_un_emploi == 9, Recherche_un_emploi_c := 9999]
 data_merged <- data_merged[is.na(Recherche_un_emploi_c), Recherche_un_emploi_c := 9999]
 
-data_merged <- data_merged[, Raison_absence_recherche_c := Raison_absence_recherche]
-data_merged <- data_merged[Raison_absence_recherche == 9, Raison_absence_recherche_c := 9999]
-data_merged <- data_merged[is.na(Raison_absence_recherche_c), Raison_absence_recherche_c := 9999]
+# data_merged <- data_merged[, Raison_absence_recherche_c := Raison_absence_recherche]
+# data_merged <- data_merged[Raison_absence_recherche == 9, Raison_absence_recherche_c := 9999]
+# data_merged <- data_merged[is.na(Raison_absence_recherche_c), Raison_absence_recherche_c := 9999]
 
 data_merged <- data_merged[, Statut_dans_emploi_c := Statut_dans_emploi]
 data_merged <- data_merged[Statut_dans_emploi == 9, Statut_dans_emploi_c := 9999]
@@ -368,13 +368,13 @@ df_merged<- as.data.frame(data_merged)
 
 
 df_merged <- df_merged %>%
-  mutate(Temps_partiel_clean = ifelse(Temps_partiel ==2, 0, Temps_partiel)) %>% 
+  mutate(Temps_partiel_clean = ifelse(Temps_partiel ==2, 0, Temps_partiel)) %>%
   mutate(Temps_partiel_clean = ifelse(Temps_partiel ==9, is.na(Temps_partiel_clean), Temps_partiel_clean)) %>% # Création de TP égale à 1 si temps plein, 0 si temps partiel
-  mutate(ETP = ifelse(Temps_partiel_clean ==1, 1, 0)) %>% 
+  mutate(ETP = ifelse(Temps_partiel_clean ==1, 1, 0)) %>%
   mutate(heures_clean = ifelse(Volume_travail_habituel ==99 | Volume_travail_habituel ==00, NA_real_, Volume_travail_habituel)) %>% # création de heures clean, variable nettoyée du nombre d'heures travaillées habituellement
-  group_by(Annee_enquete, Temps_partiel_clean) %>% 
-  mutate(mediane_h = median(heures_clean, na.rm = TRUE)) %>% 
-  group_by(Annee_enquete) %>% 
+  group_by(Annee_enquete, Temps_partiel_clean) %>%
+  mutate(mediane_h = median(heures_clean, na.rm = TRUE)) %>%
+  group_by(Annee_enquete) %>%
   mutate(mediane_h = max(mediane_h, na.rm = TRUE)) # création de la médiane des heures travaillées par les individus à plein temps pour chaque année
 
 # summary(df_merged$EQTP)

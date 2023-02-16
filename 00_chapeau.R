@@ -18,11 +18,11 @@ repgen <- "C:/Users/Benjamin/Desktop/Ensae/Projet_statapp"#BB
 
 
 liste_annees <- 1998:2018
-pays <- "FR"
+pays <- "GR"
 
 nom_fichier_html <- paste("Taux_activite", pays, sep = "_")
 
-creer_base <- FALSE
+creer_base <- TRUE
 mettre_coeffs_nan_a_zero <- TRUE
 
 
@@ -53,7 +53,7 @@ liste_variables <- c('QHHNUM', #Identifiant ménage
                      'AVAILBLE', # Availability to start working within two weeks if work were found now. 1 = Could start to work immediately. 2 = could not start
                      'SEEKWORK', # Seeking employment during previous four weeks. 1 = Person has already found a job which will start within a period of at most 3 months. 2 = Person has already found a job which will start in more than 3 months. 3 = Person is not seeking employment and has not found
                      # any job to start late. 4 = Person is seeking employment
-                     'SEEKREAS', # Reasons for not searching an employment because. 1 = awaiting recall to work (persons on lay-off). 2 = of own illness or disability. 3 = looking after children or incapacitated adults (from 2006). 4 = of other personal or family responsibilities. 5 = of education or training. 6 = of retirement. 7 = of belief that no work is available. 8 = of other reasons
+                     # 'SEEKREAS', # Reasons for not searching an employment because. 1 = awaiting recall to work (persons on lay-off). 2 = of own illness or disability. 3 = looking after children or incapacitated adults (from 2006). 4 = of other personal or family responsibilities. 5 = of education or training. 6 = of retirement. 7 = of belief that no work is available. 8 = of other reasons
                      'DEGURBA', # Degree of urbanisation. 1 = Densely. 2 = intermediate. 3 = rural
                      'STAPRO', #Professional status. 1 = Self-employed with employees. 2 = Self-employed without employees. 3 = Employee. 4 = Family worker. 
                      'FTPT', # 1 = Full-time. 2 = Part-time job.
@@ -74,7 +74,6 @@ liste_variables <- c('QHHNUM', #Identifiant ménage
                      'HHNBCH8', # Number of children [6,8] years in the household
                      'HHNBCH11', # Number of children [9,11] years in the household
                      'HHNBCH14', # Number of children [12,14] years in the household
-                     'SEEKREAS', # Reasons for looking for another job
                      'NOWKREAS', # Reasons for not working while having a job (includes maternity and parentality leaves)
                      'LEAVREAS', # Reasons for leaving last job
                      'AVAIREAS' # Reasons for not being available within the two next weeks to come
