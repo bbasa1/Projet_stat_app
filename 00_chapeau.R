@@ -18,7 +18,7 @@ repgen <- "C:/Users/Benjamin/Desktop/Ensae/Projet_statapp"#BB
 
 
 liste_annees <- 1998:2018
-pays <- "GR"
+pays <- "AT"
 
 nom_fichier_html <- paste("Taux_activite", pays, sep = "_")
 
@@ -330,7 +330,7 @@ longueur_liste <- longueur_liste + 1
 
 
 titre <- paste("Taux d'emploi ETP par niveau d'éducation,\n sexe et année d'enquête (entre", age_min, "et", age_max, "ans)", "\n (", dico_pays[pays], ")", sep = " ")
-titre_save <- paste(pays, "Taux_emploi_educ_sexe_annee_enqu.pdf", sep ='_')
+titre_save <- paste(pays, "Taux_emploi_etp_educ_sexe_annee_enqu.pdf", sep ='_')
 titre_save <- paste(repo_sorties, titre_save, sep ='/')
 x <-"Annee_enquete"
 sortby_x <- "Annee_enquete"
