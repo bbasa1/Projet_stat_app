@@ -86,6 +86,7 @@ source(paste(repo_prgm , "03_nettoyage.R" , sep = "/"))
 ### On commence par filtrer sur l'âge
 data_merged <- data_merged[Age_tranche - 2 >= age_min, ]
 data_merged <- data_merged[Age_tranche + 2 <= age_max, ]
+data_merged <- data_merged[Sexe_1H_2F == 2]
 
 data_merged
 
@@ -124,14 +125,24 @@ data_merged[, eval(liste_cols_delete) :=NULL]  # remove columns
 data_merged[is.na(data_merged)] <- 0
 
 
+liste_var_sup <- c("Pays_AT", "Pays_DE", "Pays_DK", "Pays_ES", "Pays_FR", "Pays_IT")
+liste_indices_sup <- c()
+for (nom_col in liste_var_sup){
+  numero_col <- which(colnames(data_merged) == nom_col)
+  liste_indices_sup <- c(liste_indices_sup,numero_col)
 
-resultats_acp  <- PCA(data_merged, scale.unit = TRUE, ncp = 5, graph = FALSE)
+}
+
+
+
+resultats_acp  <- PCA(data_merged, scale.unit = TRUE, ncp = 5, ind.sup = liste_indices_sup,
+                      quanti.sup=NULL, quali.sup=NULL, graph=FALSE)
 
 get_eigenvalue(resultats_acp)
 fviz_eig(resultats_acp, addlabels = TRUE)
 
 
-fviz_pca_var(resultats_acp)
+fviz_pca_var(resultats_acp,  choix = "var")
 
 
 ### On essaie du clustering
@@ -150,41 +161,70 @@ resKM <- kmeans(data_merged_scale, centers=3,nstart=20)
 resKM
 
 
-sample <- as.data.table(sapply(data_merged_scale[], sample, 10000))
+sample <- as.data.table(sapply(data_merged_scale[], sample, 100000))
 
 
 factoextra::fviz_nbclust(sample, FUNcluster =factoextra::hcut, method = "silhouette",hc_method = "average", hc_metric = "euclidean", stand = TRUE)
 
 
-sample[, eval(c("Nb_enfants_moins_2_ans_99", "Age_tranche_99")) := NULL]
+sample[, eval(c("Nb_enfants_moins_2_ans_9999", "Age_tranche_9999", "Sexe_1H_2F_2")) := NULL]
 
-resKM <- kmeans(sample, centers=3, nstart=20, kmeans_init_iter_max=10000000)
+sample
+# , kmeans_init_iter_max=10000
+resKM <- kmeans(sample, centers=3, nstart=20)
 resKM
 
+
+summary(sample)
+
+
 fviz_cluster(resKM, sample)
-
-
-
-
 # 
-# rs = split(seq(nrow(data_merged)), data_merged$Temps_partiel)
-# # data_merged[, names(rs) := 0 ]
-# 
-# # paste("Temps_partiel", rs, sep = "_")
-# 
-# data_merged[, names(paste("Temps_partiel", rs, sep = "_")) := 0 ]
-# data_merged
-# for (n in names(rs)) set(data_merged, i = rs[[n]], j = paste("Temps_partiel", n, sep = "_"), v = 1)
-# # for (n in names(rs)){data_merged[is.na(paste("Temps_partiel", n, sep = "_")), paste("Temps_partiel", n, sep = "_") = 0]}
-# data_merged
-# 
-# n = 1
-# 
-# names(paste("Temps_partiel", n, sep = "_"))
-# data_merged[is.na(names(paste("Temps_partiel", n, sep = "_")))]
+# fviz_cluster(res.km, data = df[, -5],
+#              palette = c("#2E9FDF", "#00AFBB", "#E7B800"), 
+#              geom = "point",
+#              ellipse.type = "convex", 
+#              ggtheme = theme_bw()
+# )
+
+
+########### Et un peu de KNN
+ran <- sample(1:nrow(data_merged), 0.9 * nrow(data_merged)) 
+
+##the normalization function is created
+nor <-function(x) { (x -min(x))/(max(x)-min(x))   }
+
+##Run nomalization on first 4 coulumns of dataset because they are the predictors
+data_merged_norm <- as.data.table(lapply(data_merged, nor))
+data_merged_norm
+data_merged_norm[, eval(c("Nb_enfants_moins_2_ans_9999", "Age_tranche_9999", "Sexe_1H_2F_2")) := NULL]
 
 
 
+# summary(iris_norm)
+##extract training set
+iris_train <- data_merged_norm[ran,] 
+##extract testing set
+iris_test <- data_merged_norm[-ran,] 
+
+library(class)
+
+
+y_train <- iris_train$Statut_emploi_1_emploi_1
+y_test <- iris_test$Statut_emploi_1_emploi_1
+iris_train[, Statut_emploi_1_emploi_1 := NULL]
+iris_test[, Statut_emploi_1_emploi_1 := NULL]
+
+
+pr <- knn(iris_train,iris_test,cl=y_train,k=13)
+
+##create confusion matrix
+tab <- table(pr,y_test)
+
+##this function divides the correct predictions by total number of predictions that tell us how accurate teh model is.
+
+accuracy <- function(x){sum(diag(x)/(sum(rowSums(x)))) * 100}
+accuracy(tab)
 
 data_merged
 
