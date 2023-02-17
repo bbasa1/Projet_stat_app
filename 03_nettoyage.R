@@ -386,6 +386,7 @@ calcul_EQTP <- function(data_merged_loc){
   
   df_merged <- df_merged %>%
     mutate(EQTP = Volume_travail_habituel/mediane_h) %>% # création du coefficient d'équivalent temps plein (linéaire: variable continue)
+    mutate(EQTP = ifelse(Statut_emploi_1_emploi==1, EQTP, 0)) %>%
     mutate(EQTP = ifelse(EQTP>1, 1, EQTP))%>%
     mutate(EQTP = ifelse(is.na(heures_clean), NA_real_, EQTP))
   
