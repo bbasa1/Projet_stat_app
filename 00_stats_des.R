@@ -18,11 +18,11 @@ repgen <- "C:/Users/Benjamin/Desktop/Ensae/Projet_statapp"#BB
 
 
 liste_annees <- 1998:2018
-pays <- "AT"
+pays <- "FR"
 
 nom_fichier_html <- paste("Taux_activite", pays, sep = "_")
 
-creer_base <- TRUE
+creer_base <- FALSE
 mettre_coeffs_nan_a_zero <- TRUE
 
 
