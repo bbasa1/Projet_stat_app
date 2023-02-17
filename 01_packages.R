@@ -26,6 +26,10 @@ library(broom)
 library(ggpubr)
 #install.packages("finalfit")
 library(finalfit)
+# install.packages("FactoMineR")
+library(FactoMineR)
+# install.packages("factoextra")
+library(factoextra)
 
 
 ### Liste des pays possibles (dico sur https://www.iban.com/country-codes )###

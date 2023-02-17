@@ -83,7 +83,6 @@ liste_variables <- c('QHHNUM', #Identifiant ménage
 age_min <- 20
 age_max <- 59
 
-
 ################################################################################
 #            B. PACKAGES              -------------------------------
 ################################################################################
@@ -94,10 +93,11 @@ source(paste(repo_prgm , "01_packages.R" , sep = "/"))
 ################################################################################
 #            I. CREATION OU IMPOERT DE LA BASE   ===============================
 ################################################################################
+source(paste(repo_prgm , "02_creation_base.R" , sep = "/"))
 
 # Soit on créé la table, soit on l'importe...
 if(creer_base){
-  source(paste(repo_prgm , "02_creation_base.R" , sep = "/"))
+  data_merged <- fnt_creation_base_stats_des()
 }else{
   nom_base <- paste(repo_data, "/data_intermediaire/base_", pays, ".Rdata", sep = "")
   load(file = nom_base)
@@ -111,6 +111,8 @@ if(creer_base){
 
 source(paste(repo_prgm , "03_nettoyage.R" , sep = "/"))
 # 100 * nrow(data_merged[is.na(COEFF), ])/nrow(data_merged)
+
+data_merged <- calcul_EQTP(data_merged)
 
 
 

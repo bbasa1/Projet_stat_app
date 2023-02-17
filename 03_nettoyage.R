@@ -7,151 +7,151 @@
 ################################################################################
 
 ######### Renaming des variables conservées ######################
-setnames(data_merged,'QHHNUM',"Identifiant_menage")
-setnames(data_merged,'COUNTRY',"Pays")
-setnames(data_merged,'SEX',"Sexe_1H_2F")
-setnames(data_merged,'YEAR',"Annee_enquete")
-setnames(data_merged,'AGE',"Age_tranche")
-setnames(data_merged,'YSTARTWK',"Debut_emploi_actuel")
+try(setnames(data_merged,'QHHNUM',"Identifiant_menage"), silent=TRUE)
+try(setnames(data_merged,'COUNTRY',"Pays"), silent=TRUE)
+try(setnames(data_merged,'SEX',"Sexe_1H_2F"), silent=TRUE)
+try(setnames(data_merged,'YEAR',"Annee_enquete"), silent=TRUE)
+try(setnames(data_merged,'AGE',"Age_tranche"), silent=TRUE)
+try(setnames(data_merged,'YSTARTWK',"Debut_emploi_actuel"), silent=TRUE)
 
-setnames(data_merged,'ILOSTAT',"Statut_emploi_1_emploi")
-setnames(data_merged,'WSTATOR',"Statut_semaine")
-setnames(data_merged,'WANTWORK',"Souhaite_travailler")
-setnames(data_merged,'WISHMORE',"Souhaite_davantage_travailler")
-setnames(data_merged,'AVAILBLE',"Disponible_pour_travailler")
-setnames(data_merged,'SEEKWORK',"Recherche_un_emploi")
-# setnames(data_merged,'SEEKREAS',"Raison_absence_recherche")
-setnames(data_merged,'STAPRO',"Statut_dans_emploi")
-setnames(data_merged,'FTPT',"Temps_partiel")
+try(setnames(data_merged,'ILOSTAT',"Statut_emploi_1_emploi"), silent=TRUE)
+try(setnames(data_merged,'WSTATOR',"Statut_semaine"), silent=TRUE)
+try(setnames(data_merged,'WANTWORK',"Souhaite_travailler"), silent=TRUE)
+try(setnames(data_merged,'WISHMORE',"Souhaite_davantage_travailler"), silent=TRUE)
+try(setnames(data_merged,'AVAILBLE',"Disponible_pour_travailler"), silent=TRUE)
+try(setnames(data_merged,'SEEKWORK',"Recherche_un_emploi"), silent=TRUE)
+# try(setnames(data_merged,'SEEKREAS',"Raison_absence_recherche"), silent=TRUE)
+try(setnames(data_merged,'STAPRO',"Statut_dans_emploi"), silent=TRUE)
+try(setnames(data_merged,'FTPT',"Temps_partiel"), silent=TRUE)
 
-setnames(data_merged,'ISCO3D',"CSP")
-setnames(data_merged,'TEMP',"Perennite_emploi")
-setnames(data_merged,'TEMPDUR',"Duree_contrat")
-setnames(data_merged,'HWWISH',"Volume_travail_souhaite")
-setnames(data_merged,'HWUSUAL',"Volume_travail_habituel")
-setnames(data_merged,'INCDECIL',"Decile_salaire")
+try(setnames(data_merged,'ISCO3D',"CSP"), silent=TRUE)
+try(setnames(data_merged,'TEMP',"Perennite_emploi"), silent=TRUE)
+try(setnames(data_merged,'TEMPDUR',"Duree_contrat"), silent=TRUE)
+try(setnames(data_merged,'HWWISH',"Volume_travail_souhaite"), silent=TRUE)
+try(setnames(data_merged,'HWUSUAL',"Volume_travail_habituel"), silent=TRUE)
+try(setnames(data_merged,'INCDECIL',"Decile_salaire"), silent=TRUE)
 
-setnames(data_merged,'HATLEV1D',"Niveau_education")
-setnames(data_merged,'HATFIELD',"Domaine_education")
+try(setnames(data_merged,'HATLEV1D',"Niveau_education"), silent=TRUE)
+try(setnames(data_merged,'HATFIELD',"Domaine_education"), silent=TRUE)
 
-setnames(data_merged,'HHNBCH2',"Nb_enfants_moins_2_ans")
-setnames(data_merged,'HHNBCH5',"Nb_enfants_entre_3_5_ans")
-setnames(data_merged,'HHNBCH8',"Nb_enfants_entre_6_8_ans")
-setnames(data_merged,'HHNBCH11',"Nb_enfants_entre_9_11_ans")
-setnames(data_merged,'HHNBCH14',"Nb_enfants_entre_11_14_ans")
+try(setnames(data_merged,'HHNBCH2',"Nb_enfants_moins_2_ans"), silent=TRUE)
+try(setnames(data_merged,'HHNBCH5',"Nb_enfants_entre_3_5_ans"), silent=TRUE)
+try(setnames(data_merged,'HHNBCH8',"Nb_enfants_entre_6_8_ans"), silent=TRUE)
+try(setnames(data_merged,'HHNBCH11',"Nb_enfants_entre_9_11_ans"), silent=TRUE)
+try(setnames(data_merged,'HHNBCH14',"Nb_enfants_entre_11_14_ans"), silent=TRUE)
 
-setnames(data_merged,'FTPTREAS',"Raisons_temps_partiel")
-# setnames(data_merged,'SEEKREAS',"Raisons_recherche_emploi")
-# setnames(data_merged,'NOWKREAS',"Raisons_emploi_mais_pas_travail")
-# setnames(data_merged,'LEAVREAS',"Raisons_démission")
-# setnames(data_merged,'AVAIREAS',"Raisons_indisponibilité_travail")
+try(setnames(data_merged,'FTPTREAS',"Raisons_temps_partiel"), silent=TRUE)
+# try(setnames(data_merged,'SEEKREAS',"Raisons_recherche_emploi"), silent=TRUE)
+# try(setnames(data_merged,'NOWKREAS',"Raisons_emploi_mais_pas_travail"), silent=TRUE)
+# try(setnames(data_merged,'LEAVREAS',"Raisons_démission"), silent=TRUE)
+# try(setnames(data_merged,'AVAIREAS',"Raisons_indisponibilité_travail"), silent=TRUE)
 
 
 ######### Recoder les variables avec des modalités NA et non concerné ######################
 
-data_merged <- data_merged[, Souhaite_travailler_c := Souhaite_travailler]
-data_merged <- data_merged[Souhaite_travailler == 9, Souhaite_travailler_c := 9999]
-data_merged <- data_merged[is.na(Souhaite_travailler_c), Souhaite_travailler_c := 9999]
+try(data_merged <- data_merged[, Souhaite_travailler_c := Souhaite_travailler], silent=TRUE)
+try(data_merged <- data_merged[Souhaite_travailler == 9, Souhaite_travailler_c := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(Souhaite_travailler_c), Souhaite_travailler_c := 9999], silent=TRUE)
 
-data_merged <- data_merged[, Souhaite_davantage_travailler_c := Souhaite_davantage_travailler]
-data_merged <- data_merged[Souhaite_davantage_travailler == 9, Souhaite_davantage_travailler_c := 9999]
-data_merged <- data_merged[is.na(Souhaite_davantage_travailler_c), Souhaite_davantage_travailler_c := 9999]
+try(data_merged <- data_merged[, Souhaite_davantage_travailler_c := Souhaite_davantage_travailler], silent=TRUE)
+try(data_merged <- data_merged[Souhaite_davantage_travailler == 9, Souhaite_davantage_travailler_c := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(Souhaite_davantage_travailler_c), Souhaite_davantage_travailler_c := 9999], silent=TRUE)
 
-data_merged <- data_merged[, Disponible_pour_travailler_c := Disponible_pour_travailler]
-data_merged <- data_merged[Disponible_pour_travailler == 9, Disponible_pour_travailler_c := 9999]
-data_merged <- data_merged[is.na(Disponible_pour_travailler_c), Disponible_pour_travailler_c := 9999]
+try(data_merged <- data_merged[, Disponible_pour_travailler_c := Disponible_pour_travailler], silent=TRUE)
+try(data_merged <- data_merged[Disponible_pour_travailler == 9, Disponible_pour_travailler_c := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(Disponible_pour_travailler_c), Disponible_pour_travailler_c := 9999], silent=TRUE)
 
-data_merged <- data_merged[, Recherche_un_emploi_c := Recherche_un_emploi]
-data_merged <- data_merged[Recherche_un_emploi == 9, Recherche_un_emploi_c := 9999]
-data_merged <- data_merged[is.na(Recherche_un_emploi_c), Recherche_un_emploi_c := 9999]
+try(data_merged <- data_merged[, Recherche_un_emploi_c := Recherche_un_emploi], silent=TRUE)
+try(data_merged <- data_merged[Recherche_un_emploi == 9, Recherche_un_emploi_c := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(Recherche_un_emploi_c), Recherche_un_emploi_c := 9999], silent=TRUE)
 
-# data_merged <- data_merged[, Raison_absence_recherche_c := Raison_absence_recherche]
-# data_merged <- data_merged[Raison_absence_recherche == 9, Raison_absence_recherche_c := 9999]
-# data_merged <- data_merged[is.na(Raison_absence_recherche_c), Raison_absence_recherche_c := 9999]
+# try(data_merged <- data_merged[, Raison_absence_recherche_c := Raison_absence_recherche], silent=TRUE)
+# try(data_merged <- data_merged[Raison_absence_recherche == 9, Raison_absence_recherche_c := 9999], silent=TRUE)
+# try(data_merged <- data_merged[is.na(Raison_absence_recherche_c), Raison_absence_recherche_c := 9999], silent=TRUE)
 
-data_merged <- data_merged[, Statut_dans_emploi_c := Statut_dans_emploi]
-data_merged <- data_merged[Statut_dans_emploi == 9, Statut_dans_emploi_c := 9999]
-data_merged <- data_merged[is.na(Statut_dans_emploi_c), Statut_dans_emploi_c := 9999]
+try(data_merged <- data_merged[, Statut_dans_emploi_c := Statut_dans_emploi], silent=TRUE)
+try(data_merged <- data_merged[Statut_dans_emploi == 9, Statut_dans_emploi_c := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(Statut_dans_emploi_c), Statut_dans_emploi_c := 9999], silent=TRUE)
 
-data_merged <- data_merged[, Temps_partiel_c := Temps_partiel]
-data_merged <- data_merged[Temps_partiel == 9, Temps_partiel_c := 9999]
-data_merged <- data_merged[is.na(Temps_partiel_c), Temps_partiel_c := 9999]
+try(data_merged <- data_merged[, Temps_partiel_c := Temps_partiel], silent=TRUE)
+try(data_merged <- data_merged[Temps_partiel == 9, Temps_partiel_c := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(Temps_partiel_c), Temps_partiel_c := 9999], silent=TRUE)
 
-data_merged <- data_merged[, Perennite_emploi_c := Perennite_emploi]
-data_merged <- data_merged[Perennite_emploi == 9, Perennite_emploi_c := 9999]
-data_merged <- data_merged[is.na(Perennite_emploi_c), Perennite_emploi_c := 9999]
+try(data_merged <- data_merged[, Perennite_emploi_c := Perennite_emploi], silent=TRUE)
+try(data_merged <- data_merged[Perennite_emploi == 9, Perennite_emploi_c := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(Perennite_emploi_c), Perennite_emploi_c := 9999], silent=TRUE)
 
-data_merged <- data_merged[, Duree_contrat_c := Duree_contrat]
-data_merged <- data_merged[Duree_contrat == 9, Duree_contrat_c := 9999]
-data_merged <- data_merged[is.na(Duree_contrat_c), Duree_contrat_c := 9999]
+try(data_merged <- data_merged[, Duree_contrat_c := Duree_contrat], silent=TRUE)
+try(data_merged <- data_merged[Duree_contrat == 9, Duree_contrat_c := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(Duree_contrat_c), Duree_contrat_c := 9999], silent=TRUE)
 
-data_merged <- data_merged[, Raisons_temps_partiel_c := Raisons_temps_partiel]
-data_merged <- data_merged[Raisons_temps_partiel == 9, Raisons_temps_partiel_c := 9999]
-data_merged <- data_merged[is.na(Raisons_temps_partiel_c), Raisons_temps_partiel_c := 9999]
+try(data_merged <- data_merged[, Raisons_temps_partiel_c := Raisons_temps_partiel], silent=TRUE)
+try(data_merged <- data_merged[Raisons_temps_partiel == 9, Raisons_temps_partiel_c := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(Raisons_temps_partiel_c), Raisons_temps_partiel_c := 9999], silent=TRUE)
 
-data_merged <- data_merged[, NEEDCARE_c := NEEDCARE]
-data_merged <- data_merged[NEEDCARE == 9, NEEDCARE_c := 9999]
-data_merged <- data_merged[is.na(NEEDCARE_c), NEEDCARE_c := 9999]
+try(data_merged <- data_merged[, NEEDCARE_c := NEEDCARE], silent=TRUE)
+try(data_merged <- data_merged[NEEDCARE == 9, NEEDCARE_c := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(NEEDCARE_c), NEEDCARE_c := 9999], silent=TRUE)
 
-data_merged <- data_merged[, Niveau_education_c := Niveau_education]
-data_merged <- data_merged[Niveau_education == "9", Niveau_education_c := "9999"]
-data_merged <- data_merged[is.na(Niveau_education_c), Niveau_education_c := "9999"]
+try(data_merged <- data_merged[, Niveau_education_c := Niveau_education], silent=TRUE)
+try(data_merged <- data_merged[Niveau_education == "9", Niveau_education_c := "9999"], silent=TRUE)
+try(data_merged <- data_merged[is.na(Niveau_education_c), Niveau_education_c := "9999"], silent=TRUE)
 
-data_merged <- data_merged[, Volume_travail_souhaite_c := Volume_travail_souhaite]
-data_merged <- data_merged[Volume_travail_souhaite == 99, Volume_travail_souhaite_c := 9999]
-data_merged <- data_merged[is.na(Volume_travail_souhaite_c), Volume_travail_souhaite_c := 9999]
+try(data_merged <- data_merged[, Volume_travail_souhaite_c := Volume_travail_souhaite], silent=TRUE)
+try(data_merged <- data_merged[Volume_travail_souhaite == 99, Volume_travail_souhaite_c := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(Volume_travail_souhaite_c), Volume_travail_souhaite_c := 9999], silent=TRUE)
 
-data_merged <- data_merged[, Volume_travail_habituel_c := Volume_travail_habituel]
-data_merged <- data_merged[Volume_travail_habituel == 99, Volume_travail_habituel_c := 9999]
-data_merged <- data_merged[is.na(Volume_travail_habituel_c), Volume_travail_habituel_c := 9999]
+try(data_merged <- data_merged[, Volume_travail_habituel_c := Volume_travail_habituel], silent=TRUE)
+try(data_merged <- data_merged[Volume_travail_habituel == 99, Volume_travail_habituel_c := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(Volume_travail_habituel_c), Volume_travail_habituel_c := 9999], silent=TRUE)
 
-data_merged <- data_merged[, HWACTUAL_c := HWACTUAL]
-data_merged <- data_merged[HWACTUAL == 99, HWACTUAL_c := 9999]
-data_merged <- data_merged[is.na(HWACTUAL_c), HWACTUAL_c := 9999]
+try(data_merged <- data_merged[, HWACTUAL_c := HWACTUAL], silent=TRUE)
+try(data_merged <- data_merged[HWACTUAL == 99, HWACTUAL_c := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(HWACTUAL_c), HWACTUAL_c := 9999], silent=TRUE)
 
-data_merged <- data_merged[, HWACTUA2_c := HWACTUA2]
-data_merged <- data_merged[HWACTUA2 == 99, HWACTUA2_c := 9999]
-data_merged <- data_merged[is.na(HWACTUA2_c), HWACTUA2_c := 9999]
+try(data_merged <- data_merged[, HWACTUA2_c := HWACTUA2], silent=TRUE)
+try(data_merged <- data_merged[HWACTUA2 == 99, HWACTUA2_c := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(HWACTUA2_c), HWACTUA2_c := 9999], silent=TRUE)
 
-data_merged <- data_merged[, Nb_enfants_moins_2_ans_c := Nb_enfants_moins_2_ans]
-data_merged <- data_merged[Nb_enfants_moins_2_ans == "99", Nb_enfants_moins_2_ans_c := "9999"]
-data_merged <- data_merged[is.na(Nb_enfants_moins_2_ans_c), Nb_enfants_moins_2_ans_c := "9999"]
+try(data_merged <- data_merged[, Nb_enfants_moins_2_ans_c := Nb_enfants_moins_2_ans], silent=TRUE)
+try(data_merged <- data_merged[Nb_enfants_moins_2_ans == "99", Nb_enfants_moins_2_ans_c := "9999"], silent=TRUE)
+try(data_merged <- data_merged[is.na(Nb_enfants_moins_2_ans_c), Nb_enfants_moins_2_ans_c := "9999"], silent=TRUE)
 
-data_merged <- data_merged[, Nb_enfants_entre_3_5_ans_c := Nb_enfants_entre_3_5_ans]
-data_merged <- data_merged[Nb_enfants_entre_3_5_ans == "99", Nb_enfants_entre_3_5_ans_c := "9999"]
-data_merged <- data_merged[is.na(Nb_enfants_entre_3_5_ans_c), Nb_enfants_entre_3_5_ans_c := "9999"]
+try(data_merged <- data_merged[, Nb_enfants_entre_3_5_ans_c := Nb_enfants_entre_3_5_ans], silent=TRUE)
+try(data_merged <- data_merged[Nb_enfants_entre_3_5_ans == "99", Nb_enfants_entre_3_5_ans_c := "9999"], silent=TRUE)
+try(data_merged <- data_merged[is.na(Nb_enfants_entre_3_5_ans_c), Nb_enfants_entre_3_5_ans_c := "9999"], silent=TRUE)
 
-data_merged <- data_merged[, Nb_enfants_entre_6_8_ans_c := Nb_enfants_entre_6_8_ans]
-data_merged <- data_merged[Nb_enfants_entre_6_8_ans == "99", Nb_enfants_entre_6_8_ans_c := "9999"]
-data_merged <- data_merged[is.na(Nb_enfants_entre_6_8_ans_c), Nb_enfants_entre_6_8_ans_c := "9999"]
+try(data_merged <- data_merged[, Nb_enfants_entre_6_8_ans_c := Nb_enfants_entre_6_8_ans], silent=TRUE)
+try(data_merged <- data_merged[Nb_enfants_entre_6_8_ans == "99", Nb_enfants_entre_6_8_ans_c := "9999"], silent=TRUE)
+try(data_merged <- data_merged[is.na(Nb_enfants_entre_6_8_ans_c), Nb_enfants_entre_6_8_ans_c := "9999"], silent=TRUE)
 
-data_merged <- data_merged[, Nb_enfants_entre_9_11_ans_c := Nb_enfants_entre_9_11_ans]
-data_merged <- data_merged[Nb_enfants_entre_9_11_ans == "99", Nb_enfants_entre_9_11_ans_c := "9999"]
-data_merged <- data_merged[is.na(Nb_enfants_entre_9_11_ans_c), Nb_enfants_entre_9_11_ans_c := "9999"]
+try(data_merged <- data_merged[, Nb_enfants_entre_9_11_ans_c := Nb_enfants_entre_9_11_ans], silent=TRUE)
+try(data_merged <- data_merged[Nb_enfants_entre_9_11_ans == "99", Nb_enfants_entre_9_11_ans_c := "9999"], silent=TRUE)
+try(data_merged <- data_merged[is.na(Nb_enfants_entre_9_11_ans_c), Nb_enfants_entre_9_11_ans_c := "9999"], silent=TRUE)
 
-data_merged <- data_merged[, Nb_enfants_entre_11_14_ans_c := Nb_enfants_entre_11_14_ans]
-data_merged <- data_merged[Nb_enfants_entre_11_14_ans == "99", Nb_enfants_entre_11_14_ans_c := "9999"]
-data_merged <- data_merged[is.na(Nb_enfants_entre_11_14_ans_c), Nb_enfants_entre_11_14_ans_c := "9999"]
+try(data_merged <- data_merged[, Nb_enfants_entre_11_14_ans_c := Nb_enfants_entre_11_14_ans], silent=TRUE)
+try(data_merged <- data_merged[Nb_enfants_entre_11_14_ans == "99", Nb_enfants_entre_11_14_ans_c := "9999"], silent=TRUE)
+try(data_merged <- data_merged[is.na(Nb_enfants_entre_11_14_ans_c), Nb_enfants_entre_11_14_ans_c := "9999"], silent=TRUE)
 
-data_merged <- data_merged[, Domaine_education_c := Domaine_education]
-data_merged <- data_merged[Domaine_education == "999", Domaine_education_c := "9999"]
-data_merged <- data_merged[is.na(Domaine_education_c), Domaine_education_c := "9999"]
+try(data_merged <- data_merged[, Domaine_education_c := Domaine_education], silent=TRUE)
+try(data_merged <- data_merged[Domaine_education == "999", Domaine_education_c := "9999"], silent=TRUE)
+try(data_merged <- data_merged[is.na(Domaine_education_c), Domaine_education_c := "9999"], silent=TRUE)
 
-# data_merged <- data_merged[, Raisons_emploi_mais_pas_travail_c := Raisons_emploi_mais_pas_travail]
-# data_merged <- data_merged[Raisons_emploi_mais_pas_travail == "99", Raisons_emploi_mais_pas_travail_c := "9999"]
-# data_merged <- data_merged[is.na(Raisons_emploi_mais_pas_travail_c), Raisons_emploi_mais_pas_travail_c := "9999"]
+# try(data_merged <- data_merged[, Raisons_emploi_mais_pas_travail_c := Raisons_emploi_mais_pas_travail], silent=TRUE)
+# try(data_merged <- data_merged[Raisons_emploi_mais_pas_travail == "99", Raisons_emploi_mais_pas_travail_c := "9999"], silent=TRUE)
+# try(data_merged <- data_merged[is.na(Raisons_emploi_mais_pas_travail_c), Raisons_emploi_mais_pas_travail_c := "9999"], silent=TRUE)
 # 
-# data_merged <- data_merged[, Raisons_démission_c := Raisons_démission]
-# data_merged <- data_merged[Raisons_démission == "99", Raisons_démission_c := "9999"]
-# data_merged <- data_merged[is.na(Raisons_démission_c), Raisons_démission_c := "9999"]
+# try(data_merged <- data_merged[, Raisons_démission_c := Raisons_démission], silent=TRUE)
+# try(data_merged <- data_merged[Raisons_démission == "99", Raisons_démission_c := "9999"], silent=TRUE)
+# try(data_merged <- data_merged[is.na(Raisons_démission_c), Raisons_démission_c := "9999"], silent=TRUE)
 # 
-# data_merged <- data_merged[, Raisons_indisponibilité_travail_c := Raisons_indisponibilité_travail]
-# data_merged <- data_merged[Raisons_indisponibilité_travail == "99", Raisons_indisponibilité_travail_c := "9999"]
-# data_merged <- data_merged[is.na(Raisons_indisponibilité_travail_c), Raisons_indisponibilité_travail_c := "9999"]
+# try(data_merged <- data_merged[, Raisons_indisponibilité_travail_c := Raisons_indisponibilité_travail], silent=TRUE)
+# try(data_merged <- data_merged[Raisons_indisponibilité_travail == "99", Raisons_indisponibilité_travail_c := "9999"], silent=TRUE)
+# try(data_merged <- data_merged[is.na(Raisons_indisponibilité_travail_c), Raisons_indisponibilité_travail_c := "9999"], silent=TRUE)
 # 
-# data_merged <- data_merged[, Raisons_recherche_emploi_c := Raisons_recherche_emploi]
-# data_merged <- data_merged[Raisons_recherche_emploi == "99", Raisons_recherche_emploi_c := "9999"]
-# data_merged <- data_merged[is.na(Raisons_recherche_emploi_c), Raisons_recherche_emploi_c := "9999"]
+# try(data_merged <- data_merged[, Raisons_recherche_emploi_c := Raisons_recherche_emploi], silent=TRUE)
+# try(data_merged <- data_merged[Raisons_recherche_emploi == "99", Raisons_recherche_emploi_c := "9999"], silent=TRUE)
+# try(data_merged <- data_merged[is.na(Raisons_recherche_emploi_c), Raisons_recherche_emploi_c := "9999"], silent=TRUE)
 
 
 ################################################################################
@@ -356,49 +356,54 @@ data_merged <- data_merged[is.na(Domaine_education_c), Domaine_education_c := "9
 #         4 . Equivalent temps plein  ========================
 ################################################################################
 
-## Création de poids d'équivalent temps plein
-
-# Passage en df pour les calculs
-
-df_merged<- as.data.frame(data_merged)
-
-# 100*table(df_merged$Volume_travail_habituel)/nrow(df_merged)
-# 100*table(df_merged$Statut_semaine)/nrow(df_merged)
-# 100*table(df_merged$Statut_emploi_1_emploi)/nrow(df_merged)
-
-
-df_merged <- df_merged %>%
-  mutate(Temps_partiel_clean = ifelse(Temps_partiel ==2, 0, Temps_partiel)) %>%
-  mutate(Temps_partiel_clean = ifelse(Temps_partiel ==9, is.na(Temps_partiel_clean), Temps_partiel_clean)) %>% # Création de TP égale à 1 si temps plein, 0 si temps partiel
-  mutate(ETP = ifelse(Temps_partiel_clean ==1, 1, 0)) %>%
-  mutate(heures_clean = ifelse(Volume_travail_habituel ==99 | Volume_travail_habituel ==00, NA_real_, Volume_travail_habituel)) %>% # création de heures clean, variable nettoyée du nombre d'heures travaillées habituellement
-  group_by(Annee_enquete, Temps_partiel_clean) %>%
-  mutate(mediane_h = median(heures_clean, na.rm = TRUE)) %>%
-  group_by(Annee_enquete) %>%
-  mutate(mediane_h = max(mediane_h, na.rm = TRUE)) # création de la médiane des heures travaillées par les individus à plein temps pour chaque année
-
-# summary(df_merged$EQTP)
-
-df_merged <- df_merged %>%
-  mutate(EQTP = Volume_travail_habituel/mediane_h) %>% # création du coefficient d'équivalent temps plein (linéaire: variable continue)
-  mutate(EQTP = ifelse(EQTP>1, 1, EQTP))%>%
-  mutate(EQTP = ifelse(is.na(heures_clean), NA_real_, EQTP))
-
-#### Il y a des NAN dans EQTP ssi Volume_travail_habituel = NAN ssi Volume_travail_habituel == 99 ou 0
-
-# summary(df_merged$EQTP)
-
-
-df_merged <- df_merged %>%
-  mutate(Poids_final = EQTP*COEFF) # création du poids final égal au coeff initial de l'enquête x le coeff d'ETP
-
-summary(df_merged$Poids_final)
-
-df_merged <- df_merged %>%
-  select(-ETP) # suppression de la variable ETP, conservation des autres variables
-
-
-data_merged<- as.data.table(df_merged)
+calcul_EQTP <- function(data_merged_loc){
+  
+  ## Création de poids d'équivalent temps plein
+  
+  # Passage en df pour les calculs
+  
+  df_merged<- as.data.frame(data_merged_loc)
+  
+  # 100*table(df_merged$Volume_travail_habituel)/nrow(df_merged)
+  # 100*table(df_merged$Statut_semaine)/nrow(df_merged)
+  # 100*table(df_merged$Statut_emploi_1_emploi)/nrow(df_merged)
+  
+  
+  df_merged <- df_merged %>%
+    mutate(Temps_partiel_clean = ifelse(Temps_partiel ==2, 0, Temps_partiel)) %>%
+    mutate(Temps_partiel_clean = ifelse(Temps_partiel ==9, is.na(Temps_partiel_clean), Temps_partiel_clean)) %>% # Création de TP égale à 1 si temps plein, 0 si temps partiel
+    mutate(ETP = ifelse(Temps_partiel_clean ==1, 1, 0)) %>%
+    mutate(heures_clean = ifelse(Volume_travail_habituel ==99 | Volume_travail_habituel ==00, NA_real_, Volume_travail_habituel)) %>% # création de heures clean, variable nettoyée du nombre d'heures travaillées habituellement
+    group_by(Annee_enquete, Temps_partiel_clean) %>%
+    mutate(mediane_h = median(heures_clean, na.rm = TRUE)) %>%
+    group_by(Annee_enquete) %>%
+    mutate(mediane_h = max(mediane_h, na.rm = TRUE)) # création de la médiane des heures travaillées par les individus à plein temps pour chaque année
+  
+  # summary(df_merged$EQTP)
+  
+  df_merged <- df_merged %>%
+    mutate(EQTP = Volume_travail_habituel/mediane_h) %>% # création du coefficient d'équivalent temps plein (linéaire: variable continue)
+    mutate(EQTP = ifelse(EQTP>1, 1, EQTP))%>%
+    mutate(EQTP = ifelse(is.na(heures_clean), NA_real_, EQTP))
+  
+  #### Il y a des NAN dans EQTP ssi Volume_travail_habituel = NAN ssi Volume_travail_habituel == 99 ou 0
+  
+  # summary(df_merged$EQTP)
+  
+  
+  df_merged <- df_merged %>%
+    mutate(Poids_final = EQTP*COEFF) # création du poids final égal au coeff initial de l'enquête x le coeff d'ETP
+  
+  summary(df_merged$Poids_final)
+  
+  df_merged <- df_merged %>%
+    select(-ETP) # suppression de la variable ETP, conservation des autres variables
+  
+  
+  data_merged_loc<- as.data.table(df_merged)
+  
+  return(data_merged_loc)
+}
 
 
 
@@ -407,33 +412,33 @@ data_merged<- as.data.table(df_merged)
 ################################################################################
 #              5 . Exploration pbm NAN dans COEFF       ========================
 ################################################################################
- 
-summary(data_merged$COEFF)
+
+# summary(data_merged$COEFF)
 # 100*table(data_merged$COEFF)/nrow(data_merged)
 
 
-100 * nrow(data_merged[is.na(COEFF), ])/nrow(data_merged) #Donne le % de NAN dans COEFF
-table(data_merged[is.na(COEFF), ]$Statut_emploi_1_emploi) #Donne le détail des NAN qui sont dans COEFF par statut d'emploi
-table(data_merged[is.na(COEFF), ]$Annee_enquete) #Idem par année d'enquête
+# 100 * nrow(data_merged[is.na(COEFF), ])/nrow(data_merged) #Donne le % de NAN dans COEFF
+# table(data_merged[is.na(COEFF), ]$Statut_emploi_1_emploi) #Donne le détail des NAN qui sont dans COEFF par statut d'emploi
+# table(data_merged[is.na(COEFF), ]$Annee_enquete) #Idem par année d'enquête
 # data_merged[is.na(COEFF), ]
 
-100 * nrow(data_merged[is.na(COEFF), ])/nrow(data_merged)
+# 100 * nrow(data_merged[is.na(COEFF), ])/nrow(data_merged)
 
-sous_data <- data_merged %>% 
-  group_by(Annee_enquete) %>% 
-  summarise(somme_coeff = sum(COEFF, na.rm = TRUE))
-
-titre <- paste("Somme des coefficients par année en", pays, sep = " ")
-
-ggplot(data = sous_data, aes(x = Annee_enquete, y = somme_coeff)) +
-  geom_point() +
-  labs(title = titre,
-       x = "Année d'enquête",
-       y = "Somme des coefficients") # Trace la somme des COEFFS par année, pour voir s'il y a un décrochage à cause des NAN
-
-
+# sous_data <- data_merged %>% 
+#   group_by(Annee_enquete) %>% 
+#   summarise(somme_coeff = sum(COEFF, na.rm = TRUE))
+# 
+# titre <- paste("Somme des coefficients par année en", pays, sep = " ")
+# 
+# ggplot(data = sous_data, aes(x = Annee_enquete, y = somme_coeff)) +
+#   geom_point() +
+#   labs(title = titre,
+#        x = "Année d'enquête",
+#        y = "Somme des coefficients") # Trace la somme des COEFFS par année, pour voir s'il y a un décrochage à cause des NAN
 
 
-100 * nrow(data_merged[is.na(COEFF), ])/nrow(data_merged)
+
+
+# 100 * nrow(data_merged[is.na(COEFF), ])/nrow(data_merged)
 if(mettre_coeffs_nan_a_zero){data_merged <- data_merged[is.na(COEFF), COEFF := 0, ]}
-100 * nrow(data_merged[is.na(COEFF), ])/nrow(data_merged)
+# 100 * nrow(data_merged[is.na(COEFF), ])/nrow(data_merged)
