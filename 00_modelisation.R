@@ -84,17 +84,70 @@ source(paste(repo_prgm , "03_nettoyage.R" , sep = "/"))
 # 100 * nrow(data_merged[is.na(COEFF), ])/nrow(data_merged)
 
 
+data_merged <- data_merged[Age_tranche - 2 >= age_min, ]
+data_merged <- data_merged[Age_tranche + 2 <= age_max, ]
+
 data_merged
 
 data_merged[, c('Identifiant_menage', 'Annee_enquete') :=NULL]  # remove two columns
 
 data_merged
 
-rs = split(seq(nrow(data_merged)), data_merged$Temps_partiel)
-data_merged[, names(rs) := FALSE ]
-for (n in names(rs)) set(data_merged, i = rs[[n]], j = n, v = TRUE )
+liste_cols_dummies <- c("Niveau_education", "Perennite_emploi", "Temps_partiel", "Dregre_urbanisation", "Souhaite_davantage_travailler", "Souhaite_travailler", "Statut_semaine", "Statut_emploi_1_emploi", "Sexe_1H_2F", "Pays")
+for (colonne in liste_cols_dummies){
+  rs = split(seq(nrow(data_merged)), data_merged[, ..colonne])
+  # data_merged[, names(paste(colonne, rs, sep = "_")) := 0 ]
+  for (n in names(rs)) set(data_merged, i = rs[[n]], j = paste(colonne, n, sep = "_"), v = 1)
+}
 
-PCA(df, scale.unit = TRUE, ncp = 5, graph = TRUE)
+liste_cols_cont <- c("Nb_enfants_moins_2_ans", "Age_tranche")
+for (colonne in liste_cols_cont){
+  data_merged[colonne == 99, paste(colonne, "99", sep = "_") := 1]
+}
+
+data_merged[ , Nb_enfants_moins_2_ans := as.numeric(Nb_enfants_moins_2_ans)] #### A VERIFIER 
+
+
+data_merged[, eval(liste_cols_dummies) :=NULL]  # remove columns
+data_merged[is.na(data_merged)] <- 0
+
+
+data_merged
+
+liste_cols_delete <- paste(liste_cols_dummies, "9999", sep = "_")
+data_merged[, eval(liste_cols_delete) :=NULL]  # remove columns
+
+
+
+
+resultats_acp  <- PCA(data_merged, scale.unit = TRUE, ncp = 5, graph = FALSE)
+
+get_eigenvalue(resultats_acp)
+fviz_eig(resultats_acp, addlabels = TRUE)
+
+
+fviz_pca_var(resultats_acp)
+
+
+
+# 
+# rs = split(seq(nrow(data_merged)), data_merged$Temps_partiel)
+# # data_merged[, names(rs) := 0 ]
+# 
+# # paste("Temps_partiel", rs, sep = "_")
+# 
+# data_merged[, names(paste("Temps_partiel", rs, sep = "_")) := 0 ]
+# data_merged
+# for (n in names(rs)) set(data_merged, i = rs[[n]], j = paste("Temps_partiel", n, sep = "_"), v = 1)
+# # for (n in names(rs)){data_merged[is.na(paste("Temps_partiel", n, sep = "_")), paste("Temps_partiel", n, sep = "_") = 0]}
+# data_merged
+# 
+# n = 1
+# 
+# names(paste("Temps_partiel", n, sep = "_"))
+# data_merged[is.na(names(paste("Temps_partiel", n, sep = "_")))]
+
+
 
 
 data_merged

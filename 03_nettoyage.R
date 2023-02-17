@@ -47,6 +47,9 @@ try(setnames(data_merged,'FTPTREAS',"Raisons_temps_partiel"), silent=TRUE)
 # try(setnames(data_merged,'AVAIREAS',"Raisons_indisponibilité_travail"), silent=TRUE)
 
 
+try(setnames(data_merged,'DEGURBA',"Dregre_urbanisation"), silent=TRUE)
+
+
 ######### Recoder les variables avec des modalités NA et non concerné ######################
 
 try(data_merged <- data_merged[, Souhaite_travailler  := Souhaite_travailler], silent=TRUE)
