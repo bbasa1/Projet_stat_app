@@ -83,16 +83,18 @@ data_merged
 source(paste(repo_prgm , "03_nettoyage.R" , sep = "/"))
 # 100 * nrow(data_merged[is.na(COEFF), ])/nrow(data_merged)
 
-
+### On commence par filtrer sur l'âge
 data_merged <- data_merged[Age_tranche - 2 >= age_min, ]
 data_merged <- data_merged[Age_tranche + 2 <= age_max, ]
 
 data_merged
 
+#On vire les identifiants et les années d'enquête
 data_merged[, c('Identifiant_menage', 'Annee_enquete') :=NULL]  # remove two columns
 
 data_merged
 
+# On encode les variables catégorielles en dummies, en n'oubliant pas de supprimer les colonnes initiales
 liste_cols_dummies <- c("Niveau_education", "Perennite_emploi", "Temps_partiel", "Dregre_urbanisation", "Souhaite_davantage_travailler", "Souhaite_travailler", "Statut_semaine", "Statut_emploi_1_emploi", "Sexe_1H_2F", "Pays")
 for (colonne in liste_cols_dummies){
   rs = split(seq(nrow(data_merged)), data_merged[, ..colonne])
@@ -100,23 +102,26 @@ for (colonne in liste_cols_dummies){
   for (n in names(rs)) set(data_merged, i = rs[[n]], j = paste(colonne, n, sep = "_"), v = 1)
 }
 
+
+# On rajoute une modalité pour les variables continues : Le NA ou le 9999
 liste_cols_cont <- c("Nb_enfants_moins_2_ans", "Age_tranche")
 for (colonne in liste_cols_cont){
-  data_merged[colonne == 99, paste(colonne, "99", sep = "_") := 1]
+  data_merged[colonne == 99, paste(colonne, "9999", sep = "_") := 1]
 }
 
+
+# Il faut passer le nb d'enfants en numérique pour ne pas avoir de problème
 data_merged[ , Nb_enfants_moins_2_ans := as.numeric(Nb_enfants_moins_2_ans)] #### A VERIFIER 
 
 
 data_merged[, eval(liste_cols_dummies) :=NULL]  # remove columns
-data_merged[is.na(data_merged)] <- 0
 
 
-data_merged
-
+# On supprime les 
 liste_cols_delete <- paste(liste_cols_dummies, "9999", sep = "_")
 data_merged[, eval(liste_cols_delete) :=NULL]  # remove columns
 
+data_merged[is.na(data_merged)] <- 0
 
 
 
@@ -127,6 +132,37 @@ fviz_eig(resultats_acp, addlabels = TRUE)
 
 
 fviz_pca_var(resultats_acp)
+
+
+### On essaie du clustering
+
+data_merged_scale <- scale(data_merged)
+data_merged_scale <- as.data.table(data_merged_scale)
+data_merged_scale[is.na(data_merged_scale)] <- 0
+
+# 
+# data_merged_scale[, lapply(.SD, function(x) sum(is.na(x)))]
+# 
+# data_merged_scale
+# str(data_merged_scale)
+
+resKM <- kmeans(data_merged_scale, centers=3,nstart=20)
+resKM
+
+
+sample <- as.data.table(sapply(data_merged_scale[], sample, 10000))
+
+
+factoextra::fviz_nbclust(sample, FUNcluster =factoextra::hcut, method = "silhouette",hc_method = "average", hc_metric = "euclidean", stand = TRUE)
+
+
+sample[, eval(c("Nb_enfants_moins_2_ans_99", "Age_tranche_99")) := NULL]
+
+resKM <- kmeans(sample, centers=3, nstart=20, kmeans_init_iter_max=10000000)
+resKM
+
+fviz_cluster(resKM, sample)
+
 
 
 
