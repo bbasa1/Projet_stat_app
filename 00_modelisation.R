@@ -21,7 +21,7 @@ liste_pays <- c("FR", "ES", "IT", "DE", "DK", "AT")
 
 nom_fichier_html <- paste("Modelisation", annee, sep = "_")
 
-creer_base <- TRUE
+creer_base <- FALSE
 
 repo_prgm <- paste(repgen, "programmes/Projet_stat_app" , sep = "/")
 
@@ -83,4 +83,21 @@ data_merged
 source(paste(repo_prgm , "03_nettoyage.R" , sep = "/"))
 # 100 * nrow(data_merged[is.na(COEFF), ])/nrow(data_merged)
 
+
 data_merged
+
+data_merged[, c('Identifiant_menage', 'Annee_enquete') :=NULL]  # remove two columns
+
+data_merged
+
+rs = split(seq(nrow(data_merged)), data_merged$Temps_partiel)
+data_merged[, names(rs) := FALSE ]
+for (n in names(rs)) set(data_merged, i = rs[[n]], j = n, v = TRUE )
+
+PCA(df, scale.unit = TRUE, ncp = 5, graph = TRUE)
+
+
+data_merged
+
+
+
