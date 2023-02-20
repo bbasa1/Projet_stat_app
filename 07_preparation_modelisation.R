@@ -27,22 +27,24 @@ for (colonne in liste_cols_dummies){
 
 data_merged
 
-# data_merged_copy <- copy(data_merged)
+data_merged_copy <- copy(data_merged)
 
-
-
-data_merged <- copy(data_merged_copy)
+# data_merged <- copy(data_merged_copy)
 
 # On rajoute une modalité pour les variables continues : Le NA ou le 9999, et on passe bien en numeric les colonnes
 for (colonne in liste_cols_cont){
   print(colonne)
   data_merged[colonne == 99, paste(colonne, "9999", sep = "_") := 1]
   data_merged[ , colonne := as.numeric(colonne)] #### A VERIFIER
+  # transform(data_merged,colonne = as.numeric(colonne)) 
+  
 }
 
-data_merged$Nb_enfants_moins_2_ans
+# data_merged
+# data_merged$Nb_enfants_moins_2_ans
+# data_merged$Age_tranche
 
-data_merged[ , Nb_enfants_moins_2_ans := as.numeric(Nb_enfants_moins_2_ans )]
+try(data_merged[ , Nb_enfants_moins_2_ans := as.numeric(Nb_enfants_moins_2_ans )]) ###### A DISCUTER POURQUOI CA MARCHE PAS SUR CETTE VARIABLE ????
 
 # data_merged
 

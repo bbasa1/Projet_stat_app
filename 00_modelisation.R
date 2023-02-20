@@ -129,8 +129,9 @@ sample <- as.data.table(sapply(data_merged[], sample, n_sample))
 
 
 # Il faut retirer les colonnes cstes pour pas faire bug l'ACP...
-names(sample[, sapply(df, function(v) var(v, na.rm=TRUE)==0)]) 
-sample[,sapply(sample, function(v) var(v, na.rm=TRUE)!=0)] 
+sample <- remove_constant(sample, na.rm = FALSE, quiet = TRUE)
+data_merged_scale<- remove_constant(data_merged_scale, na.rm = FALSE, quiet = TRUE)
+
 
 
 ### On normalise tout ça
@@ -150,15 +151,15 @@ sample[is.na(sample)] <- 0
 # factoextra::fviz_nbclust(sample, FUNcluster =factoextra::hcut, method = "silhouette",hc_method = "average", hc_metric = "euclidean", stand = TRUE) 
 
 
+resKM <- kmeans(sample, centers=2, nstart=20)
+resKM
+fviz_cluster(resKM, sample)
+
+
+
 resKM <- kmeans(data_merged_scale, centers=2, nstart=20)
 resKM
-# data_merged_scale[, eval(c("Nb_enfants_moins_2_ans_9999", "Age_tranche_9999", "Sexe_1H_2F_2")) := NULL]
-
-
 fviz_cluster(resKM, data_merged_scale)
-
-
-
 
 
 

@@ -33,6 +33,8 @@ library(factoextra)
 library(cluster)
 # install.packages("compare")
 library(compare)
+# install.packages("janitor")
+library(janitor)
 
 
 
