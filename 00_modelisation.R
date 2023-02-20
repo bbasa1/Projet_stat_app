@@ -128,12 +128,6 @@ fviz_pca_var(resultats_acp,  choix = "var")
 sample <- as.data.table(sapply(data_merged[], sample, n_sample))
 
 
-# Il faut retirer les colonnes cstes pour pas faire bug l'ACP...
-sample <- remove_constant(sample, na.rm = FALSE, quiet = TRUE)
-data_merged_scale<- remove_constant(data_merged_scale, na.rm = FALSE, quiet = TRUE)
-
-
-
 ### On normalise tout ça
 data_merged_scale <- scale(data_merged)
 data_merged_scale <- as.data.table(data_merged_scale)
@@ -143,6 +137,10 @@ sample_ <- scale(sample)
 sample <- as.data.table(sample)
 sample[is.na(sample)] <- 0
 
+
+# Il faut retirer les colonnes cstes pour pas faire bug l'ACP...
+sample <- remove_constant(sample, na.rm = FALSE, quiet = FALSE)
+data_merged_scale <- remove_constant(data_merged_scale, na.rm = FALSE, quiet = FALSE)
 
 
 

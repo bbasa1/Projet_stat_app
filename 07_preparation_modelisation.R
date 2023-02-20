@@ -35,16 +35,12 @@ data_merged_copy <- copy(data_merged)
 for (colonne in liste_cols_cont){
   print(colonne)
   data_merged[colonne == 99, paste(colonne, "9999", sep = "_") := 1]
-  data_merged[ , colonne := as.numeric(colonne)] #### A VERIFIER
+  # data_merged[ , eval(colonne) := as.numeric(colonne)] #### A VERIFIER
   # transform(data_merged,colonne = as.numeric(colonne)) 
-  
 }
 
-# data_merged
-# data_merged$Nb_enfants_moins_2_ans
-# data_merged$Age_tranche
-
 try(data_merged[ , Nb_enfants_moins_2_ans := as.numeric(Nb_enfants_moins_2_ans )]) ###### A DISCUTER POURQUOI CA MARCHE PAS SUR CETTE VARIABLE ????
+try(data_merged[ , Age_tranche := as.numeric(Age_tranche )]) ###### A DISCUTER POURQUOI CA MARCHE PAS SUR CETTE VARIABLE ????
 
 # data_merged
 
