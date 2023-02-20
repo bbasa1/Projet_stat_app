@@ -25,15 +25,26 @@ for (colonne in liste_cols_dummies){
   for (n in names(rs)) set(data_merged, i = rs[[n]], j = paste(colonne, n, sep = "_"), v = 1)
 }
 
+data_merged
+
+# data_merged_copy <- copy(data_merged)
+
+
+
+data_merged <- copy(data_merged_copy)
 
 # On rajoute une modalité pour les variables continues : Le NA ou le 9999, et on passe bien en numeric les colonnes
 for (colonne in liste_cols_cont){
+  print(colonne)
   data_merged[colonne == 99, paste(colonne, "9999", sep = "_") := 1]
-  data_merged[ , eval(colonne) := as.numeric(eval(colonne))] #### A VERIFIER 
+  data_merged[ , colonne := as.numeric(colonne)] #### A VERIFIER
 }
 
+data_merged$Nb_enfants_moins_2_ans
 
+data_merged[ , Nb_enfants_moins_2_ans := as.numeric(Nb_enfants_moins_2_ans )]
 
+# data_merged
 
 ### On vire maintenant les colonnes à supprimer, et les colonnes qu'on a passé en dummies
 data_merged[, eval(liste_cols_dummies) :=NULL]

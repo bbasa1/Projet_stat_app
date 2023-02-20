@@ -96,13 +96,15 @@ liste_var_sup <- c("Pays_AT", "Pays_DE", "Pays_DK", "Pays_ES", "Pays_FR", "Pays_
 
 n_sample <- 1000 #La taille de l'échantillon pour la PCA (déso Laurie sans doute que si tu mets plus que 10 ton PC va mourir mdr)
 
+data_merged
 
-source(paste(repo_prgm , "07_preparation_modelisaation.R" , sep = "/"))
+source(paste(repo_prgm , "07_preparation_modelisation.R" , sep = "/"))
 
 
 ################################################################################
 #            IV. MODELISATION             ===============================
 ################################################################################
+data_merged
 
 ### NOTE : Je laisse le script 08_modelisation.R vide pour le moment. 
 # Quand on aura une idée de la façon dont on veut l'organiser on pourra le remplir avec le script en dessous :
@@ -208,7 +210,7 @@ sample <- as.data.table(sapply(data_merged_scale[], sample, 10000))
 # factoextra::fviz_nbclust(sample, FUNcluster =factoextra::hcut, method = "silhouette",hc_method = "average", hc_metric = "euclidean", stand = TRUE)
 
 
-sample[, eval(c("Nb_enfants_moins_2_ans_9999", "Age_tranche_9999", "Sexe_1H_2F_2")) := NULL]
+# sample[, eval(c("Nb_enfants_moins_2_ans_9999", "Age_tranche_9999", "Sexe_1H_2F_2")) := NULL]
 
 sample
 # , kmeans_init_iter_max=10000
