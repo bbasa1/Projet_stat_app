@@ -374,9 +374,9 @@ calcul_EQTP <- function(data_merged_loc){
   
   df_merged <- df_merged %>%
     mutate(Temps_partiel_clean = ifelse(Temps_partiel ==2, 0, Temps_partiel)) %>%
-    mutate(Temps_partiel_clean = ifelse(Temps_partiel ==9, is.na(Temps_partiel_clean), Temps_partiel_clean)) %>% # Création de TP égale à 1 si temps plein, 0 si temps partiel
+    mutate(Temps_partiel_clean = ifelse(Temps_partiel ==9, 0, Temps_partiel_clean)) %>% # Création de TP égale à 1 si temps plein, 0 si temps partiel
     mutate(ETP = ifelse(Temps_partiel_clean ==1, 1, 0)) %>%
-    mutate(heures_clean = ifelse(Volume_travail_habituel ==99 | Volume_travail_habituel ==00, NA_real_, Volume_travail_habituel)) %>% # création de heures clean, variable nettoyée du nombre d'heures travaillées habituellement
+    mutate(heures_clean = ifelse(Volume_travail_habituel ==99 | Volume_travail_habituel ==00, 0, Volume_travail_habituel)) %>% # création de heures clean, variable nettoyée du nombre d'heures travaillées habituellement
     group_by(Annee_enquete, Temps_partiel_clean) %>%
     mutate(mediane_h = median(heures_clean, na.rm = TRUE)) %>%
     group_by(Annee_enquete) %>%
@@ -388,7 +388,7 @@ calcul_EQTP <- function(data_merged_loc){
     mutate(EQTP = Volume_travail_habituel/mediane_h) %>% # création du coefficient d'équivalent temps plein (linéaire: variable continue)
     mutate(EQTP = ifelse(Statut_emploi_1_emploi==1, EQTP, 0)) %>%
     mutate(EQTP = ifelse(EQTP>1, 1, EQTP))%>%
-    mutate(EQTP = ifelse(is.na(heures_clean), NA_real_, EQTP))
+    mutate(EQTP = ifelse(is.na(heures_clean), 0 , EQTP))
   
   #### Il y a des NAN dans EQTP ssi Volume_travail_habituel = NAN ssi Volume_travail_habituel == 99 ou 0
   
