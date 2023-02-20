@@ -30,6 +30,10 @@ library(finalfit)
 library(FactoMineR)
 # install.packages("factoextra")
 library(factoextra)
+library(cluster)
+# install.packages("compare")
+library(compare)
+
 
 
 ### Liste des pays possibles (dico sur https://www.iban.com/country-codes )###
