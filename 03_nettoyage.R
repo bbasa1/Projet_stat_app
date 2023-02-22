@@ -410,11 +410,32 @@ calcul_EQTP <- function(data_merged_loc){
 }
 
 
+################################################################################
+#         5 . Index de conservatisme  ========================
+################################################################################
 
 
+calcul_index_conservatisme <- function(data_merged_loc){
+  
+  df_merged<- as.data.frame(data_merged_loc)
+  
+  df_merged <- df_merged %>%
+  mutate(Index_conservatisme = 0) %>%
+  mutate(Index_conservatisme = ifelse(Pays =="FR", 0.115, Index_conservatisme)) %>%
+  mutate(Index_conservatisme = ifelse(Pays =="DE", 0.077, Index_conservatisme)) %>% 
+  mutate(Index_conservatisme = ifelse(Pays =="DK", 0.022, Index_conservatisme)) %>%
+  mutate(Index_conservatisme = ifelse(Pays =="HU", 0.224, Index_conservatisme)) %>%
+  mutate(Index_conservatisme = ifelse(Pays =="IT", 0.254, Index_conservatisme)) %>%
+  mutate(Index_conservatisme = ifelse(Pays =="ES", 0.108, Index_conservatisme))
+#summary(df_merged$Index_conservatisme)
+  
+  data_merged_loc<- as.data.table(df_merged)
+  
+  return(data_merged_loc)
+}
 
 ################################################################################
-#              5 . Exploration pbm NAN dans COEFF       ========================
+#              6 . Exploration pbm NAN dans COEFF       ========================
 ################################################################################
 
 # summary(data_merged$COEFF)
