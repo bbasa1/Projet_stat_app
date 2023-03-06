@@ -543,13 +543,17 @@ source(paste(repo_prgm,"06_page_html.R",sep="/") ,
 #            VIII. Analyse de la situation familiale  ==========================
 ################################################################################
 # Pensez a regarder le taux de chômage aussi avant - pour que ce soit plus facilement lisible qu'en croisant taux d'activité et taux d'emploi
-# Henri avait filtré les gens qui sont encore en études (initiales) - est ce qu'on fait paril ? 
+# Henri avait filtré les gens qui sont encore en études (initiales) - est ce qu'on fait pareil ? 
+# Est ce que l'on se recentre sur les ménages ordinaire ? 
 
 # Comme on est sur des données pondérées que l'on ne veut pas retraiter à la main on va passer par le package survey 
 # Utile aussi pour faire des regressions pondérées 
 
 #On prépare les données avec le plan d'échantillonage : 
 dw <- svydesign(ids = ~1, data = sous_data_merged, weights = ~ sous_data_merged$COEFF)
+
+# Faire les stats de base : avoir la part de femmes et hommes par âge en pondéré, le nombre de famille avec enfants
+# Le nombre de famille monop, les familles avec des enfants en bas âge
 
 # Est ce que le taux d'activité, d'emploi et d'emploi ETP des femmes et des hommes varient selon le statut martital ?
 # Tester en couple, en couple cohabitant et mariés si possible 
@@ -568,6 +572,8 @@ dw <- svydesign(ids = ~1, data = sous_data_merged, weights = ~ sous_data_merged$
 ################################################################################
 #            IX. Analyse de l'évolution de la qualité de l'emploi  ============
 ################################################################################
+
+#  idem comencer par les stats gloables pour avoir une vue d'ensemble 
 
 # Comment varie la proportion de temps partiel dans le temps selon l'âge et le sexe ?
 # Comment varie la proportion de CDI dans le temps selon l'âge et le sexe ? 
