@@ -12,13 +12,13 @@
 ################################################################################
 #            A. PARAMETRES              -------------------------------
 ################################################################################
-repgen <- "C:/Users/Benjamin/Desktop/Ensae/Projet_statapp"#BB
-# repgen <- "C:/Users/Lenovo/Desktop/statapp22"#LP
+# repgen <- "C:/Users/Benjamin/Desktop/Ensae/Projet_statapp"#BB
+repgen <- "C:/Users/Lenovo/Desktop/statapp22"#LP
 # repgen <- "/Users/charlottecombier/Desktop/ENSAE/Projet_statapp"
 
 
 liste_annees <- 1998:2018
-pays <- "FR"
+pays <- "ES"
 
 nom_fichier_html <- paste("Taux_activite", pays, sep = "_")
 
@@ -132,10 +132,12 @@ longueur_liste <- 0
 # On calcule les taux d'activités et d'emplois par âge et sexe
 liste_var <- c("Age_tranche", "Sexe_1H_2F")
 calculs_age <- calcul_taux_emplois_activite(liste_var_groupby = liste_var, data_loc = data_merged)
-
+# Sauf erreur il faut multiplir le taux d'emploi en etp par 100 (la population aussi ?): 
+calculs_age$tx_emploi_etp <- calculs_age$tx_emploi_etp*100 
+calculs_age$population_emplois_etp <- calculs_age$population_emplois_etp*100 
 calculs_age
 
-#            III.B CONSTRUCTION GRAPHIQUES               ------------------
+#           III.B CONSTRUCTION GRAPHIQUES               ------------------
 source(paste(repo_prgm , "05_sorties_graphiques.R" , sep = "/"))
 
 
@@ -195,6 +197,15 @@ graph <- trace_barplot(calculs_age, x, sortby_x, y, fill, xlabel, ylabel, titre,
 list_graph[[longueur_liste + 1]] <- graph
 longueur_liste <- longueur_liste + 1
 
+# Attention, il faut reprendre le calcul des ETP, il y a un problème a priori (les parts sont trop faibles)
+# j'ai multiplié par 100 mais apparement ce n'est pas le pb : poids en continue qui baisse la valeurs ? 
+# il faut regarder la distribution des heures obtenues + des poids + contrôler l'indicateur (est ce qu'on a le bon numérateur et le bon dénominateur)
+head(data_merged$Poids_final,20)
+head(data_merged$COEFF,20)
+head(data_merged$EQTP,20)
+# A priori en regardant rapidement je ne vois pas de problème sur l'indicateur 
+# MAIS LES POIDS_FINAUX ME PARAISSENT TRES FAIBLES : a mon avis il y a un problème a ce niveau
+# Je pense qu'il faut reprendre la variable EQTP (peut être un problème d'échelle) 
 
 ################################################################################
 #            IV. CALCULS TAUX D'EMPLOIS ET ACTIVITE PAR ÂGE, SEXE & ANNEE D'ENQUETE  ===============================
@@ -497,3 +508,40 @@ source(paste(repo_prgm,"06_page_html.R",sep="/") ,
 #   facet_wrap(~Mesure)
 # 
 # p
+
+################################################################################
+#            VIII. Analyse de la situation familiale  ==========================
+################################################################################
+# Pensez a regarder le taux de chômage aussi avant - pour que ce soit plus facilement lisible qu'en croisant taux d'activité et taux d'emploi
+# Henri avait filtré les gens qui sont encore en études (initiales) - est ce qu'on fait paril ? 
+
+# Comme on est sur des données pondérées que l'on ne veut pas retraiter à la main on va passer par le package survey 
+# Utile aussi pour faire des regressions pondérées 
+
+#On prépare les données avec le plan d'échantillonage : 
+dw <- svydesign(ids = ~1, data = sous_data_merged, weights = ~ sous_data_merged$COEFF)
+
+# Est ce que le taux d'activité, d'emploi et d'emploi ETP des femmes et des hommes varient selon le statut martital ?
+# Tester en couple, en couple cohabitant et mariés si possible 
+
+# Est ce que le taux d'activité, d'emploi et d'emploi ETP des femmes et des hommes varient selon le nombre d'enfant à charge ?
+# Trier sur les mineurs, à charge (au domicile) et le nombre 1,2 et 3 
+# Tester aussi selon l'âge des enfants : nombre de moins de trois ans, nombre de moins de 6 ans (et autre - voir tester les majeurs avec nombre de plus de 18 ans)
+
+# si déterminant regarder l'évolution du nombre d'enfant en moyenne sur toute la population, sur les moins diplomés et chez les plus diplomés 
+# si possible créer une variable csp du couple / diplome du couple et une variable couple biactif ou non 
+
+# Faire une analyse plus spécifique du temps partiel (attention ca peut aussi entrer dans la partie suivante) : 
+# avec le fait d'être en couple marié/cohabitant, d'avoir des enfants, dont en bas âges, voir si on a une variable congé parental 
+# voir si on a les raisons de ce temps partiel, regarder si ces personnes souhaiteraient travailler plus ou chnager d'emploi et pourquoi 
+
+################################################################################
+#            IX. Analyse de l'évolution de la qualité de l'emploi  ============
+################################################################################
+
+# Comment varie la proportion de temps partiel dans le temps selon l'âge et le sexe ?
+# Comment varie la proportion de CDI dans le temps selon l'âge et le sexe ? 
+# idem autre type de contrat : CDD, intérim - voir comment cela change selon la législation par pays 
+
+# Si on voit une évolution marquante, regarder par qui elle est porté dans chaque sous-population : 
+# les familles monoparentales, les familles avec jeunes enfants, au contraire les personnes seules, les moins diplomées etc.
