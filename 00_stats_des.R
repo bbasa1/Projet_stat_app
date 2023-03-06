@@ -80,7 +80,7 @@ liste_variables <- c('QHHNUM', #Identifiant ménage
                      'LEAVREAS', # Reasons for leaving last job
                      'AVAIREAS', # Reasons for not being available within the two next weeks to come
                      'SIGNISAL', # Continuing receipt of the wage or salary (from 2006) 
-                     'EMPSTAT', # Etre en emploi (variable filtre)
+                     # 'EMPSTAT', # Etre en emploi (variable filtre)
                      'TEMPREAS', # Raison pour être en CDD
                      'WSTAT1Y', # Situation pro un an avant l’enquête (emploi, chômage, …)
                      'STAPRO1Y', # Situation pro un an avant l'enquête (salarié, auto-entrepreneur, …)
@@ -92,7 +92,7 @@ liste_variables <- c('QHHNUM', #Identifiant ménage
                      'LOOKREAS', # raisons pour lesquels on veut trouver un autre job
                      'REGIONW', # région du travail (peut être faire des analyses en fonction de la ruralité etc?)
                      'MARSTAT', # statut marital
-                     'ISCO4D', # numéro isco mais agrégé a priori 
+                     # 'ISCO4D', # numéro isco mais agrégé a priori 
                      'SIZEFIRM', # Pour compter en fnt de la taille de la boîte.
                      'NATIONAL', # Nationalité
                      'HHPARTNR', # est ce que le partenaire cohabite 

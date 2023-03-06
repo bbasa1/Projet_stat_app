@@ -179,7 +179,7 @@ try(data_merged <- data_merged[Raisons_démission == "99", Raisons_démission  :
 try(data_merged <- data_merged[is.na(Raisons_démission ), Raisons_démission  := "9999"], silent=TRUE)
 
 try(data_merged <- data_merged[, Raisons_indisponibilité_travail  := Raisons_indisponibilité_travail], silent=TRUE)
-try(data_merged <- data_merged[Raisons_indisponibilité_travail == "99", Raisons_indisponibilité_travail  := "9999"], silent=TRUE)
+try(data_merged <- data_merged[Raisons_indisponibilité_travail == "9", Raisons_indisponibilité_travail  := "9999"], silent=TRUE)
 try(data_merged <- data_merged[is.na(Raisons_indisponibilité_travail ), Raisons_indisponibilité_travail  := "9999"], silent=TRUE)
 
 # try(data_merged <- data_merged[, Raisons_recherche_emploi  := Raisons_recherche_emploi], silent=TRUE)
