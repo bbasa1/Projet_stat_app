@@ -74,10 +74,40 @@ liste_variables <- c('QHHNUM', #Identifiant ménage
                      'HHNBCH8', # Number of children [6,8] years in the household
                      'HHNBCH11', # Number of children [9,11] years in the household
                      'HHNBCH14', # Number of children [12,14] years in the household
+                     'HHNBCH17', # Number of children [15,17] years in the household
+                     'HHNBCH24', # Number of children [18,24] years in the household
                      'NOWKREAS', # Reasons for not working while having a job (includes maternity and parentality leaves)
                      'LEAVREAS', # Reasons for leaving last job
-                     'AVAIREAS' # Reasons for not being available within the two next weeks to come
-                     
+                     'AVAIREAS', # Reasons for not being available within the two next weeks to come
+                     'SIGNISAL', # Continuing receipt of the wage or salary (from 2006) 
+                     'EMPSTAT', # Etre en emploi (variable filtre)
+                     'TEMPREAS', # Raison pour être en CDD
+                     'WSTAT1Y', # Situation pro un an avant l’enquête (emploi, chômage, …)
+                     'STAPRO1Y', # Situation pro un an avant l'enquête (salarié, auto-entrepreneur, …)
+                     'SEEKDUR', # Temps passé en recherche d’emploi
+                     'HHCHILDR', # est ce qu'il y a des enfants dans le foyer ou est ce qu'ils sont dans un autre foyer'
+                     'HHNBPERS', #  nombre total de personnes dans le ménages
+                     'HHNB0014', # Number of children in the household (aged less than 15 years) 
+                     'HATYEAR', # année ou on a fini ses études
+                     'LOOKREAS', # raisons pour lesquels on veut trouver un autre job
+                     'REGIONW', # région du travail (peut être faire des analyses en fonction de la ruralité etc?)
+                     'MARSTAT', # statut marital
+                     'ISCO4D', # numéro isco mais agrégé a priori 
+                     'SIZEFIRM', # Pour compter en fnt de la taille de la boîte.
+                     'NATIONAL', # Nationalité
+                     'HHPARTNR', # est ce que le partenaire cohabite 
+                     'SUPVISOR', # manageur ?
+                     'TEMPAGCY', # indicateur du fait d'être "en agence d'intérim"
+                     'SHIFTWK', # Shift work 
+                     'EVENWK', # Evening work 
+                     'NIGHTWK', # Night work 
+                     'SATWK', # Saturday work 
+                     'SUNWK', # Sunday work 
+                     'EXIST2J', # existence de plusieurs emplois
+                     'HHWKSTAT', #  Working status of adults living in the same household 
+                     'HHAGEYG', # Age of the youngest child in the household (aged less than 25 years) 
+                     'HHPRIV' # Classification of individuals (private household members) - voir si on devreait pas filtré que sur les ménages ordinaires 
+
 )
 
 age_min <- 20
@@ -542,6 +572,10 @@ dw <- svydesign(ids = ~1, data = sous_data_merged, weights = ~ sous_data_merged$
 # Comment varie la proportion de temps partiel dans le temps selon l'âge et le sexe ?
 # Comment varie la proportion de CDI dans le temps selon l'âge et le sexe ? 
 # idem autre type de contrat : CDD, intérim - voir comment cela change selon la législation par pays 
+# existence de plusieurs emploi ?
+# Faire les different croisements avec les variables de postes atypiques
 
 # Si on voit une évolution marquante, regarder par qui elle est porté dans chaque sous-population : 
 # les familles monoparentales, les familles avec jeunes enfants, au contraire les personnes seules, les moins diplomées etc.
+
+# On peut aussi essayer d'explorer le type d'emploi par le secteur dans cette partie / voir si ca vaut le temps de travail : peut être ciblé que certains secteurs
