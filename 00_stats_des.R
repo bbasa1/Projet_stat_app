@@ -106,6 +106,8 @@ liste_variables <- c('QHHNUM', #Identifiant ménage
                      'EXIST2J', # existence de plusieurs emplois
                      'HHWKSTAT', #  Working status of adults living in the same household 
                      'HHAGEYG', # Age of the youngest child in the household (aged less than 25 years) 
+                     'MAINSTAT', # Main status
+                     'HHCOMP', # Composition du foyer = mais vraible a retraiter 
                      'HHPRIV' # Classification of individuals (private household members) - voir si on devreait pas filtré que sur les ménages ordinaires 
 
 )
