@@ -77,7 +77,8 @@ try(setnames(data_merged,'EXIST2J',"exist_autre_emploi"), silent=TRUE)
 try(setnames(data_merged,'HHWKSTAT',"statu_emp_adulte_men"), silent=TRUE)
 try(setnames(data_merged,'HHAGEYG',"age_enf_plus_jeune"), silent=TRUE)
 try(setnames(data_merged,'HHPRIV',"menage_ordinaire"), silent=TRUE)
-
+try(setnames(data_merged,'MAINSTAT',"statut_travail"), silent=TRUE)
+try(setnames(data_merged,'HHCOMP',"compo_men_v1"), silent=TRUE)
 
 ######### Recoder les variables avec des modalités NA et non concerné ######################
 # on a choisi de recoder les na ou les "hors sujets" systhématiquement en 9999 (si ce n'était pas déjà le cas)
@@ -178,6 +179,7 @@ try(data_merged <- data_merged[Nb_enfants_entre_18_24_ans == "9999", Nb_enfants_
 try(data_merged <- data_merged[is.na(Nb_enfants_entre_18_24_ans ), Nb_enfants_entre_18_24_ans  := "00"], silent=TRUE)
 
 try(data_merged <- data_merged[, Domaine_education  := Domaine_education], silent=TRUE)
+try(data_merged <- data_merged[Domaine_education == "99", Domaine_education  := "9999"], silent=TRUE)
 try(data_merged <- data_merged[Domaine_education == "999", Domaine_education  := "9999"], silent=TRUE)
 try(data_merged <- data_merged[is.na(Domaine_education ), Domaine_education  := "9999"], silent=TRUE)
 
@@ -282,6 +284,14 @@ try(data_merged <- data_merged[is.na(statu_emp_adulte_men), statu_emp_adulte_men
 try(data_merged <- data_merged[, age_enf_plus_jeune  := age_enf_plus_jeune], silent=TRUE)
 try(data_merged <- data_merged[age_enf_plus_jeune == "99", age_enf_plus_jeune  := "9999"], silent=TRUE)
 try(data_merged <- data_merged[is.na(age_enf_plus_jeune), age_enf_plus_jeune  := "9999"], silent=TRUE)
+
+try(data_merged <- data_merged[, statut_travail  := statut_travail], silent=TRUE)
+try(data_merged <- data_merged[statut_travail == 9 , statut_travail  := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(statut_travail), statut_travail  := 9999], silent=TRUE)
+
+try(data_merged <- data_merged[, compo_men_v1  := compo_men_v1], silent=TRUE)
+try(data_merged <- data_merged[compo_men_v1 == "99" , compo_men_v1  := "9999"], silent=TRUE)
+try(data_merged <- data_merged[is.na(compo_men_v1), compo_men_v1  := "9999"], silent=TRUE)
 
 ################################################################################
 #         2 . Petite analyse des "valeurs manquantes" ========================
@@ -616,76 +626,61 @@ data_merged <- data_merged[nb_enf_tot == 0, nb_enf := "0"]
 data_merged <- data_merged[nb_enf_tot == 1, nb_enf := "1"]
 data_merged <- data_merged[nb_enf_tot == 2, nb_enf := "2"]
 
-try(setnames(data_merged,'QHHNUM',"Identifiant_menage"), silent=TRUE)
-try(setnames(data_merged,'COUNTRY',"Pays"), silent=TRUE)
-try(setnames(data_merged,'SEX',"Sexe_1H_2F"), silent=TRUE)
-try(setnames(data_merged,'YEAR',"Annee_enquete"), silent=TRUE)
-try(setnames(data_merged,'AGE',"Age_tranche"), silent=TRUE)
-try(setnames(data_merged,'YSTARTWK',"Debut_emploi_actuel"), silent=TRUE)
+# Test famille monop, ménage complexe en soustrayant enfant tot moins nombre de personne : 
+data_merged <- data_merged[, nb_adulte_tot:= as.numeric(nb_pers_men) - nb_enf_tot] 
+# Pas de nombre négatifs donc on peut travailler sur ca pour avoir une petite variable compo du ménage 
 
-try(setnames(data_merged,'ILOSTAT',"Statut_emploi_1_emploi"), silent=TRUE)
-try(setnames(data_merged,'WSTATOR',"Statut_semaine"), silent=TRUE)
-try(setnames(data_merged,'WANTWORK',"Souhaite_travailler"), silent=TRUE)
-try(setnames(data_merged,'WISHMORE',"Souhaite_davantage_travailler"), silent=TRUE)
-try(setnames(data_merged,'AVAILBLE',"Disponible_pour_travailler"), silent=TRUE)
-try(setnames(data_merged,'SEEKWORK',"Recherche_un_emploi"), silent=TRUE)
-# try(setnames(data_merged,'SEEKREAS',"Raison_absence_recherche"), silent=TRUE)
-try(setnames(data_merged,'STAPRO',"Statut_dans_emploi"), silent=TRUE)
-try(setnames(data_merged,'FTPT',"Temps_partiel"), silent=TRUE)
+data_merged <- data_merged[, compo_men := "9999"] 
+data_merged <- data_merged[nb_adulte_tot == 1 & nb_enf_tot >=1 , compo_men := "fam_monop"] 
+data_merged <- data_merged[nb_adulte_tot == 1 & nb_enf_tot == 0, compo_men := "celibataire"]
+data_merged <- data_merged[couple_cohab == 1 & nb_enf_tot == 0, compo_men := "couple"]
+data_merged <- data_merged[couple_cohab == 1 & nb_enf_tot >= 1, compo_men := "couple_enf"]
+data_merged <- data_merged[couple_cohab == 1 & nb_adulte_tot>=3, compo_men := "men_complexe"]
+data_merged <- data_merged[couple_cohab == 2 & nb_adulte_tot>=2, compo_men := "men_complexe"]
+# sans pondéré il me semble y avoir beaucoup de ménage complexe, on pourra comparer avec la variable de l'enquête 
+# ou se débrouiller en croisant les deux 
+# On pourrait aussi afiner avec la variable sur la présence d'enfant à l'exterieur mais je pense plus tot utiliser l'indicatrice directement 
 
-try(setnames(data_merged,'ISCO3D',"CSP"), silent=TRUE)
-try(setnames(data_merged,'TEMP',"Perennite_emploi"), silent=TRUE)
-try(setnames(data_merged,'TEMPDUR',"Duree_contrat"), silent=TRUE)
-try(setnames(data_merged,'HWWISH',"Volume_travail_souhaite"), silent=TRUE)
-try(setnames(data_merged,'HWUSUAL',"Volume_travail_habituel"), silent=TRUE)
-try(setnames(data_merged,'INCDECIL',"Decile_salaire"), silent=TRUE)
+# Sur l'emploi occupé en lien avec la famille (creation d'indicatrice): 
+# A temps partiel pour s'occuper des enfants ou de sa famille
+data_merged <- data_merged[, raisons_tp_enf_fam := 0] 
+data_merged <- data_merged[Raisons_temps_partiel == 3, raisons_tp_enf_fam := 1] 
+data_merged <- data_merged[Raisons_temps_partiel == 4, raisons_tp_enf_fam := 1]
 
-try(setnames(data_merged,'HATLEV1D',"Niveau_education"), silent=TRUE)
-try(setnames(data_merged,'HATFIELD',"Domaine_education"), silent=TRUE)
+# A un emploi mais ne travaille pas car en maternité ou en congé parental ou pour d'autres raisons personnelles ou familiales 
+data_merged <- data_merged[, raisons_emp_no_trav_enf_fam := 0] 
+data_merged <- data_merged[Raisons_emploi_mais_pas_travail == "05", raisons_emp_no_trav_enf_fam := 1] 
+data_merged <- data_merged[Raisons_emploi_mais_pas_travail == "06", raisons_emp_no_trav_enf_fam := 1]
+data_merged <- data_merged[Raisons_emploi_mais_pas_travail == "09", raisons_emp_no_trav_enf_fam := 1]
 
-try(setnames(data_merged,'HHNBCH2',"Nb_enfants_moins_2_ans"), silent=TRUE)
-try(setnames(data_merged,'HHNBCH5',"Nb_enfants_entre_3_5_ans"), silent=TRUE)
-try(setnames(data_merged,'HHNBCH8',"Nb_enfants_entre_6_8_ans"), silent=TRUE)
-try(setnames(data_merged,'HHNBCH11',"Nb_enfants_entre_9_11_ans"), silent=TRUE)
-try(setnames(data_merged,'HHNBCH14',"Nb_enfants_entre_11_14_ans"), silent=TRUE)
-try(setnames(data_merged,'HHNBCH17',"Nb_enfants_entre_15_17_ans"), silent=TRUE)
-try(setnames(data_merged,'HHNBCH24',"Nb_enfants_entre_18_24_ans"), silent=TRUE)
+# A du démissioner à cause des enfants ou pour raison familiale, y compris grossesse
+data_merged <- data_merged[, raison_dem_enf_fam := 0] 
+data_merged <- data_merged[Raisons_démission == "02", raison_dem_enf_fam := 1] 
+data_merged <- data_merged[Raisons_démission == "03", raison_dem_enf_fam := 1]
 
-try(setnames(data_merged,'FTPTREAS',"Raisons_temps_partiel"), silent=TRUE)
-# try(setnames(data_merged,'SEEKREAS',"Raisons_recherche_emploi"), silent=TRUE)
-try(setnames(data_merged,'NOWKREAS',"Raisons_emploi_mais_pas_travail"), silent=TRUE)
-try(setnames(data_merged,'LEAVREAS',"Raisons_démission"), silent=TRUE)
-try(setnames(data_merged,'AVAIREAS',"Raisons_indisponibilité_travail"), silent=TRUE)
+# Ne peut pas travailler à cause des enfants ou pour grossesse
+data_merged <- data_merged[, raison_no_trav_enf_fam := 0] 
+data_merged <- data_merged[Raisons_indisponibilité_travail == 4, raison_no_trav_enf_fam := 1] 
 
+# Sur l'emploi occuper plus largement 
+# A temps partiel car ne trouve pas un temps plein
+data_merged <- data_merged[, raisons_tp_abs_plein := 0] 
+data_merged <- data_merged[Raisons_temps_partiel == 5, raisons_tp_abs_plein := 1] 
 
-try(setnames(data_merged,'DEGURBA',"Dregre_urbanisation"), silent=TRUE)
+# En CDD car ne trouve pas un emploi "pemranent"
+data_merged <- data_merged[, raisons_cdd_trouve_ps_cdi:= 0] 
+data_merged <- data_merged[raison_cdd == 2, raisons_cdd_trouve_ps_cdi := 1]
 
-try(setnames(data_merged,'SIGNISAL',"Absence_et_salaire_2006"), silent=TRUE)
-try(setnames(data_merged,'TEMPREAS',"raison_cdd"), silent=TRUE)
-try(setnames(data_merged,'WSTAT1Y',"sit_pro_avant_enq"), silent=TRUE)
-try(setnames(data_merged,'STAPRO1Y',"statu_pro_avant_enq"), silent=TRUE)
-try(setnames(data_merged,'SEEKDUR',"temp_recherche_emp"), silent=TRUE)
-try(setnames(data_merged,'HHCHILDR',"dom_enf"), silent=TRUE)
-try(setnames(data_merged,'HHNBPERS',"nb_pers_men"), silent=TRUE)
-try(setnames(data_merged,'HHNB0014',"nb_enf_m15"), silent=TRUE)
-try(setnames(data_merged,'HATYEAR',"annee_fin_etude"), silent=TRUE)
-try(setnames(data_merged,'LOOKREAS',"raison_changer_job"), silent=TRUE)
-try(setnames(data_merged,'REGIONW',"region_travail"), silent=TRUE)
-try(setnames(data_merged,'MARSTAT',"statu_marital"), silent=TRUE)
-try(setnames(data_merged,'SIZEFIRM',"taille_ent"), silent=TRUE)
-try(setnames(data_merged,'NATIONAL',"nationalit"), silent=TRUE)
-try(setnames(data_merged,'HHPARTNR',"couple_cohab"), silent=TRUE)
-try(setnames(data_merged,'SUPVISOR',"travail_respon"), silent=TRUE)
-try(setnames(data_merged,'TEMPAGCY',"travail_interim"), silent=TRUE)
-try(setnames(data_merged,'SHIFTWK',"travail_3_8"), silent=TRUE) 
-try(setnames(data_merged,'EVENWK',"travail_soiree"), silent=TRUE)
-try(setnames(data_merged,'NIGHTWK',"travail_nuit"), silent=TRUE)
-try(setnames(data_merged,'SATWK',"travail_samedi"), silent=TRUE)
-try(setnames(data_merged,'SUNWK',"travail_dimanche"), silent=TRUE)
-try(setnames(data_merged,'EXIST2J',"exist_autre_emploi"), silent=TRUE)
-try(setnames(data_merged,'HHWKSTAT',"statu_emp_adulte_men"), silent=TRUE)
-try(setnames(data_merged,'HHAGEYG',"age_enf_plus_jeune"), silent=TRUE)
-try(setnames(data_merged,'HHPRIV',"menage_ordinaire"), silent=TRUE)
+# Se déclare comme "au foyer"
+data_merged <- data_merged[, sit_pro_foyer:= 0] 
+data_merged <- data_merged[statut_travail == 7, sit_pro_foyer := 1]
 
+# A été "au foyer"
+data_merged <- data_merged[, sit_pro_avant_enq_foyer:= 0] 
+data_merged <- data_merged[sit_pro_avant_enq == 7, sit_pro_avant_enq_foyer := 1]
 
-
+# Depuis quand est ce que la personne est entrée sur le marché du travail totale (ie date enquête moins celle de fin d'étude)
+data_merged <- data_merged[, dure_marche_trav_tot:= as.numeric(Annee_enquete) - as.numeric(annee_fin_etude)] 
+data_merged <- data_merged[dure_marche_trav_tot <= 0, dure_marche_trav_tot := 0] 
+# A voir si les cas bizarre sortie des études depuis très très longtemps ne sont pas des points abérents : filtre sur l'âge
+# Avec la fin de l'année des études on pourrait calculer aussi le temps d'arriver des enfants etc
