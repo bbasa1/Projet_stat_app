@@ -35,7 +35,8 @@ library(cluster)
 library(compare)
 # install.packages("janitor")
 library(janitor)
-
+# install.packages("survey")
+library(survey)
 
 
 ### Liste des pays possibles (dico sur https://www.iban.com/country-codes )###
