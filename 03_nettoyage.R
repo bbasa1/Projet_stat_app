@@ -200,28 +200,28 @@ try(data_merged <- data_merged[is.na(Raisons_indisponibilité_travail ), Raisons
 # try(data_merged <- data_merged[is.na(Raisons_recherche_emploi ), Raisons_recherche_emploi  := "9999"], silent=TRUE)
 
 try(data_merged <- data_merged[, Absence_et_salaire_2006  := Absence_et_salaire_2006], silent=TRUE)
-try(data_merged <- data_merged[Absence_et_salaire_2006 == "9", Absence_et_salaire_2006  := "9999"], silent=TRUE)
-try(data_merged <- data_merged[is.na(Absence_et_salaire_2006), Absence_et_salaire_2006  := "9999"], silent=TRUE)
+try(data_merged <- data_merged[Absence_et_salaire_2006 == 9, Absence_et_salaire_2006  := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(Absence_et_salaire_2006), Absence_et_salaire_2006  := 9999], silent=TRUE)
 
 try(data_merged <- data_merged[, raison_cdd  := raison_cdd], silent=TRUE)
-try(data_merged <- data_merged[raison_cdd == "9", raison_cdd  := "9999"], silent=TRUE)
-try(data_merged <- data_merged[is.na(raison_cdd), raison_cdd  := "9999"], silent=TRUE)
+try(data_merged <- data_merged[raison_cdd == 9, raison_cdd  := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(raison_cdd), raison_cdd  := 9999], silent=TRUE)
 
 try(data_merged <- data_merged[, sit_pro_avant_enq  := sit_pro_avant_enq], silent=TRUE)
-try(data_merged <- data_merged[sit_pro_avant_enq == "9", sit_pro_avant_enq  := "9999"], silent=TRUE)
-try(data_merged <- data_merged[is.na(sit_pro_avant_enq), sit_pro_avant_enq  := "9999"], silent=TRUE)
+try(data_merged <- data_merged[sit_pro_avant_enq == 9, sit_pro_avant_enq  := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(sit_pro_avant_enq), sit_pro_avant_enq  := 9999], silent=TRUE)
 
 try(data_merged <- data_merged[, statu_pro_avant_enq  := statu_pro_avant_enq], silent=TRUE)
-try(data_merged <- data_merged[statu_pro_avant_enq == "9", statu_pro_avant_enq  := "9999"], silent=TRUE)
-try(data_merged <- data_merged[is.na(statu_pro_avant_enq), statu_pro_avant_enq  := "9999"], silent=TRUE)
+try(data_merged <- data_merged[statu_pro_avant_enq == 9, statu_pro_avant_enq  := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(statu_pro_avant_enq), statu_pro_avant_enq  := 9999], silent=TRUE)
 
 try(data_merged <- data_merged[, temp_recherche_emp  := temp_recherche_emp], silent=TRUE)
-try(data_merged <- data_merged[temp_recherche_emp == "9", temp_recherche_emp  := "9999"], silent=TRUE)
-try(data_merged <- data_merged[is.na(temp_recherche_emp), temp_recherche_emp  := "9999"], silent=TRUE)
+try(data_merged <- data_merged[temp_recherche_emp == 9, temp_recherche_emp  := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(temp_recherche_emp), temp_recherche_emp  := 9999], silent=TRUE)
 
 try(data_merged <- data_merged[, dom_enf  := dom_enf], silent=TRUE)
-try(data_merged <- data_merged[dom_enf == "9", dom_enf  := "9999"], silent=TRUE)
-try(data_merged <- data_merged[is.na(dom_enf), dom_enf  := "9999"], silent=TRUE)
+try(data_merged <- data_merged[dom_enf == 9, dom_enf  := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(dom_enf), dom_enf  := 9999], silent=TRUE)
 
 try(data_merged <- data_merged[, nb_pers_men  := nb_pers_men], silent=TRUE)
 try(data_merged <- data_merged[nb_pers_men == "99", nb_pers_men  := "9999"], silent=TRUE)
@@ -232,54 +232,54 @@ try(data_merged <- data_merged[nb_enf_m15 == "99", nb_enf_m15  := "9999"], silen
 try(data_merged <- data_merged[is.na(nb_enf_m15), nb_enf_m15  := "9999"], silent=TRUE)
 
 try(data_merged <- data_merged[, raison_changer_job  := raison_changer_job], silent=TRUE)
-try(data_merged <- data_merged[raison_changer_job == "9", raison_changer_job  := "9999"], silent=TRUE)
-try(data_merged <- data_merged[is.na(raison_changer_job), raison_changer_job  := "9999"], silent=TRUE)
+try(data_merged <- data_merged[raison_changer_job == 9, raison_changer_job  := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(raison_changer_job), raison_changer_job  := 9999], silent=TRUE)
 
 # Pour la variable REGIONW je ne sais pas comment la retraiter 
 
 try(data_merged <- data_merged[, taille_ent  := taille_ent], silent=TRUE)
-try(data_merged <- data_merged[taille_ent == "99", taille_ent  := "9999"], silent=TRUE)
-try(data_merged <- data_merged[is.na(taille_ent), taille_ent  := "9999"], silent=TRUE)
+try(data_merged <- data_merged[taille_ent == 99, taille_ent  := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(taille_ent), taille_ent  := 9999], silent=TRUE)
 
 try(data_merged <- data_merged[, couple_cohab  := couple_cohab], silent=TRUE)
-try(data_merged <- data_merged[couple_cohab == "9", couple_cohab  := "9999"], silent=TRUE)
-try(data_merged <- data_merged[is.na(couple_cohab), couple_cohab  := "9999"], silent=TRUE)
+try(data_merged <- data_merged[couple_cohab == 9, couple_cohab  := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(couple_cohab), couple_cohab  := 9999], silent=TRUE)
 
 try(data_merged <- data_merged[, travail_respon  := travail_respon], silent=TRUE)
-try(data_merged <- data_merged[travail_respon == "9", travail_respon  := "9999"], silent=TRUE)
-try(data_merged <- data_merged[is.na(travail_respon), travail_respon  := "9999"], silent=TRUE)
+try(data_merged <- data_merged[travail_respon == 9, travail_respon  := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(travail_respon), travail_respon  := 9999], silent=TRUE)
 
 try(data_merged <- data_merged[, travail_interim  := travail_interim], silent=TRUE)
-try(data_merged <- data_merged[travail_interim == "9", travail_interim  := "9999"], silent=TRUE)
-try(data_merged <- data_merged[is.na(travail_interim), travail_interim  := "9999"], silent=TRUE)
+try(data_merged <- data_merged[travail_interim == 9, travail_interim  := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(travail_interim), travail_interim  := 9999], silent=TRUE)
 
 try(data_merged <- data_merged[, travail_3_8  := travail_3_8], silent=TRUE)
-try(data_merged <- data_merged[travail_3_8 == "9", travail_3_8  := "9999"], silent=TRUE)
-try(data_merged <- data_merged[is.na(travail_3_8), travail_3_8  := "9999"], silent=TRUE)
+try(data_merged <- data_merged[travail_3_8 == 9, travail_3_8  := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(travail_3_8), travail_3_8  := 9999], silent=TRUE)
 
 try(data_merged <- data_merged[, travail_soiree  := travail_soiree], silent=TRUE)
-try(data_merged <- data_merged[travail_soiree == "9", travail_soiree  := "9999"], silent=TRUE)
-try(data_merged <- data_merged[is.na(travail_soiree), travail_soiree  := "9999"], silent=TRUE)
+try(data_merged <- data_merged[travail_soiree == 9, travail_soiree  := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(travail_soiree), travail_soiree  := 9999], silent=TRUE)
 
 try(data_merged <- data_merged[, travail_nuit  := travail_nuit], silent=TRUE)
-try(data_merged <- data_merged[travail_nuit == "9", travail_nuit  := "9999"], silent=TRUE)
-try(data_merged <- data_merged[is.na(travail_nuit), travail_nuit  := "9999"], silent=TRUE)
+try(data_merged <- data_merged[travail_nuit == 9, travail_nuit  := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(travail_nuit), travail_nuit  := 9999], silent=TRUE)
 
 try(data_merged <- data_merged[, travail_samedi  := travail_samedi], silent=TRUE)
-try(data_merged <- data_merged[travail_samedi == "9", travail_samedi  := "9999"], silent=TRUE)
-try(data_merged <- data_merged[is.na(travail_samedi), travail_samedi  := "9999"], silent=TRUE)
+try(data_merged <- data_merged[travail_samedi == 9, travail_samedi  := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(travail_samedi), travail_samedi  := 9999], silent=TRUE)
 
 try(data_merged <- data_merged[, travail_dimanche  := travail_dimanche], silent=TRUE)
-try(data_merged <- data_merged[travail_dimanche == "9", travail_dimanche  := "9999"], silent=TRUE)
-try(data_merged <- data_merged[is.na(travail_dimanche), travail_dimanche  := "9999"], silent=TRUE)
+try(data_merged <- data_merged[travail_dimanche == 9, travail_dimanche  := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(travail_dimanche), travail_dimanche  := 9999], silent=TRUE)
 
 try(data_merged <- data_merged[, exist_autre_emploi  := exist_autre_emploi], silent=TRUE)
-try(data_merged <- data_merged[exist_autre_emploi == "9", exist_autre_emploi  := "9999"], silent=TRUE)
-try(data_merged <- data_merged[is.na(exist_autre_emploi), exist_autre_emploi  := "9999"], silent=TRUE)
+try(data_merged <- data_merged[exist_autre_emploi == 9, exist_autre_emploi  := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(exist_autre_emploi), exist_autre_emploi  := 9999], silent=TRUE)
 
 try(data_merged <- data_merged[, statu_emp_adulte_men  := statu_emp_adulte_men], silent=TRUE)
-try(data_merged <- data_merged[statu_emp_adulte_men == "9", statu_emp_adulte_men  := "9999"], silent=TRUE)
-try(data_merged <- data_merged[is.na(statu_emp_adulte_men), statu_emp_adulte_men  := "9999"], silent=TRUE)
+try(data_merged <- data_merged[statu_emp_adulte_men == 9, statu_emp_adulte_men  := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(statu_emp_adulte_men), statu_emp_adulte_men  := 9999], silent=TRUE)
 
 try(data_merged <- data_merged[, age_enf_plus_jeune  := age_enf_plus_jeune], silent=TRUE)
 try(data_merged <- data_merged[age_enf_plus_jeune == "99", age_enf_plus_jeune  := "9999"], silent=TRUE)
@@ -290,8 +290,8 @@ try(data_merged <- data_merged[statut_travail == 9 , statut_travail  := 9999], s
 try(data_merged <- data_merged[is.na(statut_travail), statut_travail  := 9999], silent=TRUE)
 
 try(data_merged <- data_merged[, compo_men_v1  := compo_men_v1], silent=TRUE)
-try(data_merged <- data_merged[compo_men_v1 == "99" , compo_men_v1  := "9999"], silent=TRUE)
-try(data_merged <- data_merged[is.na(compo_men_v1), compo_men_v1  := "9999"], silent=TRUE)
+try(data_merged <- data_merged[compo_men_v1 == 99 , compo_men_v1  := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(compo_men_v1), compo_men_v1  := 9999], silent=TRUE)
 
 ################################################################################
 #         2 . Petite analyse des "valeurs manquantes" ========================
