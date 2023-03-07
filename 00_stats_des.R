@@ -672,6 +672,8 @@ lprop(tab_foyer_avant_enquete)
 tab_FH_foyer_avant_enquete <- svytable(~ Sexe_1H_2F +sit_pro_avant_enq_foyer, dw_tot)
 lprop(tab_FH_foyer_avant_enquete)
 
+# # Il faudrait réussir à avoir cette partie pour chaque année, ou alors pour charque "periode" et regarder les évolutions 
+
 # Est ce que le fait d'être en d'activité, d'emploi et d'emploi ETP des femmes et des hommes varient selon le statut martital ?
 # Tester en couple, en couple cohabitant et mariés si possible : on a pas encore toutes les variables, on test juste mariés
 # Femmes
@@ -687,25 +689,75 @@ lprop(tab_hom_stat_mar_emploi)
 # Actif : 
 tab_hom_stat_mar_actif <- svytable(~ statu_marital +i_actif, dw_hom)
 lprop(tab_hom_stat_mar_actif)
-
+# Les hommes mariés sont près de fois plus nombreux a avoir un emploi (32 points d'écart)
+# on voit que ca évolue en sens inverse, hommes mariés plus souvent actif et enmploi que celibataire (encore plus séparé)
+# inversement les femmes sont plus souvent actives et en emploi célibataire ou divorcée que mariés 
+# Pour les femmes l'écart actif / emploi se creusent alors qu'il se réduit pour les hommes (différence rapport à la l'inactivité et au chômage ?)
 # Il faudrait ensuite refaire les même graphique que plus haut mais en filtrant sur les modalités mariés ou non 
 
 # Est ce que le taux d'activité, d'emploi et d'emploi ETP des femmes et des hommes varient selon le nombre d'enfant à charge ?
-# Trier sur les mineurs, à charge (au domicile) et le nombre 1,2 et 3 
+# Trier sur les mineurs, à charge (au domicile) et le nombre 1,2 et 3 : je ne suis pas sure d'avoir bien la distinction a charge
+# On commence par le nombre :
+# Femmes
+# En emploi : 
+tab_fem_nb_enf_emploi <- svytable(~ nb_enf+i_emploi, dw_fem)
+lprop(tab_fem_nb_enf_emploi)
+# Actif : 
+tab_fem_nb_enf_actif <- svytable(~ nb_enf +i_actif, dw_fem)
+lprop(tab_fem_nb_enf_actif)
+# Hommes
+tab_hom_nb_enf_emploi <- svytable(~ nb_enf+i_emploi, dw_hom)
+lprop(tab_hom_nb_enf_emploi)
+# Actif : 
+tab_hom_nb_enf_actif <- svytable(~ nb_enf +i_actif, dw_hom)
+lprop(tab_hom_nb_enf_actif)
+# Pour les femmes c'est globalement linéaire, mais surtout tres proches pour celles sans enfants ou avec moins de 3 : il y a un gros saut à 3 enfants et plus
+# Inversement chez les hommes c'est croissant, sauf le taux d'emploi (chômage car pas activité) qui baisse au troisième et plus
 # Tester aussi selon l'âge des enfants : nombre de moins de trois ans, nombre de moins de 6 ans (et autre - voir tester les majeurs avec nombre de plus de 18 ans)
-
+# Moins de 3 ans 
+# Femmes
+# En emploi : 
+tab_fem_enf_3ans_emploi <- svytable(~ enf_m3ans+i_emploi, dw_fem)
+lprop(tab_fem_enf_3ans_emploi)
+# Actif : 
+tab_fem_enf_3ans_actif <- svytable(~ enf_m3ans +i_actif, dw_fem)
+lprop(tab_fem_enf_3ans_actif)
+# Hommes
+tab_hom_enf_3ans_emploi <- svytable(~ enf_m3ans+i_emploi, dw_hom)
+lprop(tab_hom_enf_3ans_emploi)
+# Actif : 
+tab_hom_enf_3ans_actif <- svytable(~ enf_m3ans +i_actif, dw_hom)
+lprop(tab_hom_enf_3ans_actif)
+# On retroue un ecrat important entre les hommes et les femmes deja évoqué 
+# la différence avec sans enfant et plus marquée chez les hommes: plus souvent actif/emploi, a l'inverse des femmes
+# la présence d'un enfant de moins de 3 ans et lié moins négativement que celle d''en avoir plusieurs (croisé moins de 3 et moins de 6 ?)
+# moins de 6 ans 
+# Femmes
+# En emploi : 
+tab_fem_enf_6ans_emploi <- svytable(~ enf_m6ans+i_emploi, dw_fem)
+lprop(tab_fem_enf_6ans_emploi)
+# Actif : 
+tab_fem_enf_6ans_actif <- svytable(~ enf_m6ans +i_actif, dw_fem)
+lprop(tab_fem_enf_6ans_actif)
+# Hommes
+tab_hom_enf_6ans_emploi <- svytable(~ enf_m6ans+i_emploi, dw_hom)
+lprop(tab_hom_enf_6ans_emploi)
+# Actif : 
+tab_hom_enf_6ans_actif <- svytable(~ enf_m6ans +i_actif, dw_hom)
+lprop(tab_hom_enf_6ans_actif)
+# les conclusions sur les moins de 6 sont un peu moins marquées / pas plus intéressante dans ce pays : croisé les deux ?
 # si déterminant regarder l'évolution du nombre d'enfant en moyenne sur toute la population, sur les moins diplomés et chez les plus diplomés 
-# si possible créer une variable csp du couple / diplome du couple et une variable couple biactif ou non 
+# A priori compliqué : si possible créer une variable csp du couple / diplome du couple et une variable couple biactif ou non 
 
 # Faire une analyse plus spécifique du temps partiel (attention ca peut aussi entrer dans la partie suivante) : 
 # avec le fait d'être en couple marié/cohabitant, d'avoir des enfants, dont en bas âges, voir si on a une variable congé parental 
 # voir si on a les raisons de ce temps partiel, regarder si ces personnes souhaiteraient travailler plus ou chnager d'emploi et pourquoi 
 
-################################################################################
-#            IX. Analyse de l'évolution de la qualité de l'emploi  ============
-################################################################################
+######################################################################################################################################
+#            IX. Analyse de l'évolution de la qualité de l'emploi et de la position sur le marché du travail             ============
+######################################################################################################################################
 
-#  idem comencer par les stats gloables pour avoir une vue d'ensemble 
+#  idem commencer par les stats gloables pour avoir une vue d'ensemble 
 
 # Comment varie la proportion de temps partiel dans le temps selon l'âge et le sexe ?
 # Comment varie la proportion de CDI dans le temps selon l'âge et le sexe ? 
