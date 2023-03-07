@@ -614,8 +614,8 @@ data_merged <- data_merged[Nb_enfants_entre_3_5_ans == "04", enf_m6ans := 1]
 
 # Présence d'au moins un enfant
 data_merged <- data_merged[, enf := 1] 
-data_merged <- data_merged[age_enf_plus_jeune == "00", enf_m6ans := 0] 
-data_merged <- data_merged[age_enf_plus_jeune == "9999", enf_m6ans := 0]
+data_merged <- data_merged[age_enf_plus_jeune == "00", enf := 0] 
+data_merged <- data_merged[age_enf_plus_jeune == "9999", enf := 0]
 
 # Nombre d'enfants de moins de 24 ans dans le ménage
 data_merged <- data_merged[, nb_enf_tot:= as.numeric(Nb_enfants_entre_18_24_ans)+as.numeric(Nb_enfants_entre_15_17_ans)+as.numeric(Nb_enfants_entre_11_14_ans)+as.numeric(Nb_enfants_entre_9_11_ans)+as.numeric(Nb_enfants_entre_6_8_ans)+as.numeric(Nb_enfants_moins_2_ans)+as.numeric(Nb_enfants_entre_3_5_ans)] 
