@@ -664,6 +664,14 @@ data_merged <- data_merged[, fam_monop := 9999]
 data_merged <- data_merged[enf == 1, fam_monop := 0] 
 data_merged <- data_merged[compo_men == "fam_monop", fam_monop := 1] 
 
+# a un emploi :
+data_merged <- data_merged[, i_emploi := 0] 
+data_merged <- data_merged[Statut_emploi_1_emploi==1, i_emploi := 1]
+
+# est actif (emploi ou chômage):
+data_merged <- data_merged[, i_actif := 0] 
+data_merged <- data_merged[Statut_emploi_1_emploi %in% c("1","2"), i_actif := 1]
+
 # Sur l'emploi occupé en lien avec la famille (creation d'indicatrice): 
 # A temps partiel pour s'occuper des enfants ou de sa famille
 data_merged <- data_merged[, raisons_tp_enf_fam := 0] 
