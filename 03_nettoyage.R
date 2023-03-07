@@ -79,6 +79,7 @@ try(setnames(data_merged,'HHAGEYG',"age_enf_plus_jeune"), silent=TRUE)
 try(setnames(data_merged,'HHPRIV',"menage_ordinaire"), silent=TRUE)
 try(setnames(data_merged,'MAINSTAT',"statut_travail"), silent=TRUE)
 try(setnames(data_merged,'HHCOMP',"compo_men_v1"), silent=TRUE)
+try(setnames(data_merged,'HHLINK',"lien_pers_ref"), silent=TRUE)
 
 ######### Recoder les variables avec des modalités NA et non concerné ######################
 # on a choisi de recoder les na ou les "hors sujets" systhématiquement en 9999 (si ce n'était pas déjà le cas)
@@ -292,6 +293,10 @@ try(data_merged <- data_merged[is.na(statut_travail), statut_travail  := 9999], 
 try(data_merged <- data_merged[, compo_men_v1  := compo_men_v1], silent=TRUE)
 try(data_merged <- data_merged[compo_men_v1 == 99 , compo_men_v1  := 9999], silent=TRUE)
 try(data_merged <- data_merged[is.na(compo_men_v1), compo_men_v1  := 9999], silent=TRUE)
+
+try(data_merged <- data_merged[, lien_pers_ref  := lien_pers_ref], silent=TRUE)
+try(data_merged <- data_merged[lien_pers_ref == 9 , lien_pers_ref  := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(lien_pers_ref), lien_pers_ref  := 9999], silent=TRUE)
 
 ################################################################################
 #         2 . Petite analyse des "valeurs manquantes" ========================
@@ -612,13 +617,12 @@ data_merged <- data_merged[Nb_enfants_entre_3_5_ans == "02", enf_m6ans := 1]
 data_merged <- data_merged[Nb_enfants_entre_3_5_ans == "03", enf_m6ans := 1]
 data_merged <- data_merged[Nb_enfants_entre_3_5_ans == "04", enf_m6ans := 1]
 
-# Présence d'au moins un enfant
-data_merged <- data_merged[, enf := 1] 
-data_merged <- data_merged[age_enf_plus_jeune == "00", enf := 0] 
-data_merged <- data_merged[age_enf_plus_jeune == "9999", enf := 0]
-
 # Nombre d'enfants de moins de 24 ans dans le ménage
 data_merged <- data_merged[, nb_enf_tot:= as.numeric(Nb_enfants_entre_18_24_ans)+as.numeric(Nb_enfants_entre_15_17_ans)+as.numeric(Nb_enfants_entre_11_14_ans)+as.numeric(Nb_enfants_entre_9_11_ans)+as.numeric(Nb_enfants_entre_6_8_ans)+as.numeric(Nb_enfants_moins_2_ans)+as.numeric(Nb_enfants_entre_3_5_ans)] 
+
+# Présence d'au moins un enfant
+data_merged <- data_merged[, enf := 0] 
+data_merged <- data_merged[nb_enf_tot >= 1, enf := 1] 
 
 # Nombre d'enfant avec 4 modalités : 0, 1, 2 ou plus de trois 
 data_merged <- data_merged[, nb_enf := "3 et plus"] 
@@ -630,16 +634,35 @@ data_merged <- data_merged[nb_enf_tot == 2, nb_enf := "2"]
 data_merged <- data_merged[, nb_adulte_tot:= as.numeric(nb_pers_men) - nb_enf_tot] 
 # Pas de nombre négatifs donc on peut travailler sur ca pour avoir une petite variable compo du ménage 
 
-data_merged <- data_merged[, compo_men := "9999"] 
-data_merged <- data_merged[nb_adulte_tot == 1 & nb_enf_tot >=1 , compo_men := "fam_monop"] 
-data_merged <- data_merged[nb_adulte_tot == 1 & nb_enf_tot == 0, compo_men := "celibataire"]
-data_merged <- data_merged[couple_cohab == 1 & nb_enf_tot == 0, compo_men := "couple"]
-data_merged <- data_merged[couple_cohab == 1 & nb_enf_tot >= 1, compo_men := "couple_enf"]
-data_merged <- data_merged[couple_cohab == 1 & nb_adulte_tot>=3, compo_men := "men_complexe"]
-data_merged <- data_merged[couple_cohab == 2 & nb_adulte_tot>=2, compo_men := "men_complexe"]
+# data_merged <- data_merged[, compo_men := "9999"] 
+# data_merged <- data_merged[nb_adulte_tot == 1 & nb_enf_tot >=1 , compo_men := "fam_monop"] 
+# data_merged <- data_merged[nb_adulte_tot == 1 & nb_enf_tot == 0, compo_men := "celibataire"]
+# data_merged <- data_merged[couple_cohab == 1 & nb_enf_tot == 0, compo_men := "couple"]
+# data_merged <- data_merged[couple_cohab == 1 & nb_enf_tot >= 1, compo_men := "couple_enf"]
+# data_merged <- data_merged[couple_cohab == 1 & nb_adulte_tot>=3, compo_men := "men_complexe"]
+# data_merged <- data_merged[couple_cohab == 2 & nb_adulte_tot>=2, compo_men := "men_complexe"]
 # sans pondéré il me semble y avoir beaucoup de ménage complexe, on pourra comparer avec la variable de l'enquête 
 # ou se débrouiller en croisant les deux 
+# Finalement je pense que la variable n'est pas bonne, je vais plutot recoder celle de l'enquête
+data_merged <- data_merged[, compo_men := "9999"] 
+data_merged <- data_merged[compo_men_v1 == 11, compo_men := "fam_monop"] 
+data_merged <- data_merged[compo_men_v1 == 12, compo_men := "fam_monop"] 
+data_merged <- data_merged[compo_men_v1 == 10, compo_men := "celibataire"]
+data_merged <- data_merged[compo_men_v1 == 20, compo_men := "couple"]
+data_merged <- data_merged[compo_men_v1 == 21, compo_men := "couple_enf"]
+data_merged <- data_merged[compo_men_v1 == 22, compo_men := "couple_enf"]
+data_merged <- data_merged[compo_men_v1 == 13, compo_men := "men_complexe"]
+data_merged <- data_merged[compo_men_v1 == 23, compo_men := "men_complexe"]
+data_merged <- data_merged[compo_men_v1 == 30, compo_men := "men_complexe"]
+data_merged <- data_merged[compo_men_v1 == 31, compo_men := "men_complexe"]
+data_merged <- data_merged[compo_men_v1 == 32, compo_men := "men_complexe"]
+data_merged <- data_merged[compo_men_v1 == 33, compo_men := "men_complexe"]
 # On pourrait aussi afiner avec la variable sur la présence d'enfant à l'exterieur mais je pense plus tot utiliser l'indicatrice directement 
+
+# Indicateur famille monop parmis les familles avec enfants :
+data_merged <- data_merged[, fam_monop := 9999] 
+data_merged <- data_merged[enf == 1, fam_monop := 0] 
+data_merged <- data_merged[compo_men == "fam_monop", fam_monop := 1] 
 
 # Sur l'emploi occupé en lien avec la famille (creation d'indicatrice): 
 # A temps partiel pour s'occuper des enfants ou de sa famille
