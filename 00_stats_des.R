@@ -564,6 +564,14 @@ sous_data_merged <- sous_data_merged[lien_pers_ref==1 | lien_pers_ref==2, ]
 dw_tot <- svydesign(ids = ~1, data = sous_data_merged, weights = ~ sous_data_merged$COEFF)
 # Je pense qu'il faudrait en faire un par année même si c'est pas optimal, à rediscuter 
 
+# On va créer des bases spécifiques F et H pour travailler plus facilement sur les différents croisements
+# Femmes
+sous_data_merged_fem <- sous_data_merged[Sexe_1H_2F==2, ]
+dw_fem <- svydesign(ids = ~1, data = sous_data_merged_fem, weights = ~ sous_data_merged_fem$COEFF)
+# Hommes 
+sous_data_merged_hom<- sous_data_merged[Sexe_1H_2F==1, ]
+dw_hom <- svydesign(ids = ~1, data = sous_data_merged_hom, weights = ~ sous_data_merged_hom$COEFF)
+
 # Faire les stats de base : 
 
 # avoir la part de femmes et hommes par âge en pondéré, 
@@ -574,42 +582,113 @@ lprop(tab_FH_age)
 tab_FH_enquete <- svytable(~ Annee_enquete +Sexe_1H_2F, dw_tot)
 lprop(tab_FH_enquete)
 # => peut être intéressant pour appréhender l'effet démographie : est ce que l'on a pas des gros désq : a priori non 
+
 # le nombre de famille avec enfants
 tab_fam_enf_age <- svytable(~ Age_tranche+enf, dw_tot)
 lprop(tab_fam_enf_age)
 # par année d'enquête
 tab_fam_enf_enquete <- svytable(~ Annee_enquete +enf, dw_tot)
 lprop(tab_fam_enf_enquete)
+# L'idée ici c'est de voir si y a une baisse des naissances / du nombre de familles avec enfant : oui 
+# ce qui peut avoir un impact sur le marché du travail. 
+# Avec l'âge on voit aussi les tranches concernés par les enfants, il faudrait croiser les trois aussi (age /année)
+# par sexe : rien de bizarre, proche (on aurait quand même pu avoir les fam monop en creux - difficile a quantifier)
+tab_FH_enf_enquete <- svytable(~ Sexe_1H_2F +enf, dw_tot)
+lprop(tab_FH_enf_enquete)
+
 # Le nombre de famille monop en particulier: comme pour la composition familiale on a de gros écarts avec d'autres sources
 # Variable a reprendre si on veut s'en servir (on devrait être à 9% des familles avec enfants) pour info : https://www.insee.fr/fr/statistiques/6047775?sommaire=6047805#tableau-figure2
 # tab_monop_age <- svytable(~ Age_tranche+fam_monop, dw_tot)
 # lprop(tab_monop_age)
 # # par année d'enquête
-# tab_FH_enquete <- svytable(~ Annee_enquete +fam_monop, dw_tot)
+# tab_monop_enquete <- svytable(~ Annee_enquete +fam_monop, dw_tot)
 # lprop(tab_monop_enquete)
 # # la répartition par type en général : beaucoup de ménage complexe, je ne sais pas si j'exploite bien la variable
+# a priori non vu les données de l'ocde...
 # tab_compomen_age <- svytable(~ Age_tranche+compo_men, dw_tot)
 # lprop(tab_compomen_age)
 # # par année d'enquête
 # tab_compomen_enquete <- svytable(~ Annee_enquete +compo_men, dw_tot)
 # lprop(tab_compomen_enquete)
-# les familles avec des enfants en bas âge
+
+# les familles avec des enfants en bas âge : on sait que c'est ca qui penalise le plus notamment du fait des MDG
 # moins de 3 ans 
 tab_enf_m3_age <- svytable(~ Age_tranche+enf_m3ans, dw_tot)
 lprop(tab_enf_m3_age)
+# Majoritairement concerné autours de 32 ans mais pas negligeable de 20 à 40 ans 
 # par année d'enquête
 tab_enf_m3_enquete <- svytable(~ Annee_enquete +enf_m3ans, dw_tot)
 lprop(tab_enf_m3_enquete)
+# on constate une légère diminution mais peut être pas signifiatifs (moins visible que pour l'enfant en général)
 # moins de 6 ans 
 tab_enf_m6_age <- svytable(~ Age_tranche+enf_m6ans, dw_tot)
 lprop(tab_enf_m6_age)
 # par année d'enquête
 tab_enf_m6_enquete <- svytable(~ Annee_enquete +enf_m6ans, dw_tot)
 lprop(tab_enf_m6_enquete)
+# Conclu proche des moins de 3 ans avec un déclage sur l'âge
 
-# Est ce que le taux d'activité, d'emploi et d'emploi ETP des femmes et des hommes varient selon le statut martital ?
-# Tester en couple, en couple cohabitant et mariés si possible 
-# regarder ici la proportion de femmes/hommes au foyer
+# Famille avec enfant selon le nombre d'enfant
+# par âge :
+tab_fam_nb_enf_age <- svytable(~ Age_tranche+nb_enf, dw_tot)
+lprop(tab_fam_nb_enf_age)
+# Coté tardif des naissances dans les familles avec au moins un enfant
+# par année d'enquête
+tab_fam_nb_enf_enquete <- svytable(~ Annee_enquete +nb_enf, dw_tot)
+lprop(tab_fam_nb_enf_enquete)
+# On voit une stabilité pour 0 et 1 enfant mais attention ca diminue quand même pas mal pour les familles de deux et plus 
+
+
+# Statut marital : 2 mariés, 1 celibataire, 0 veuf/divorcé/séparé
+# par âge :
+tab_stat_mar_age <- svytable(~ Age_tranche+statu_marital, dw_tot)
+lprop(tab_stat_mar_age)
+# par année d'enquête
+tab_stat_mar_enquete <- svytable(~ Annee_enquete +statu_marital, dw_tot)
+lprop(tab_stat_mar_enquete)
+# On constate une importante diminution du mariage et une certaine hausse du célibat dans les enquêtes sur l'ensemble (peut jouer sur le marché du travail, à croiser avec le sexe dans l'idéal)
+# par sexe : equivalence sur le mariage, mais moins de femmes celibataires et plus veuves
+tab_FH_stat_mar_enquete <- svytable(~ Sexe_1H_2F +statu_marital, dw_tot)
+lprop(tab_FH_stat_mar)
+
+# (Mesurer à partir de 2006) Proportion de personnes qui se déclarent comme "au foyer" (ie comme s'occupant du foyer) au moments de l'enquête
+# par âge : pas si importante ua moment des enfants, plus fréquent chz les plus âgés (effet génération?)
+tab_foyer_age <- svytable(~ Age_tranche+sit_pro_foyer, dw_tot)
+lprop(tab_foyer_age)
+# par année d'enquête : en forte diminution depuis de 15% à un peu moins de 7%
+tab_foyer_enquete <- svytable(~ Annee_enquete +sit_pro_foyer, dw_tot)
+lprop(tab_foyer_enquete)
+# par sexe : Moins de 10% de la pop mais 12 fois plus de femmes que d'homme
+tab_FH_foyer <- svytable(~ Sexe_1H_2F +sit_pro_foyer, dw_tot)
+lprop(tab_FH_foyer)
+# idemn mais avant l'enquête (on a des mesures avant 2006)
+# par âge : idem avec un effet encore plus marqué, ie plus fort chez les plus âgées
+tab_foyer_avant_age <- svytable(~ Age_tranche+sit_pro_avant_enq_foyer, dw_tot)
+lprop(tab_foyer_avant_age)
+# par année d'enquête : on voit la forte baisse de 24% en 1999, soit une femme sur 4 à 7% en 2018, moins d'une sur 10
+tab_foyer_avant_enquete <- svytable(~ Annee_enquete +sit_pro_avant_enq_foyer, dw_tot)
+lprop(tab_foyer_avant_enquete)
+# par sexe : quasiment aucun homme, 23% des femmes :donc plus d'une femme sur 5 s'est retrouvée au foyer 
+tab_FH_foyer_avant_enquete <- svytable(~ Sexe_1H_2F +sit_pro_avant_enq_foyer, dw_tot)
+lprop(tab_FH_foyer_avant_enquete)
+
+# Est ce que le fait d'être en d'activité, d'emploi et d'emploi ETP des femmes et des hommes varient selon le statut martital ?
+# Tester en couple, en couple cohabitant et mariés si possible : on a pas encore toutes les variables, on test juste mariés
+# Femmes
+# En emploi : 
+tab_fem_stat_mar_emploi <- svytable(~ statu_marital+i_emploi, dw_fem)
+lprop(tab_fem_stat_mar_emploi)
+# Actif : 
+tab_fem_stat_mar_actif <- svytable(~ statu_marital +i_actif, dw_fem)
+lprop(tab_fem_stat_mar_actif)
+# Hommes
+tab_hom_stat_mar_emploi <- svytable(~ statu_marital+i_emploi, dw_hom)
+lprop(tab_hom_stat_mar_emploi)
+# Actif : 
+tab_hom_stat_mar_actif <- svytable(~ statu_marital +i_actif, dw_hom)
+lprop(tab_hom_stat_mar_actif)
+
+# Il faudrait ensuite refaire les même graphique que plus haut mais en filtrant sur les modalités mariés ou non 
 
 # Est ce que le taux d'activité, d'emploi et d'emploi ETP des femmes et des hommes varient selon le nombre d'enfant à charge ?
 # Trier sur les mineurs, à charge (au domicile) et le nombre 1,2 et 3 
