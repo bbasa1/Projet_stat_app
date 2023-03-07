@@ -164,7 +164,8 @@ longueur_liste <- 0
 # On calcule les taux d'activités et d'emplois par âge et sexe
 liste_var <- c("Age_tranche", "Sexe_1H_2F")
 calculs_age <- calcul_taux_emplois_activite(liste_var_groupby = liste_var, data_loc = data_merged)
-# Sauf erreur il faut multiplir le taux d'emploi en etp par 100 (la population aussi ?): 
+# Sauf erreur il faut multiplir le taux d'emploi en etp par 100 (la population aussi ?):
+# Non a priori problème 
 calculs_age$tx_emploi_etp <- calculs_age$tx_emploi_etp*100 
 calculs_age$population_emplois_etp <- calculs_age$population_emplois_etp*100 
 calculs_age
@@ -549,16 +550,33 @@ source(paste(repo_prgm,"06_page_html.R",sep="/") ,
 # Est ce que l'on se recentre sur les ménages ordinaire ? 
 
 # Comme on est sur des données pondérées que l'on ne veut pas retraiter à la main on va passer par le package survey 
+# on aurait pu essayé de créer une fonction qui puisse s'adapter a plusieurs variables mais compliqué car encodage différent
 # Utile aussi pour faire des regressions pondérées 
+# On prépare les données avec le plan d'échantillonage : 
+dw_tot <- svydesign(ids = ~1, data = data_merged, weights = ~ data_merged$COEFF)
 
-#On prépare les données avec le plan d'échantillonage : 
-dw <- svydesign(ids = ~1, data = sous_data_merged, weights = ~ sous_data_merged$COEFF)
+# Faire les stats de base : 
 
-# Faire les stats de base : avoir la part de femmes et hommes par âge en pondéré, le nombre de famille avec enfants
-# Le nombre de famille monop, les familles avec des enfants en bas âge
+# avoir la part de femmes et hommes par âge en pondéré, 
+tab_FH <- svytable(~ Sexe_1H_2F + Age_tranche, dw_tot)
+tab_FH
+lprop(tab_FH)
+# par année d'enquête
+tab_FH <- svytable(~ Sexe_1H_2F + Annee_enquete, dw_tot)
+tab_FH
+lprop(tab_FH)
+# les deux 
+tab_FH <- svytable(~ Sexe_1H_2F + Annee_enquete, dw_tot)
+tab_FH
+lprop(tab_FH)
+# le nombre de famille avec enfants
+# Le nombre de famille monop, 
+# les familles avec des enfants en bas âge
+
 
 # Est ce que le taux d'activité, d'emploi et d'emploi ETP des femmes et des hommes varient selon le statut martital ?
 # Tester en couple, en couple cohabitant et mariés si possible 
+# regarder ici la proportion de femmes/hommes au foyer
 
 # Est ce que le taux d'activité, d'emploi et d'emploi ETP des femmes et des hommes varient selon le nombre d'enfant à charge ?
 # Trier sur les mineurs, à charge (au domicile) et le nombre 1,2 et 3 
