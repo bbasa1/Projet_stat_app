@@ -588,7 +588,7 @@ if(mettre_coeffs_nan_a_zero){data_merged <- data_merged[is.na(COEFF), COEFF := 0
 ################################################################################
 # Passage en df pour les calculs
 
-df_merged<- as.data.frame(data_merged)
+# df_merged<- as.data.frame(data_merged)
 
 #### relative à la famille : 
 
@@ -598,7 +598,7 @@ table(df_merged$statu_marital, df_merged$couple_cohab)
 
 # Enfants : 
 # Présence d'enfant de moins de trois ans 
-df_merged$enf_m3ans <- 0 
+
 data_merged <- data_merged[, enf_m3ans := 0] 
 data_merged <- data_merged[Nb_enfants_moins_2_ans == "01", enf_m3ans := 1] 
 data_merged <- data_merged[Nb_enfants_moins_2_ans == "02", enf_m3ans := 1]
