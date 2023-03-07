@@ -108,6 +108,7 @@ liste_variables <- c('QHHNUM', #Identifiant ménage
                      'HHAGEYG', # Age of the youngest child in the household (aged less than 25 years) 
                      'MAINSTAT', # Main status
                      'HHCOMP', # Composition du foyer = mais vraible a retraiter 
+                     'HHLINK',# lien pers de réf
                      'HHPRIV' # Classification of individuals (private household members) - voir si on devreait pas filtré que sur les ménages ordinaires 
 
 )
@@ -547,11 +548,14 @@ source(paste(repo_prgm,"06_page_html.R",sep="/") ,
 ################################################################################
 # Pensez a regarder le taux de chômage aussi avant - pour que ce soit plus facilement lisible qu'en croisant taux d'activité et taux d'emploi
 # Henri avait filtré les gens qui sont encore en études (initiales) - est ce qu'on fait pareil ? 
-# Est ce que l'on se recentre sur les ménages ordinaire ? 
+# Est ce que l'on se recentre sur les ménages ordinaire ? Je le ferais
+# je vais selectioner aussi que les personnes principales ou conjointe du principal dans le foyer
 
 # On filtre sur la population d'intérêt :
 sous_data_merged <- data_merged[Age_tranche - 2 >= age_min, ]
 sous_data_merged <- sous_data_merged[Age_tranche + 2 <= age_max, ]
+sous_data_merged <- sous_data_merged[menage_ordinaire==1, ]
+sous_data_merged <- sous_data_merged[lien_pers_ref==1 | lien_pers_ref==2, ]
 
 # Comme on est sur des données pondérées que l'on ne veut pas retraiter à la main on va passer par le package survey 
 # on aurait pu essayé de créer une fonction qui puisse s'adapter a plusieurs variables mais compliqué car encodage différent
@@ -569,18 +573,26 @@ lprop(tab_FH_age)
 # par année d'enquête
 tab_FH_enquete <- svytable(~ Annee_enquete +Sexe_1H_2F, dw_tot)
 lprop(tab_FH_enquete)
+# => peut être intéressant pour appréhender l'effet démographie : est ce que l'on a pas des gros désq : a priori non 
 # le nombre de famille avec enfants
 tab_fam_enf_age <- svytable(~ Age_tranche+enf, dw_tot)
 lprop(tab_fam_enf_age)
 # par année d'enquête
 tab_fam_enf_enquete <- svytable(~ Annee_enquete +enf, dw_tot)
 lprop(tab_fam_enf_enquete)
-# Le nombre de famille monop en particulier, la répartition par type en général 
-tab_monop_age <- svytable(~ Age_tranche+compo_men, dw_tot)
-lprop(tab_monop_age)
-# par année d'enquête
-tab_FH_enquete <- svytable(~ Annee_enquete +compo_men, dw_tot)
-lprop(tab_FH_enquete)
+# Le nombre de famille monop en particulier: comme pour la composition familiale on a de gros écarts avec d'autres sources
+# Variable a reprendre si on veut s'en servir (on devrait être à 9% des familles avec enfants) pour info : https://www.insee.fr/fr/statistiques/6047775?sommaire=6047805#tableau-figure2
+# tab_monop_age <- svytable(~ Age_tranche+fam_monop, dw_tot)
+# lprop(tab_monop_age)
+# # par année d'enquête
+# tab_FH_enquete <- svytable(~ Annee_enquete +fam_monop, dw_tot)
+# lprop(tab_monop_enquete)
+# # la répartition par type en général : beaucoup de ménage complexe, je ne sais pas si j'exploite bien la variable
+# tab_compomen_age <- svytable(~ Age_tranche+compo_men, dw_tot)
+# lprop(tab_compomen_age)
+# # par année d'enquête
+# tab_compomen_enquete <- svytable(~ Annee_enquete +compo_men, dw_tot)
+# lprop(tab_compomen_enquete)
 # les familles avec des enfants en bas âge
 # moins de 3 ans 
 tab_enf_m3_age <- svytable(~ Age_tranche+enf_m3ans, dw_tot)
