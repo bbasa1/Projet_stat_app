@@ -193,8 +193,8 @@ try(data_merged <- data_merged[Raisons_démission == "99", Raisons_démission  :
 try(data_merged <- data_merged[is.na(Raisons_démission ), Raisons_démission  := "9999"], silent=TRUE)
 
 try(data_merged <- data_merged[, Raisons_indisponibilité_travail  := Raisons_indisponibilité_travail], silent=TRUE)
-try(data_merged <- data_merged[Raisons_indisponibilité_travail == "9", Raisons_indisponibilité_travail  := "9999"], silent=TRUE)
-try(data_merged <- data_merged[is.na(Raisons_indisponibilité_travail ), Raisons_indisponibilité_travail  := "9999"], silent=TRUE)
+try(data_merged <- data_merged[Raisons_indisponibilité_travail == 9, Raisons_indisponibilité_travail  := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(Raisons_indisponibilité_travail ), Raisons_indisponibilité_travail  := 9999], silent=TRUE)
 
 # try(data_merged <- data_merged[, Raisons_recherche_emploi  := Raisons_recherche_emploi], silent=TRUE)
 # try(data_merged <- data_merged[Raisons_recherche_emploi == "99", Raisons_recherche_emploi  := "9999"], silent=TRUE)
@@ -598,7 +598,7 @@ if(mettre_coeffs_nan_a_zero){data_merged <- data_merged[is.na(COEFF), COEFF := 0
 #### relative à la famille : 
 
 # Couple : célibataire, veuf/divorsé/séparé (et non remis en couple), marié, en couple cohab, en couple décohab 
-table(df_merged$statu_marital, df_merged$couple_cohab)
+table(data_merged$statu_marital, data_merged$couple_cohab)
 # dans l'idéal mais en réalité difficile de comprendre la variable "couple" donc on laisse tomber pour l'instant
 
 # Enfants : 
