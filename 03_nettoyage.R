@@ -361,10 +361,6 @@ try(data_merged <- data_merged[is.na(Domaine_education ), Domaine_education  := 
 
 calcul_EQTP <- function(data_merged_loc){
   
-  ## Création de poids d'équivalent temps plein
-  
-  # Passage en df pour les calculs
-  
   df_merged<- as.data.frame(data_merged_loc)
   
   # 100*table(df_merged$Volume_travail_habituel)/nrow(df_merged)
@@ -378,9 +374,11 @@ calcul_EQTP <- function(data_merged_loc){
     mutate(ETP = ifelse(Temps_partiel_clean ==1, 1, 0)) %>%
     mutate(heures_clean = ifelse(Volume_travail_habituel ==99 | Volume_travail_habituel ==00, 0, Volume_travail_habituel)) %>% # création de heures clean, variable nettoyée du nombre d'heures travaillées habituellement
     group_by(Annee_enquete, Temps_partiel_clean) %>%
+    mutate(heures_clean = ifelse(Statut_emploi_1_emploi==1, heures_clean, is.na(heures_clean))) %>%
     mutate(mediane_h = median(heures_clean, na.rm = TRUE)) %>%
     group_by(Annee_enquete) %>%
-    mutate(mediane_h = max(mediane_h, na.rm = TRUE)) # création de la médiane des heures travaillées par les individus à plein temps pour chaque année
+    mutate(mediane_h = max(mediane_h, na.rm = TRUE)) 
+  
   
   # summary(df_merged$EQTP)
   
@@ -402,6 +400,7 @@ calcul_EQTP <- function(data_merged_loc){
   
   df_merged <- df_merged %>%
     select(-ETP) # suppression de la variable ETP, conservation des autres variables
+  
   
   
   data_merged_loc<- as.data.table(df_merged)
