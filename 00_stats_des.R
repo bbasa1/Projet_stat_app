@@ -549,30 +549,51 @@ source(paste(repo_prgm,"06_page_html.R",sep="/") ,
 # Henri avait filtré les gens qui sont encore en études (initiales) - est ce qu'on fait pareil ? 
 # Est ce que l'on se recentre sur les ménages ordinaire ? 
 
+# On filtre sur la population d'intérêt :
+sous_data_merged <- data_merged[Age_tranche - 2 >= age_min, ]
+sous_data_merged <- sous_data_merged[Age_tranche + 2 <= age_max, ]
+
 # Comme on est sur des données pondérées que l'on ne veut pas retraiter à la main on va passer par le package survey 
 # on aurait pu essayé de créer une fonction qui puisse s'adapter a plusieurs variables mais compliqué car encodage différent
 # Utile aussi pour faire des regressions pondérées 
 # On prépare les données avec le plan d'échantillonage : 
-dw_tot <- svydesign(ids = ~1, data = data_merged, weights = ~ data_merged$COEFF)
+dw_tot <- svydesign(ids = ~1, data = sous_data_merged, weights = ~ sous_data_merged$COEFF)
+# Je pense qu'il faudrait en faire un par année même si c'est pas optimal, à rediscuter 
 
 # Faire les stats de base : 
 
 # avoir la part de femmes et hommes par âge en pondéré, 
-tab_FH <- svytable(~ Sexe_1H_2F + Age_tranche, dw_tot)
-tab_FH
-lprop(tab_FH)
+tab_FH_age <- svytable(~ Age_tranche+Sexe_1H_2F, dw_tot)
+# tab_FH_age
+lprop(tab_FH_age)
 # par année d'enquête
-tab_FH <- svytable(~ Sexe_1H_2F + Annee_enquete, dw_tot)
-tab_FH
-lprop(tab_FH)
-# les deux 
-tab_FH <- svytable(~ Sexe_1H_2F + Annee_enquete, dw_tot)
-tab_FH
-lprop(tab_FH)
+tab_FH_enquete <- svytable(~ Annee_enquete +Sexe_1H_2F, dw_tot)
+lprop(tab_FH_enquete)
 # le nombre de famille avec enfants
-# Le nombre de famille monop, 
+tab_fam_enf_age <- svytable(~ Age_tranche+enf, dw_tot)
+lprop(tab_fam_enf_age)
+# par année d'enquête
+tab_fam_enf_enquete <- svytable(~ Annee_enquete +enf, dw_tot)
+lprop(tab_fam_enf_enquete)
+# Le nombre de famille monop en particulier, la répartition par type en général 
+tab_monop_age <- svytable(~ Age_tranche+compo_men, dw_tot)
+lprop(tab_monop_age)
+# par année d'enquête
+tab_FH_enquete <- svytable(~ Annee_enquete +compo_men, dw_tot)
+lprop(tab_FH_enquete)
 # les familles avec des enfants en bas âge
-
+# moins de 3 ans 
+tab_enf_m3_age <- svytable(~ Age_tranche+enf_m3ans, dw_tot)
+lprop(tab_enf_m3_age)
+# par année d'enquête
+tab_enf_m3_enquete <- svytable(~ Annee_enquete +enf_m3ans, dw_tot)
+lprop(tab_enf_m3_enquete)
+# moins de 6 ans 
+tab_enf_m6_age <- svytable(~ Age_tranche+enf_m6ans, dw_tot)
+lprop(tab_enf_m6_age)
+# par année d'enquête
+tab_enf_m6_enquete <- svytable(~ Annee_enquete +enf_m6ans, dw_tot)
+lprop(tab_enf_m6_enquete)
 
 # Est ce que le taux d'activité, d'emploi et d'emploi ETP des femmes et des hommes varient selon le statut martital ?
 # Tester en couple, en couple cohabitant et mariés si possible 
