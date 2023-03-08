@@ -35,8 +35,10 @@ library(cluster)
 library(compare)
 # install.packages("janitor")
 library(janitor)
-
-
+# install.packages("survey")
+library(survey)
+# install.packages("questionr")
+library(questionr)
 
 ### Liste des pays possibles (dico sur https://www.iban.com/country-codes )###
 dico_pays <- c(
