@@ -526,6 +526,7 @@ calcul_EQTP <- function(data_merged_loc){
   df_merged <- df_merged %>%
     mutate(EQTP = Volume_travail_habituel/mediane_h) %>% # création du coefficient d'équivalent temps plein (linéaire: variable continue)
     mutate(EQTP = ifelse(Statut_emploi_1_emploi==1, EQTP, 0)) %>%
+    mutate(EQTP = ifelse(Temps_partiel_clean==1, 1, EQTP)) %>%
     mutate(EQTP = ifelse(EQTP>1, 1, EQTP))%>%
     mutate(EQTP = ifelse(is.na(heures_clean), 0 , EQTP))
   
@@ -567,6 +568,7 @@ calcul_index_conservatisme <- function(data_merged_loc){
   mutate(Index_conservatisme = ifelse(Pays =="HU", 0.224, Index_conservatisme)) %>%
   mutate(Index_conservatisme = ifelse(Pays =="IT", 0.254, Index_conservatisme)) %>%
   mutate(Index_conservatisme = ifelse(Pays =="ES", 0.108, Index_conservatisme))
+  
 #summary(df_merged$Index_conservatisme)
   
   data_merged_loc<- as.data.table(df_merged)

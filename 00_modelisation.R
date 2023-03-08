@@ -88,7 +88,7 @@ data_merged <- calcul_index_conservatisme(data_merged)
 ################################################################################
 
 liste_cols_dummies <- c("Niveau_education", "Perennite_emploi", "Temps_partiel", "Dregre_urbanisation", "Souhaite_davantage_travailler", "Souhaite_travailler", "Statut_semaine", "Statut_emploi_1_emploi", "Sexe_1H_2F", "Pays")
-liste_cols_cont <- c("Nb_enfants_moins_2_ans", "Age_tranche")
+liste_cols_cont <- c("Nb_enfants_moins_2_ans", "Age_tranche", "Index_conservatisme")
 liste_cols_to_delete <- c('Identifiant_menage', 'Annee_enquete', "Sexe_1H_2F")
 
 
