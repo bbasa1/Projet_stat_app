@@ -13,16 +13,17 @@
 #            A. PARAMETRES              -------------------------------
 ################################################################################
 # repgen <- "C:/Users/Benjamin/Desktop/Ensae/Projet_statapp"#BB
-repgen <- "C:/Users/Lenovo/Desktop/statapp22"#LP
-# repgen <- "/Users/charlottecombier/Desktop/ENSAE/Projet_statapp"
+
+# repgen <- "C:/Users/Lenovo/Desktop/statapp22"#LP
+repgen <- "/Users/charlottecombier/Desktop/ENSAE/Projet_statapp"
 
 
-liste_annees <- 1998:2018
+liste_annees <- 2004:2014
 pays <- "ES"
 
 nom_fichier_html <- paste("Taux_activite", pays, sep = "_")
 
-creer_base <- FALSE
+creer_base <- TRUE
 mettre_coeffs_nan_a_zero <- TRUE
 
 

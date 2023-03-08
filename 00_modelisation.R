@@ -11,17 +11,17 @@
 ################################################################################
 #            A. PARAMETRES              -------------------------------
 ################################################################################
-repgen <- "C:/Users/Benjamin/Desktop/Ensae/Projet_statapp"#BB
+# repgen <- "C:/Users/Benjamin/Desktop/Ensae/Projet_statapp"#BB
 # repgen <- "C:/Users/Lenovo/Desktop/statapp22"#LP
-# repgen <- "/Users/charlottecombier/Desktop/ENSAE/Projet_statapp"
+repgen <- "/Users/charlottecombier/Desktop/ENSAE/Projet_statapp"
 
 
 annee <- 2000
-liste_pays <- c("FR", "ES", "IT", "DE", "DK", "AT")
+liste_pays <- c("FR", "ES", "IT", "DE", "DK", "HU")
 
 nom_fichier_html <- paste("Modelisation", annee, sep = "_")
 
-creer_base <- FALSE
+creer_base <- TRUE
 
 repo_prgm <- paste(repgen, "programmes/Projet_stat_app" , sep = "/")
 
@@ -51,7 +51,7 @@ liste_variables <- c('QHHNUM', #Identifiant ménage
 
 age_min <- 20
 age_max <- 59
-mettre_coeffs_nan_a_zero <- FALSE
+mettre_coeffs_nan_a_zero <- TRUE
 
 
 ################################################################################
@@ -75,13 +75,13 @@ if(creer_base){
 }
 
 
-data_merged
+
 
 ################################################################################
 #            II. NETTOYAGE, PREPARATION                        ===============================
 ################################################################################
 source(paste(repo_prgm , "03_nettoyage.R" , sep = "/"))
-
+data_merged <- calcul_index_conservatisme(data_merged)
 
 ################################################################################
 #            III. PREPARATION DE LA MODELISATION             ===============================
