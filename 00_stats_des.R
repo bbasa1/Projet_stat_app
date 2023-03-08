@@ -758,6 +758,8 @@ lprop(tab_hom_enf_6ans_actif)
 #            IX. Analyse de l'évolution de la qualité de l'emploi et de la position sur le marché du travail             ============
 ######################################################################################################################################
 
+### Proposer un indicateur de précarité ? Et de pénibilité ?
+
 #  idem commencer par les stats gloables pour avoir une vue d'ensemble 
 
 # Comment varie la proportion de temps partiel dans le temps selon l'âge et le sexe ?
