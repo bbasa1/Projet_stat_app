@@ -555,6 +555,11 @@ calcul_EQTP <- function(data_merged_loc){
 #         5 . Index de conservatisme  ========================
 ################################################################################
 
+# L'idée de cette partie est de prendre en compte dans la modélisation le degré de conservatisme des pays intégrées dans l'analyse
+# La World Value Survey Database permet d'obtenir pour un millésime (2017) un proxy du conservatisme au regard de la place des femmes sur le marché du travail
+# La question permettant de construire l'index est : "Jobs scarce: Men should have more right to a job than women?"
+# L'index retenu est la proportion de gens "d'accord" ou "vraiment d'accord".
+# Les données sont disponibles au lien: https://www.worldvaluessurvey.org/wvs.jsp
 
 calcul_index_conservatisme <- function(data_merged_loc){
   
