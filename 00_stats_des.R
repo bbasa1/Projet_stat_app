@@ -18,7 +18,7 @@ repgen <- "C:/Users/Lenovo/Desktop/statapp22"#LP
 # repgen <- "/Users/charlottecombier/Desktop/ENSAE/Projet_statapp"
 
 
-liste_annees <- 2016:2018
+liste_annees <- 1998:2018
 # Proposition periode : 
 # 1998-2000
 # 2001-2003
@@ -68,6 +68,7 @@ liste_variables <- c('QHHNUM', #Identifiant ménage
                      'STAPRO', #Professional status. 1 = Self-employed with employees. 2 = Self-employed without employees. 3 = Employee. 4 = Family worker. 
                      'FTPT', # 1 = Full-time. 2 = Part-time job.
                      'ISCO3D',
+                     'ISCOPR3D',
                      'TEMP', # 1 = CDI. 2 = CDD
                      'TEMPDUR', # Total duration of temporary job or work contract of limited duration. 1 = Less than one month. 2 =1 to 3 months. 3 = 4 to 6 months. 4 = 7 to 12 months = 17. 5 = 13 to 18 months. 6 = 19 to 24 months. 7 = 25 to 36 months. 8 = More than 3 years
                      'FTPTREAS', # Reasons for the part-time job 1 = Person is undergoing school education or training. 2 = Of own illness or disability. 3 =Looking after children or incapacitated adults. 4 = Other family or personal reasons (from 2006). 5 = Person could not find a full-time job. 6 = Other
@@ -715,17 +716,17 @@ lprop(tab_sect_etu_age)
 # Beaucoup trop de non réponse, on ne peut pas la garder (en tout cas pour l'Espagne)
 
 # On peut regarder la variable CSP : la variable initiale est trés détaillé on a regourper a deux niveaux voir netoyage
-# La on utilise le niveau ?
+# La on utilise le niveau ? 1
 # Attention pour l'interprétation, cette variable n'est pas dispo tout les ans (peut être créer une variable ref ?)
-# + elle n'est pas dispo pour les gens qui ne sont pas en emploi
-# par âge : 
-tab_csp_age <- svytable(~ Age_tranche+CSP, dw_tot)
+# + elle n'est pas dispo pour les gens qui ne sont pas en emploi, dans ce cas on a mis la csp dispo pour "l'ancien job"
+# par âge : parmi ceux qui sont en emploi petit effet âge des évolutions de carrière (pas trop génération je pense vu que le marché un stable)
+tab_csp_age <- svytable(~ Age_tranche+CSP_tot_1, dw_tot)
 lprop(tab_csp_age)
-# par année d'enquête : 
-tab_csp_enquete <- svytable(~ Annee_enquete +CSP, dw_tot)
+# par année d'enquête : Pour les années dispos, le marché du travail parait relativement stable
+tab_csp_enquete <- svytable(~ Annee_enquete +CSP_tot_1, dw_tot)
 lprop(tab_csp_enquete)
-# par sexe : 
-tab_FH_csp <- svytable(~ Sexe_1H_2F +CSP, dw_tot)
+# par sexe : effet genre important, peut être la variable a privilégié pour notre analyse du coup
+tab_FH_csp <- svytable(~ Sexe_1H_2F +CSP_tot_1, dw_tot)
 lprop(tab_FH_csp)
 
 # Penser à analyser pour chaque période 
