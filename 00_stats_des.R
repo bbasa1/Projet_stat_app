@@ -836,6 +836,10 @@ lprop(tab_fem_enf_csp)
 tab_hom_enf_csp <- svytable(~ nb_enf+CSP_tot_1, dw_hom)
 lprop(tab_hom_enf_csp)
 # Plus intéresssante sur la CSP, on retrouve les variation F/H mais aussi celle seont le nombre d'enfant
+# attention à l'effet âge, mais certaine évolution sont assez forte pour que ce ne soit pas que ca qui les expliques
+# On voit chez les top manageurs, une progression constante pour les hommes puis un saut un peu plus grand a trois enfants (age mais aussi famille ?)
+# Tandis que chez les femmes c'est relativement constant (progression légère)
+# en revanche au troisième enfant ya des csp qui s'éfondre ce que l'on ne voit pas chez les H (type greffier = affiner la traduction)
 
 # Comment varie la proportion de temps partiel dans le temps selon l'âge et le sexe ?
 # Comment varie la proportion de CDI dans le temps selon l'âge et le sexe ? 
