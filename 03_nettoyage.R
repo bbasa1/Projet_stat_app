@@ -25,6 +25,8 @@ try(setnames(data_merged,'STAPRO',"Statut_dans_emploi"), silent=TRUE)
 try(setnames(data_merged,'FTPT',"Temps_partiel"), silent=TRUE)
 
 try(setnames(data_merged,'ISCO3D',"CSP"), silent=TRUE)
+try(setnames(data_merged,'ISCOPR3D',"CSP_dernier_job"), silent=TRUE)
+
 try(setnames(data_merged,'TEMP',"Perennite_emploi"), silent=TRUE)
 try(setnames(data_merged,'TEMPDUR',"Duree_contrat"), silent=TRUE)
 try(setnames(data_merged,'HWWISH',"Volume_travail_souhaite"), silent=TRUE)
@@ -735,3 +737,16 @@ data_merged <- data_merged[, dure_marche_trav_tot:= as.numeric(Annee_enquete) - 
 data_merged <- data_merged[dure_marche_trav_tot <= 0, dure_marche_trav_tot := 0] 
 # A voir si les cas bizarre sortie des études depuis très très longtemps ne sont pas des points abérents : filtre sur l'âge
 # Avec la fin de l'année des études on pourrait calculer aussi le temps d'arriver des enfants etc
+
+# Regroupement la variable CSP en deux niveau 
+data_merged <- data_merged[, CSP_TOT := CSP] 
+data_merged <- data_merged[CSP == "999", CSP_TOT := CSP_dernier_job] 
+data_merged <- data_merged[CSP_TOT == "999", CSP_TOT := "NA"]
+# Obligé de garder NA ici car les 0 correspondent à un niveau 
+table(data_merged$CSP_TOT)
+# Niveau 1 : on ne garde que le premier chiffre:
+data_merged <- data_merged[, CSP_tot_1:= str_sub(data_merged$CSP_TOT, 1, 1)] 
+table(data_merged$CSP_tot_1)
+# Niveau 2 : on garde les deux premiers chiffres 
+data_merged <- data_merged[, CSP_tot_2:= str_sub(data_merged$CSP_TOT, 1, 2)] 
+table(data_merged$CSP_tot_2)
