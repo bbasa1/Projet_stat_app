@@ -26,11 +26,13 @@ liste_annees <- 2016:2018
 # 2008-2011
 # 2012-2015
 # 2016-2018 = référence ?
+# Benjamin avait parlé de liste, on pourrait aussi pour la modélisation 
+# créer une variable indicatrice par période ou à six modalités 
 pays <- "ES"
 
 nom_fichier_html <- paste("Taux_activite", pays, sep = "_")
 
-creer_base <- TRUE
+creer_base <- FALSE
 mettre_coeffs_nan_a_zero <- TRUE
 
 
@@ -155,7 +157,10 @@ data_merged <- data_merged[AGE - 2 >= age_min, ]
 data_merged <- data_merged[AGE + 2 <= age_max, ]
 data_merged <- data_merged[HHPRIV==1, ]
 data_merged <- data_merged[HHLINK==1 | HHLINK==2, ]
-
+# on filtre aussi sur les gens qui sont sorti d'études : ie l'année d'enquête est plus grande que l'année de fin d'études
+# normalement les 9999 disparaissent et on a que 1555 cas de personnes qui finissent leurs études l'année d'enquête
+# Ca me parait ok : table(data_merged$annee_fin_etude==data_merged$Annee_enquete )
+data_merged <- data_merged[YEAR > HATYEAR, ]
 
 source(paste(repo_prgm , "03_nettoyage.R" , sep = "/"))
 # 100 * nrow(data_merged[is.na(COEFF), ])/nrow(data_merged)
@@ -571,6 +576,8 @@ source(paste(repo_prgm,"06_page_html.R",sep="/") ,
 # sous_data_merged <- sous_data_merged[Age_tranche + 2 <= age_max, ]
 # sous_data_merged <- sous_data_merged[menage_ordinaire==1, ]
 # sous_data_merged <- sous_data_merged[lien_pers_ref==1 | lien_pers_ref==2, ]
+# Comme j'avais commencé à travailler sur le sous data merged et que ca ferait channger tout le code je duplique la base
+sous_data_merged <- data_merged
 
 # Comme on est sur des données pondérées que l'on ne veut pas retraiter à la main on va passer par le package survey 
 # on aurait pu essayé de créer une fonction qui puisse s'adapter a plusieurs variables mais compliqué car encodage différent
@@ -578,6 +585,8 @@ source(paste(repo_prgm,"06_page_html.R",sep="/") ,
 # On prépare les données avec le plan d'échantillonage : 
 dw_tot <- svydesign(ids = ~1, data = sous_data_merged, weights = ~ sous_data_merged$COEFF)
 # Je pense qu'il faudrait en faire un par année même si c'est pas optimal, à rediscuter 
+# 15/03 : finalement après discussion on va analyser les évolution sur 6 périodes
+# Il suffit de refaire tourner ce code sur l'ensemble des périodes + pour chaque période
 
 # On va créer des bases spécifiques F et H pour travailler plus facilement sur les différents croisements
 # Femmes
@@ -664,7 +673,7 @@ lprop(tab_stat_mar_enquete)
 # On constate une importante diminution du mariage et une certaine hausse du célibat dans les enquêtes sur l'ensemble (peut jouer sur le marché du travail, à croiser avec le sexe dans l'idéal)
 # par sexe : equivalence sur le mariage, mais moins de femmes celibataires et plus veuves
 tab_FH_stat_mar_enquete <- svytable(~ Sexe_1H_2F +statu_marital, dw_tot)
-lprop(tab_FH_stat_mar)
+lprop(tab_FH_stat_mar_enquete)
 
 # (Mesurer à partir de 2006) Proportion de personnes qui se déclarent comme "au foyer" (ie comme s'occupant du foyer) au moments de l'enquête
 # par âge : pas si importante ua moment des enfants, plus fréquent chz les plus âgés (effet génération?)
@@ -687,10 +696,42 @@ lprop(tab_foyer_avant_enquete)
 tab_FH_foyer_avant_enquete <- svytable(~ Sexe_1H_2F +sit_pro_avant_enq_foyer, dw_tot)
 lprop(tab_FH_foyer_avant_enquete)
 
-# # Il faudrait réussir à avoir cette partie pour chaque année, ou alors pour charque "periode" et regarder les évolutions 
+# Le diplôme et le secteur d'étude (voir si les variables paraissent assez pertinentes pour être conservées ensuite)
+# Le "diplôme"
+# par âge : on retrouve bien deux effets âge et période : trop jeune pas encore diplômé, trop vieu pas encore de hausse du nombre d'année d'étude visible
+tab_dip_age <- svytable(~ Age_tranche+Niveau_education, dw_tot)
+lprop(tab_dip_age)
+# par année d'enquête : on voit bien l'augmentation du nombre de diplômés
+tab_dip_enquete <- svytable(~ Annee_enquete +Niveau_education, dw_tot)
+lprop(tab_dip_enquete)
+# par sexe : répartition sensiblement identique, ce qui dans le cas de la france serait un peu étonnant 
+tab_FH_dip <- svytable(~ Sexe_1H_2F +Niveau_education, dw_tot)
+lprop(tab_FH_dip)
+# Pas sure que la variable soit très pertiennente (cf la discussion avec Henri), mais on a pas mieux pour l'instant ?
+# Le "secteur d'étude"
+# par âge : on retrouve bien deux effets âge et période : trop jeune pas encore diplômé, trop vieu pas encore de hausse du nombre d'année d'étude visible
+tab_sect_etu_age <- svytable(~ Age_tranche+Domaine_education, dw_tot)
+lprop(tab_sect_etu_age)
+# Beaucoup trop de non réponse, on ne peut pas la garder (en tout cas pour l'Espagne)
+
+# On peut regarder la variable CSP : la variable initiale est trés détaillé on a regourper a deux niveaux voir netoyage
+# La on utilise le niveau ?
+# Attention pour l'interprétation, cette variable n'est pas dispo tout les ans (peut être créer une variable ref ?)
+# + elle n'est pas dispo pour les gens qui ne sont pas en emploi
+# par âge : 
+tab_csp_age <- svytable(~ Age_tranche+CSP, dw_tot)
+lprop(tab_csp_age)
+# par année d'enquête : 
+tab_csp_enquete <- svytable(~ Annee_enquete +CSP, dw_tot)
+lprop(tab_csp_enquete)
+# par sexe : 
+tab_FH_csp <- svytable(~ Sexe_1H_2F +CSP, dw_tot)
+lprop(tab_FH_csp)
+
+# Penser à analyser pour chaque période 
 
 # Est ce que le fait d'être en d'activité, d'emploi et d'emploi ETP des femmes et des hommes varient selon le statut martital ?
-# Tester en couple, en couple cohabitant et mariés si possible : on a pas encore toutes les variables, on test juste mariés
+# Tester en couple, en couple cohabitant et mariés si possible : on a pas encore toutes les variables, on teste juste mariés
 # Femmes
 # En emploi : 
 tab_fem_stat_mar_emploi <- svytable(~ statu_marital+i_emploi, dw_fem)
@@ -704,7 +745,7 @@ lprop(tab_hom_stat_mar_emploi)
 # Actif : 
 tab_hom_stat_mar_actif <- svytable(~ statu_marital +i_actif, dw_hom)
 lprop(tab_hom_stat_mar_actif)
-# Les hommes mariés sont près de fois plus nombreux a avoir un emploi (32 points d'écart)
+# Les hommes mariés sont près de deux fois plus nombreux a avoir un emploi (32 points d'écart)
 # on voit que ca évolue en sens inverse, hommes mariés plus souvent actif et enmploi que celibataire (encore plus séparé)
 # inversement les femmes sont plus souvent actives et en emploi célibataire ou divorcée que mariés 
 # Pour les femmes l'écart actif / emploi se creusent alors qu'il se réduit pour les hommes (différence rapport à la l'inactivité et au chômage ?)
