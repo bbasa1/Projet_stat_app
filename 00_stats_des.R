@@ -14,11 +14,18 @@
 ################################################################################
 # repgen <- "C:/Users/Benjamin/Desktop/Ensae/Projet_statapp"#BB
 
-# repgen <- "C:/Users/Lenovo/Desktop/statapp22"#LP
-repgen <- "/Users/charlottecombier/Desktop/ENSAE/Projet_statapp"
+repgen <- "C:/Users/Lenovo/Desktop/statapp22"#LP
+# repgen <- "/Users/charlottecombier/Desktop/ENSAE/Projet_statapp"
 
 
-liste_annees <- 2004:2014
+liste_annees <- 2016:2018
+# Proposition periode : 
+# 1998-2000
+# 2001-2003
+# 2004-2007
+# 2008-2011
+# 2012-2015
+# 2016-2018 = référence ?
 pays <- "ES"
 
 nom_fichier_html <- paste("Taux_activite", pays, sep = "_")
@@ -142,6 +149,13 @@ if(creer_base){
 ################################################################################
 #            II. NETTOYAGE, PREPARATION                        ===============================
 ################################################################################
+
+# On filtre sur la population d'intérêt :
+data_merged <- data_merged[AGE - 2 >= age_min, ]
+data_merged <- data_merged[AGE + 2 <= age_max, ]
+data_merged <- data_merged[HHPRIV==1, ]
+data_merged <- data_merged[HHLINK==1 | HHLINK==2, ]
+
 
 source(paste(repo_prgm , "03_nettoyage.R" , sep = "/"))
 # 100 * nrow(data_merged[is.na(COEFF), ])/nrow(data_merged)
@@ -550,13 +564,13 @@ source(paste(repo_prgm,"06_page_html.R",sep="/") ,
 # Pensez a regarder le taux de chômage aussi avant - pour que ce soit plus facilement lisible qu'en croisant taux d'activité et taux d'emploi
 # Henri avait filtré les gens qui sont encore en études (initiales) - est ce qu'on fait pareil ? 
 # Est ce que l'on se recentre sur les ménages ordinaire ? Je le ferais
-# je vais selectioner aussi que les personnes principales ou conjointe du principal dans le foyer
-
-# On filtre sur la population d'intérêt :
-sous_data_merged <- data_merged[Age_tranche - 2 >= age_min, ]
-sous_data_merged <- sous_data_merged[Age_tranche + 2 <= age_max, ]
-sous_data_merged <- sous_data_merged[menage_ordinaire==1, ]
-sous_data_merged <- sous_data_merged[lien_pers_ref==1 | lien_pers_ref==2, ]
+# je vais selectioner aussi que les personnes principales ou conjointes du principal dans le foyer
+# 
+# # On filtre sur la population d'intérêt :
+# sous_data_merged <- data_merged[Age_tranche - 2 >= age_min, ]
+# sous_data_merged <- sous_data_merged[Age_tranche + 2 <= age_max, ]
+# sous_data_merged <- sous_data_merged[menage_ordinaire==1, ]
+# sous_data_merged <- sous_data_merged[lien_pers_ref==1 | lien_pers_ref==2, ]
 
 # Comme on est sur des données pondérées que l'on ne veut pas retraiter à la main on va passer par le package survey 
 # on aurait pu essayé de créer une fonction qui puisse s'adapter a plusieurs variables mais compliqué car encodage différent
