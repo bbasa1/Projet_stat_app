@@ -714,20 +714,7 @@ lprop(tab_FH_dip)
 tab_sect_etu_age <- svytable(~ Age_tranche+Domaine_education, dw_tot)
 lprop(tab_sect_etu_age)
 # Beaucoup trop de non réponse, on ne peut pas la garder (en tout cas pour l'Espagne)
-
-# On peut regarder la variable CSP : la variable initiale est trés détaillé on a regourper a deux niveaux voir netoyage
-# La on utilise le niveau ? 1
-# Attention pour l'interprétation, cette variable n'est pas dispo tout les ans (peut être créer une variable ref ?)
-# + elle n'est pas dispo pour les gens qui ne sont pas en emploi, dans ce cas on a mis la csp dispo pour "l'ancien job"
-# par âge : parmi ceux qui sont en emploi petit effet âge des évolutions de carrière (pas trop génération je pense vu que le marché un stable)
-tab_csp_age <- svytable(~ Age_tranche+CSP_tot_1, dw_tot)
-lprop(tab_csp_age)
-# par année d'enquête : Pour les années dispos, le marché du travail parait relativement stable
-tab_csp_enquete <- svytable(~ Annee_enquete +CSP_tot_1, dw_tot)
-lprop(tab_csp_enquete)
-# par sexe : effet genre important, peut être la variable a privilégié pour notre analyse du coup
-tab_FH_csp <- svytable(~ Sexe_1H_2F +CSP_tot_1, dw_tot)
-lprop(tab_FH_csp)
+# La CSP peut palier ce pb, voir partie suivante 
 
 # Penser à analyser pour chaque période 
 
@@ -805,16 +792,50 @@ lprop(tab_hom_enf_6ans_actif)
 # les conclusions sur les moins de 6 sont un peu moins marquées / pas plus intéressante dans ce pays : croisé les deux ?
 # si déterminant regarder l'évolution du nombre d'enfant en moyenne sur toute la population, sur les moins diplomés et chez les plus diplomés 
 # A priori compliqué : si possible créer une variable csp du couple / diplome du couple et une variable couple biactif ou non 
+# Finalement le plus intéressant ca serait la CSP mais c'est plutot la partie suivante 
 
 # Faire une analyse plus spécifique du temps partiel (attention ca peut aussi entrer dans la partie suivante) : 
 # avec le fait d'être en couple marié/cohabitant, d'avoir des enfants, dont en bas âges, voir si on a une variable congé parental 
 # voir si on a les raisons de ce temps partiel, regarder si ces personnes souhaiteraient travailler plus ou chnager d'emploi et pourquoi 
 
+# Faire une analyse congé parental 
 ######################################################################################################################################
 #            IX. Analyse de l'évolution de la qualité de l'emploi et de la position sur le marché du travail             ============
 ######################################################################################################################################
 
 #  idem commencer par les stats gloables pour avoir une vue d'ensemble 
+# On peut regarder la variable CSP : la variable initiale est trés détaillé on a regourper a deux niveaux voir netoyage
+# La on utilise le niveau ? 1
+# Attention pour l'interprétation, cette variable n'est pas dispo tout les ans (peut être créer une variable ref ?)
+# + elle n'est pas dispo pour les gens qui ne sont pas en emploi, dans ce cas on a mis la csp dispo pour "l'ancien job"
+# par âge : parmi ceux qui sont en emploi petit effet âge des évolutions de carrière (pas trop génération je pense vu que le marché un stable)
+tab_csp_age <- svytable(~ Age_tranche+CSP_tot_1, dw_tot)
+lprop(tab_csp_age)
+# par année d'enquête : Pour les années dispos, le marché du travail parait relativement stable
+tab_csp_enquete <- svytable(~ Annee_enquete +CSP_tot_1, dw_tot)
+lprop(tab_csp_enquete)
+# par sexe : effet genre important, peut être la variable a privilégié pour notre analyse du coup
+tab_FH_csp <- svytable(~ Sexe_1H_2F +CSP_tot_1, dw_tot)
+lprop(tab_FH_csp)
+
+
+# Position sociale via la "CSP" attention c'est pas la même chose que la csp française 
+# Diplome et nombre d'enfant même si on y  croit pas trop 
+# Femmes 
+tab_fem_enf_dip <- svytable(~ nb_enf+Niveau_education, dw_fem)
+lprop(tab_fem_enf_dip)
+# Hommes
+tab_hom_enf_dip <- svytable(~ nb_enf+Niveau_education, dw_hom)
+lprop(tab_hom_enf_dip)
+# Pas de conclusion / analyse qui me semble ressortir : pas trop de variation F/H ni DIP/NB
+# CSP et Nombre d'enfants
+# Femmes 
+tab_fem_enf_csp <- svytable(~ nb_enf+CSP_tot_1, dw_fem)
+lprop(tab_fem_enf_csp)
+# Hommes
+tab_hom_enf_csp <- svytable(~ nb_enf+CSP_tot_1, dw_hom)
+lprop(tab_hom_enf_csp)
+# Plus intéresssante sur la CSP, on retrouve les variation F/H mais aussi celle seont le nombre d'enfant
 
 # Comment varie la proportion de temps partiel dans le temps selon l'âge et le sexe ?
 # Comment varie la proportion de CDI dans le temps selon l'âge et le sexe ? 
