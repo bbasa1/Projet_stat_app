@@ -153,15 +153,15 @@ if(creer_base){
 #            II. NETTOYAGE, PREPARATION                        ===============================
 ################################################################################
 
-# On filtre sur la population d'intérêt :
-data_merged <- data_merged[AGE - 2 >= age_min, ]
-data_merged <- data_merged[AGE + 2 <= age_max, ]
-data_merged <- data_merged[HHPRIV==1, ]
-data_merged <- data_merged[HHLINK==1 | HHLINK==2, ]
-# on filtre aussi sur les gens qui sont sorti d'études : ie l'année d'enquête est plus grande que l'année de fin d'études
-# normalement les 9999 disparaissent et on a que 1555 cas de personnes qui finissent leurs études l'année d'enquête
-# Ca me parait ok : table(data_merged$annee_fin_etude==data_merged$Annee_enquete )
-data_merged <- data_merged[YEAR > HATYEAR, ]
+  # On filtre sur la population d'intérêt :
+  data_merged <- data_merged[AGE - 2 >= age_min, ]
+  data_merged <- data_merged[AGE + 2 <= age_max, ]
+  data_merged <- data_merged[HHPRIV==1, ]
+  data_merged <- data_merged[HHLINK==1 | HHLINK==2, ]
+  # on filtre aussi sur les gens qui sont sorti d'études : ie l'année d'enquête est plus grande que l'année de fin d'études
+  # normalement les 9999 disparaissent et on a que 1555 cas de personnes qui finissent leurs études l'année d'enquête
+  # Ca me parait ok : table(data_merged$annee_fin_etude==data_merged$Annee_enquete )
+  data_merged <- data_merged[YEAR > HATYEAR, ]
 
 source(paste(repo_prgm , "03_nettoyage.R" , sep = "/"))
 # 100 * nrow(data_merged[is.na(COEFF), ])/nrow(data_merged)
@@ -597,6 +597,19 @@ dw_fem <- svydesign(ids = ~1, data = sous_data_merged_fem, weights = ~ sous_data
 sous_data_merged_hom<- sous_data_merged[Sexe_1H_2F==1, ]
 dw_hom <- svydesign(ids = ~1, data = sous_data_merged_hom, weights = ~ sous_data_merged_hom$COEFF)
 
+# Idem en emploi
+sous_data_merged_emp <- sous_data_merged[i_emploi==1, ]
+dw_emp <- svydesign(ids = ~1, data = sous_data_merged_emp, weights = ~ sous_data_merged_emp$COEFF)
+# Idem temps partiel
+sous_data_merged_tp <- sous_data_merged[Temps_partiel_clean==0, ]
+dw_tp <- svydesign(ids = ~1, data = sous_data_merged_tp, weights = ~ sous_data_merged_tp$COEFF)
+# Idem sans emploi
+sous_data_merged_sans_emp <- sous_data_merged[i_emploi==0, ]
+dw_sans_emp <- svydesign(ids = ~1, data = sous_data_merged_sans_emp, weights = ~ sous_data_merged_sans_emp$COEFF)
+# Femmes et sans emploi : 
+sous_data_merged_sans_emp_fem <- sous_data_merged[i_emploi==0 & Sexe_1H_2F==2, ]
+dw_sans_emp_fem <- svydesign(ids = ~1, data = sous_data_merged_sans_emp_fem, weights = ~ sous_data_merged_sans_emp_fem$COEFF)
+
 # Faire les stats de base : 
 
 # avoir la part de femmes et hommes par âge en pondéré, 
@@ -792,13 +805,136 @@ lprop(tab_hom_enf_6ans_actif)
 # les conclusions sur les moins de 6 sont un peu moins marquées / pas plus intéressante dans ce pays : croisé les deux ?
 # si déterminant regarder l'évolution du nombre d'enfant en moyenne sur toute la population, sur les moins diplomés et chez les plus diplomés 
 # A priori compliqué : si possible créer une variable csp du couple / diplome du couple et une variable couple biactif ou non 
-# Finalement le plus intéressant ca serait la CSP mais c'est plutot la partie suivante 
+# Finalement le plus intéressant ca serait la CSP mais c'est plutot la partie suivante (voir donc ci-après) 
 
 # Faire une analyse plus spécifique du temps partiel (attention ca peut aussi entrer dans la partie suivante) : 
 # avec le fait d'être en couple marié/cohabitant, d'avoir des enfants, dont en bas âges, voir si on a une variable congé parental 
 # voir si on a les raisons de ce temps partiel, regarder si ces personnes souhaiteraient travailler plus ou chnager d'emploi et pourquoi 
+# Temps partiel selon le sexe:
+tab_tp_sexe <- svytable(~ Sexe_1H_2F +Temps_partiel_clean, dw_tot)
+lprop(tab_tp_sexe)
+# Temps partiel selon le sexe uniquement sur le tp:
+tab_tp_sexe <- svytable(~ Temps_partiel_clean + Sexe_1H_2F, dw_tp)
+lprop(tab_tp_sexe)
+# Temps partiel raison 
+tab_sexe_tp <- svytable(~ Sexe_1H_2F +Raisons_temps_partiel, dw_tp)
+lprop(tab_sexe_tp)
+# A temps partiel pour raison familiale selon le nb d'enfants : pas vraiment de différences entre 2 et 3
+tab_nb_enf_tp_enf <- svytable(~ nb_enf +raisons_tp_enf_fam, dw_tp)
+lprop(tab_nb_enf_tp_enf)
+# A temps partiel pour raison familiale mois de 3 : très fréquent lorsque au moins un enfant a moins de trois ans
+tab_enf_m3ans_tp_enf <- svytable(~ enf_m3ans +raisons_tp_enf_fam, dw_tp)
+lprop(tab_enf_m3ans_tp_enf)
+# A temps partiel pour raison familiale mois de 6 : un peu moins fréquent que pour les moins de 3 (mais toujours pareil a voir si c'est significatifs)
+tab_enf_m6ans_tp_enf <- svytable(~ enf_m6ans +raisons_tp_enf_fam, dw_tp)
+lprop(tab_enf_m6ans_tp_enf)
+# A temps partiel pour raison familiale selon le sexe : plus féminin, relativement proche des chiffres francais 
+tab_sexe_tp_enf <- svytable(~ Sexe_1H_2F +raisons_tp_enf_fam, dw_tp)
+lprop(tab_sexe_tp_enf)
+# On va croiser a tp et enfants: l'cart 0/ au moins  est important, on voit aussi qu'il estplus large pour 2 que pour 1 ou 3
+tab_tp_nbenf_fem <- svytable(~ Temps_partiel_clean +nb_enf, dw_fem)
+lprop(tab_tp_nbenf_fem)
+# A tp et moins de 3: Pour 6 comme 3 pas si différent, petit écart mais pas si massif, on voit que pour les moins de trois c'est proche à tp ou en arret
+tab_tp_enf_m3ans_fem <- svytable(~ Temps_partiel_clean +enf_m3ans, dw_fem)
+lprop(tab_tp_enf_m3ans_fem)
+# A tp et moins de 6
+tab_tp_enf_m6ans_fem <- svytable(~ Temps_partiel_clean +enf_m6ans, dw_fem)
+lprop(tab_tp_enf_m6ans_fem)
+# A tp et mariée : pas si det
+tab_tp_marie_fem <- svytable(~ Temps_partiel_clean +statu_marital, dw_fem)
+lprop(tab_tp_marie_fem)
+# Pour les variables précédentes il faudra passé à regarder l'évolution par période
+# Ne travaille pas pour raison familiales (congé maternité / parental) : proportion faible dans l'enquete mais plus fréquent femme (voir les intervalle de confiance toutefois pas sur qu ece soit significatif)
+tab_sexe_emp_no_trav_enf <- svytable(~ Sexe_1H_2F +raisons_emp_no_trav_enf_fam, dw_tot)
+lprop(tab_sexe_emp_no_trav_enf)
+# Pour avoir le chiffre sur le total mais je pense que c'est plus intéressant à interpréter sur juste les sans emploi
+# A du démissioner à cause des enfants ou famille 
+tab_sexe_dem_enf_fam <- svytable(~ Sexe_1H_2F +raison_dem_enf_fam, dw_tot)
+lprop(tab_sexe_dem_enf_fam)
+# Ne travaille pas a cause des enfants ou famille
+tab_sexe_no_trav_enf_fam<- svytable(~ Sexe_1H_2F +raison_no_trav_enf_fam, dw_tot)
+lprop(tab_sexe_no_trav_enf_fam)
+# Uniquement chez les personnes sans emploi 
+# A du démissioner à cause des enfants ou famille : 5% des femmes quand même et surtout quasi aucun homme 
+tab_sexe_dem_enf_fam_se <- svytable(~ Sexe_1H_2F +raison_dem_enf_fam, dw_sans_emp)
+lprop(tab_sexe_dem_enf_fam_se)
+# Ne travaille pas a cause des enfants ou famille : idem quasi aucun homme 
+tab_sexe_no_trav_enf_fam_se<- svytable(~ Sexe_1H_2F +raison_no_trav_enf_fam, dw_sans_emp)
+lprop(tab_sexe_no_trav_enf_fam_se)
+# Sachant que c'est majoritairement des femmes, on va regarder les évolutions et donc par années d'enquête : 
+tab_enq_tp_sexe <- svytable(~ Annee_enquete +Sexe_1H_2F, dw_tp)
+lprop(tab_enq_tp_sexe)
+# Il ya quand même des modification de la structure (un peu plus d'homme qu'avant mais ca reste minim sur le total des en emploi)
+# A temps partiel pour raison familiale : etonnant car pic entre 200- et 2011 - beaucoup d'ecart, un politique emploi/fam ?
+tab_enq_tp_enf <- svytable(~ Annee_enquete +raisons_tp_enf_fam, dw_tp)
+lprop(tab_enq_tp_enf)
+# Ne travaille pas pour raison familiales (congé maternité / parental) : proportion faible dans l'enquete mais plus fréquent femme (voir les intervalle de confiance toutefois pas sur qu ece soit significatif)
+tab_enq_emp_no_trav_enf <- svytable(~ Annee_enquete +raisons_emp_no_trav_enf_fam, dw_tot)
+lprop(tab_enq_emp_no_trav_enf)
+# Pour avoir le chiffre sur le total mais je pense que c'est plus intéressant à interpréter sur juste les sans emploi
+# A du démissioner à cause des enfants ou famille : etonnat car on a des variations relativement importantes, notament autours de 2006/2007 = piste de la pol publique
+tab_enq_dem_enf_fam <- svytable(~ Annee_enquete +raison_dem_enf_fam, dw_tot)
+lprop(tab_enq_dem_enf_fam)
+# Ne travaille pas a cause des enfants ou famille: plus fréquent a priori avant 2000 mais relativement stable depuis
+tab_enq_no_trav_enf_fam<- svytable(~ Annee_enquete +raison_no_trav_enf_fam, dw_tot)
+lprop(tab_enq_no_trav_enf_fam)
+# Uniquement chez les personnes sans emploi 
+# A du démissioner à cause des enfants ou famille : Toujours ce pic proche de 8% en 2006-2007, des phases très basses autours de 2014 (attention probablement une erreur en 2005)
+tab_enq_dem_enf_fam_se <- svytable(~ Annee_enquete +raison_dem_enf_fam, dw_sans_emp)
+lprop(tab_enq_dem_enf_fam_se)
+# Ne travaille pas a cause des enfants ou famille : commentaire proche ensemble pop 
+tab_enq_no_trav_enf_fam_se<- svytable(~ Annee_enquete +raison_no_trav_enf_fam, dw_sans_emp)
+lprop(tab_enq_no_trav_enf_fam_se)
+# Les femmes sans emploi : les chiffres augmentent mais les commentaires ne changent pas
+# A du démissioner à cause des enfants ou famille 
+tab_enq_dem_enf_fam_se_fem <- svytable(~ Annee_enquete +raison_dem_enf_fam, dw_sans_emp_fem)
+lprop(tab_enq_dem_enf_fam_se_fem)
+# Ne travaille pas a cause des enfants ou famille  
+tab_enq_no_trav_enf_fam_se_fem<- svytable(~ Annee_enquete +raison_no_trav_enf_fam, dw_sans_emp_fem)
+lprop(tab_enq_no_trav_enf_fam_se_fem)
 
-# Faire une analyse congé parental 
+# Faire une analyse congé parental : regardé selon le fait d'avoir ou non des enfants de moins de trois ans + le nombre 
+# Ne travaille pas pour raison familiales (congé maternité / parental) : proportion faible dans l'enquete mais plus fréquent femme (voir les intervalle de confiance toutefois pas sur qu ece soit significatif)
+# par nombre d'enfant : les 0,2 sans enfants c'est peut être des déces, ca nuance les autres valeurs peut exploitable a mon avis
+tab_nb_enf_emp_no_trav_enf <- svytable(~ nb_enf +raisons_emp_no_trav_enf_fam, dw_tot)
+lprop(tab_nb_enf_emp_no_trav_enf)
+# Avce un enfant de moins de 3 : on voit un peu plus le congé mat/pat je pense
+tab_enf_m3ans_emp_no_trav_enf <- svytable(~ enf_m3ans +raisons_emp_no_trav_enf_fam, dw_tot)
+lprop(tab_enf_m3ans_emp_no_trav_enf)
+# Sur les femmes : encore plus important 
+tab_enf_m3ans_emp_no_trav_enf_fem <- svytable(~ enf_m3ans +raisons_emp_no_trav_enf_fam, dw_fem)
+lprop(tab_enf_m3ans_emp_no_trav_enf_fem)
+# Sur les hommes : quasi nul
+tab_enf_m3ans_emp_no_trav_enf_hom <- svytable(~ enf_m3ans +raisons_emp_no_trav_enf_fam, dw_hom)
+lprop(tab_enf_m3ans_emp_no_trav_enf_hom)
+# avec un enfant de moins de 6 : on rejoint les chiffres sur le nombre d'enfant - peu massif a étudié 
+tab_enf_m6ans_emp_no_trav_enf <- svytable(~ enf_m6ans +raisons_emp_no_trav_enf_fam, dw_tot)
+lprop(tab_enf_m6ans_emp_no_trav_enf)
+# On choisit de se centrer que sur les femmes puisque ca semble être un pb largement féminin 
+# Raison de démission pour enfant ou raison familiale 
+# par nombre d'enfant : 8% 2 enf 7,5 % trois enfant (peut êtr eparcxe que 2 c'est un cap)
+tab_nb_enf_dem_enf_fam_se_fem <- svytable(~ nb_enf +raison_dem_enf_fam, dw_sans_emp_fem)
+lprop(tab_nb_enf_dem_enf_fam_se_fem)
+# Avec un enfant de moins de 3 : 15% c'est beaucoup !
+tab_enf_m3ans_dem_enf_fam_se_fem <- svytable(~ enf_m3ans +raison_dem_enf_fam, dw_sans_emp_fem)
+lprop(tab_enf_m3ans_dem_enf_fam_se_fem)
+# Avec un enfant de moins de 6 : 12% pas neg non plus, ca veut dire que c'est pas mal centré sur les enfants en bas âge mais pas que les tout petit
+tab_enf_m6ans_dem_enf_fam_se_fem <- svytable(~ enf_m6ans +raison_dem_enf_fam, dw_sans_emp_fem)
+lprop(tab_enf_m6ans_dem_enf_fam_se_fem)
+# Ne travaille pas a cause des enfants ou famille : 
+# par nombre d'enfant : croissant mais pas tant d'écart que ca 
+tab_nb_enf_no_trav_enf_fam_se_fem<- svytable(~ nb_enf +raison_no_trav_enf_fam, dw_sans_emp_fem)
+lprop(tab_nb_enf_no_trav_enf_fam_se_fem)
+# Avec un enfant de moins de 3 : plus important pour les petits 
+tab_enf_m3ans_no_trav_enf_fam_se_fem<- svytable(~ enf_m3ans +raison_no_trav_enf_fam, dw_sans_emp_fem)
+lprop(tab_enf_m3ans_no_trav_enf_fam_se_fem)
+# Avec un enfant de moins de 6 : un peu moins important que les moins de 3 mais plus que pour les enf au global
+tab_enf_m6ans_no_trav_enf_fam_se_fem<- svytable(~ enf_m6ans +raison_no_trav_enf_fam, dw_sans_emp_fem)
+lprop(tab_enf_m6ans_no_trav_enf_fam_se_fem)
+# Proportion absence et salaire : on va regarder pour les femmes sans emploi et par enquete car la var n'est pas dispo tout le temps
+tab_enq_alloc_absence_se_fem<- svytable(~ Annee_enquete +Absence_et_salaire_2006, dw_sans_emp_fem)
+lprop(tab_enq_alloc_absence_se_fem)
+# A mon avis beacoup de non réponse, ca me semble peu exploitable...
 ######################################################################################################################################
 #            IX. Analyse de l'évolution de la qualité de l'emploi et de la position sur le marché du travail             ============
 ######################################################################################################################################
