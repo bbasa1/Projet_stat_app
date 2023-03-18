@@ -45,7 +45,6 @@ try(setnames(data_merged,'HHNBCH17',"Nb_enfants_entre_15_17_ans"), silent=TRUE)
 try(setnames(data_merged,'HHNBCH24',"Nb_enfants_entre_18_24_ans"), silent=TRUE)
 
 try(setnames(data_merged,'FTPTREAS',"Raisons_temps_partiel"), silent=TRUE)
-# try(setnames(data_merged,'SEEKREAS',"Raisons_recherche_emploi"), silent=TRUE)
 try(setnames(data_merged,'NOWKREAS',"Raisons_emploi_mais_pas_travail"), silent=TRUE)
 try(setnames(data_merged,'LEAVREAS',"Raisons_démission"), silent=TRUE)
 try(setnames(data_merged,'AVAIREAS',"Raisons_indisponibilité_travail"), silent=TRUE)
@@ -750,3 +749,40 @@ table(data_merged$CSP_tot_1)
 # Niveau 2 : on garde les deux premiers chiffres 
 data_merged <- data_merged[, CSP_tot_2:= str_sub(data_merged$CSP_TOT, 1, 2)] 
 table(data_merged$CSP_tot_2)
+
+
+# Création de l'indicateur précarité : 
+# On considère que tout enmploi qui n'est pas un CDI peut être considéré comme précaire
+# On ajoute également un point pour les personnes qui souhaiteraient travailler plus  
+# On considère que le temps partiel est aussi une forme de précarité même si non subi
+# On prend également en compte les personnes qui ont deux emplois ou plus 
+# On compte aussi les personnes qui recherchent un autre emploi car risque de pertes, car c'est que transitoire, parce qu'elles veulent plus d'heure ou un deuxième emploi
+
+data_merged <- data_merged[, indic_precarite_emp := 0] 
+data_merged <- data_merged[Perennite_emploi == "2", indic_precarite_emp := indic_precarite_emp + 1 ] 
+data_merged <- data_merged[raison_changer_job == "1" | raison_changer_job == "2" | raison_changer_job == "3" | raison_changer_job == "4", indic_precarite_emp := indic_precarite_emp + 1 ] 
+data_merged <- data_merged[Souhaite_davantage_travailler == "1", indic_precarite_emp := indic_precarite_emp + 1 ] 
+data_merged <- data_merged[exist_autre_emploi == "2", indic_precarite_emp := indic_precarite_emp + 1 ] 
+data_merged <- data_merged[Temps_partiel == "2", indic_precarite_emp := indic_precarite_emp + 1 ] 
+table(data_merged$indic_precarite_emp)
+# Voir si l'on fait trois est plus vu que les deux derniers sont faibles ?
+
+# Création de l'indicateur pénibilité : 
+# Pour la pénibilité on s'appuie sur les conditions de travail
+# On retient les personnes qui veulent changé de travail pour leurs conditions ou pour travailler moins 
+# On introduit aussi les emplois avec des horraires atypiques, 1 pour chaque modalité
+# telles que les 3/8, la nuits, les soirées et les weekends = il y a deux niveaux, on mets 0,5 au deuxième niveau
+# On considère aussi qu'il y a une pénibilité suplèmentaire a être intérimaire (changé souvent d'employeur)
+data_merged <- data_merged[, indic_penibilite_emp := 0] 
+data_merged <- data_merged[travail_interim == "1", indic_penibilite_emp := indic_penibilite_emp + 1 ] 
+data_merged <- data_merged[raison_changer_job == "5" | raison_changer_job == "6", indic_penibilite_emp := indic_penibilite_emp + 1 ] 
+data_merged <- data_merged[travail_dimanche == "1" | travail_samedi == "1", indic_penibilite_emp := indic_penibilite_emp + 1 ] 
+data_merged <- data_merged[travail_dimanche == "2" | travail_samedi == "2", indic_penibilite_emp := indic_penibilite_emp + 0.5 ] 
+data_merged <- data_merged[travail_nuit == "1", indic_penibilite_emp := indic_penibilite_emp + 1 ] 
+data_merged <- data_merged[travail_nuit == "2", indic_penibilite_emp := indic_penibilite_emp + 0.5 ] 
+data_merged <- data_merged[travail_soiree == "1", indic_penibilite_emp := indic_penibilite_emp + 1 ] 
+data_merged <- data_merged[travail_soiree == "2", indic_penibilite_emp := indic_penibilite_emp + 0.5] 
+data_merged <- data_merged[travail_3_8 == "1", indic_penibilite_emp := indic_penibilite_emp + 1 ] 
+data_merged <- data_merged[travail_3_8 == "2", indic_penibilite_emp := indic_penibilite_emp + 0.5 ] 
+table(data_merged$indic_penibilite_emp)
+# idem que pour l'indicateur précedent je pense qu'on pourrait faire des regroupements 
