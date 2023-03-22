@@ -162,7 +162,13 @@ if(creer_base){
   # normalement les 9999 disparaissent et on a que 1555 cas de personnes qui finissent leurs études l'année d'enquête
   # Ca me parait ok : table(data_merged$annee_fin_etude==data_merged$Annee_enquete )
   data_merged <- data_merged[YEAR > HATYEAR, ]
-
+# La version avec les variable renommées si besoin
+  # data_merged <- data_merged[Age_tranche - 2 >= age_min, ]
+  # data_merged <- data_merged[Age_tranche + 2 <= age_max, ]
+  # data_merged <- data_merged[menage_ordinaire==1, ]
+  # data_merged <- data_merged[lien_pers_ref==1 | lien_pers_ref==2, ]
+  # data_merged <- data_merged[Annee_enquete > annee_fin_etude, ]
+  
 source(paste(repo_prgm , "03_nettoyage.R" , sep = "/"))
 # 100 * nrow(data_merged[is.na(COEFF), ])/nrow(data_merged)
 
@@ -610,6 +616,14 @@ dw_sans_emp <- svydesign(ids = ~1, data = sous_data_merged_sans_emp, weights = ~
 sous_data_merged_sans_emp_fem <- sous_data_merged[i_emploi==0 & Sexe_1H_2F==2, ]
 dw_sans_emp_fem <- svydesign(ids = ~1, data = sous_data_merged_sans_emp_fem, weights = ~ sous_data_merged_sans_emp_fem$COEFF)
 
+# Femme en emploi
+sous_data_merged_emp_fem <- sous_data_merged_fem[i_emploi==1, ]
+dw_emp_fem <- svydesign(ids = ~1, data = sous_data_merged_emp_fem, weights = ~ sous_data_merged_emp_fem$COEFF)
+# Homme en emploi 
+sous_data_merged_emp_hom <- sous_data_merged_hom[i_emploi==1, ]
+dw_emp_hom <- svydesign(ids = ~1, data = sous_data_merged_emp_hom, weights = ~ sous_data_merged_emp_hom$COEFF)
+
+
 # Faire les stats de base : 
 
 # avoir la part de femmes et hommes par âge en pondéré, 
@@ -942,6 +956,7 @@ lprop(tab_enq_alloc_absence_se_fem)
 #  idem commencer par les stats gloables pour avoir une vue d'ensemble 
 # On peut regarder la variable CSP : la variable initiale est trés détaillé on a regourper a deux niveaux voir netoyage
 # La on utilise le niveau ? 1
+# Position sociale via la "CSP" attention c'est pas la même chose que la csp française 
 # Attention pour l'interprétation, cette variable n'est pas dispo tout les ans (peut être créer une variable ref ?)
 # + elle n'est pas dispo pour les gens qui ne sont pas en emploi, dans ce cas on a mis la csp dispo pour "l'ancien job"
 # par âge : parmi ceux qui sont en emploi petit effet âge des évolutions de carrière (pas trop génération je pense vu que le marché un stable)
@@ -953,9 +968,6 @@ lprop(tab_csp_enquete)
 # par sexe : effet genre important, peut être la variable a privilégié pour notre analyse du coup
 tab_FH_csp <- svytable(~ Sexe_1H_2F +CSP_tot_1, dw_tot)
 lprop(tab_FH_csp)
-
-
-# Position sociale via la "CSP" attention c'est pas la même chose que la csp française 
 # Diplome et nombre d'enfant même si on y  croit pas trop 
 # Femmes 
 tab_fem_enf_dip <- svytable(~ nb_enf+Niveau_education, dw_fem)
@@ -978,10 +990,156 @@ lprop(tab_hom_enf_csp)
 # en revanche au troisième enfant ya des csp qui s'éfondre ce que l'on ne voit pas chez les H (type greffier = affiner la traduction)
 
 # Comment varie la proportion de temps partiel dans le temps selon l'âge et le sexe ?
+# On a deja analysé les dimension fam précédement (y compris sexe) : trés femini, ca vaut le coup de regarder que chez les femmes aussi
+# On va garder un focus femme
+# par âge : 
+tab_tp_age <- svytable(~ Age_tranche+Temps_partiel_clean, dw_tot)
+lprop(tab_tp_age)
+tab_tp_age_emp <- svytable(~ Age_tranche+Temps_partiel_clean, dw_emp)
+lprop(tab_tp_age_emp)
+tab_tp_age_fem <- svytable(~ Age_tranche+Temps_partiel_clean, dw_fem)
+lprop(tab_tp_age_fem)
+tab_tp_age_fem_emp <- svytable(~ Age_tranche+Temps_partiel_clean, dw_emp_fem)
+lprop(tab_tp_age_fem_emp)
+# par année d'enquête : on constate bien la hausse au fil des enquêtes
+tab_tp_enquete <- svytable(~ Annee_enquete +Temps_partiel_clean, dw_tot)
+lprop(tab_tp_enquete)
+tab_tp_enquete_emp <- svytable(~ Annee_enquete+Temps_partiel_clean, dw_emp)
+lprop(tab_tp_enquete_emp)
+tab_tp_enquete_fem <- svytable(~ Annee_enquete +Temps_partiel_clean, dw_fem)
+lprop(tab_tp_enquete_fem)
+tab_tp_enquete_fem_emp <- svytable(~ Annee_enquete +Temps_partiel_clean, dw_emp_fem)
+lprop(tab_tp_enquete_fem_emp)
 # Comment varie la proportion de CDI dans le temps selon l'âge et le sexe ? 
+# par âge : Moins de cdi autour de 3à-40 mais les femmes ca semble etre moins le cas après 
+tab_cdi_age <- svytable(~ Age_tranche+Perennite_emploi, dw_tot)
+lprop(tab_cdi_age)
+tab_cdi_age_emp <- svytable(~ Age_tranche+Perennite_emploi, dw_emp)
+lprop(tab_cdi_age_emp)
+tab_cdi_age_fem <- svytable(~ Age_tranche+Perennite_emploi, dw_fem)
+lprop(tab_cdi_age_fem)
+tab_cdi_age_fem_emp <- svytable(~ Age_tranche+Perennite_emploi, dw_emp_fem)
+lprop(tab_cdi_age_fem_emp)
+# par année d'enquête : on constate bien la hausse au fil des enquêtes
+tab_cdi_enquete <- svytable(~ Annee_enquete +Perennite_emploi, dw_tot)
+lprop(tab_cdi_enquete)
+tab_cdi_enquete_emp <- svytable(~ Annee_enquete+Perennite_emploi, dw_emp)
+lprop(tab_cdi_enquete_emp)
+tab_cdi_enquete_fem <- svytable(~ Annee_enquete +Perennite_emploi, dw_fem)
+lprop(tab_cdi_enquete_fem)
+tab_cdi_enquete_fem_emp <- svytable(~ Annee_enquete +Perennite_emploi, dw_emp_fem)
+lprop(tab_cdi_enquete_fem_emp)
+# par sexe : la non réponse me parait étonnante et un peu elevé, mauvais signe ?
+tab_cdi_fh <- svytable(~ Sexe_1H_2F +Perennite_emploi, dw_emp)
+lprop(tab_cdi_fh)
+
 # idem autre type de contrat : CDD, intérim - voir comment cela change selon la législation par pays 
+# Travail en intérim : beaucoup de non réponse, pas sure que ce soit pertinent de la prendre en fait
+# par âge : touche plus les jeunes, différences légère pour les femmes 
+tab_interim_age_emp <- svytable(~ Age_tranche+travail_interim, dw_emp)
+lprop(tab_interim_age_emp)
+tab_interim_age_fem_emp <- svytable(~ Age_tranche+travail_interim, dw_emp_fem)
+lprop(tab_interim_age_fem_emp)
+# par année d'enquête : pas dispo avant 2005, plus important avant 2008 puis baisse et stabilisation 
+tab_interim_enquete_emp <- svytable(~ Annee_enquete+travail_interim, dw_emp)
+lprop(tab_interim_enquete_emp)
+tab_interim_enquete_fem_emp <- svytable(~ Annee_enquete +travail_interim, dw_emp_fem)
+lprop(tab_interim_enquete_fem_emp)
+# par sexe : pas trop d'écart 
+tab_interim_fh <- svytable(~ Sexe_1H_2F +travail_interim, dw_emp)
+lprop(tab_interim_fh)
+
 # existence de plusieurs emploi ?
+# par âge : peu de cumul, un peu plu sfréquent ches les jeunes mais pas sur qu ece soit signifi
+tab_autre_emp_age_emp <- svytable(~ Age_tranche+exist_autre_emploi, dw_emp)
+lprop(tab_autre_emp_age_emp)
+tab_autre_emp_age_fem_emp <- svytable(~ Age_tranche+exist_autre_emploi, dw_emp_fem)
+lprop(tab_autre_emp_age_fem_emp)
+# par année d'enquête :petite evol, et moins fréquent chz les femmes au début des années 2000
+tab_autre_emp_enquete_emp <- svytable(~ Annee_enquete+exist_autre_emploi, dw_emp)
+lprop(tab_autre_emp_enquete_emp)
+tab_autre_emp_enquete_fem_emp <- svytable(~ Annee_enquete +exist_autre_emploi, dw_emp_fem)
+lprop(tab_autre_emp_enquete_fem_emp)
+# par sexe : pas trop d'écart 
+tab_autre_emp_fh <- svytable(~ Sexe_1H_2F +exist_autre_emploi, dw_emp)
+lprop(tab_autre_emp_fh)
+
 # Faire les different croisements avec les variables de postes atypiques
+
+# Narrive pas a trouver un temps plein et donc est en tp 
+# par âge : de moins en mois de difficulté avec l'âge mais etonnameent pas la même chose pour les femmes (plus stable)
+tab_pas_tmpspl_age <- svytable(~ Age_tranche+raisons_tp_abs_plein, dw_tot)
+lprop(tab_pas_tmpspl_age)
+tab_pas_tmpspl_age_emp <- svytable(~ Age_tranche+raisons_tp_abs_plein, dw_emp)
+lprop(tab_pas_tmpspl_age_emp)
+tab_pas_tmpspl_age_fem <- svytable(~ Age_tranche+raisons_tp_abs_plein, dw_fem)
+lprop(tab_pas_tmpspl_age_fem)
+tab_pas_tmpspl_age_fem_emp <- svytable(~ Age_tranche+raisons_tp_abs_plein, dw_emp_fem)
+lprop(tab_pas_tmpspl_age_fem_emp)
+# par année d'enquête : croissance de la difficulté a trouvé un temps plein plutot qu'un temps partiel sur tout chez les femmes (attention au effet basculement vers le chomage)
+tab_pas_tmpspl_enquete <- svytable(~ Annee_enquete +raisons_tp_abs_plein, dw_tot)
+lprop(tab_pas_tmpspl_enquete)
+tab_pas_tmpspl_enquete_emp <- svytable(~ Annee_enquete+raisons_tp_abs_plein, dw_emp)
+lprop(tab_pas_tmpspl_enquete_emp)
+tab_pas_tmpspl_enquete_fem <- svytable(~ Annee_enquete +raisons_tp_abs_plein, dw_fem)
+lprop(tab_pas_tmpspl_enquete_fem)
+tab_pas_tmpspl_enquete_fem_emp <- svytable(~ Annee_enquete +raisons_tp_abs_plein, dw_emp_fem)
+lprop(tab_pas_tmpspl_enquete_fem_emp)
+# par sexe : pas trop d'écart 
+tab_pas_tmpspl_fh <- svytable(~ Sexe_1H_2F +raisons_tp_abs_plein, dw_emp)
+lprop(tab_pas_tmpspl_fh)
+# N'arrive pas a trouver un cdi 
+# par âge : de moins en mois de difficulté avec l'âge mais pas etonnant 
+tab_trouv_pas_cdi_age <- svytable(~ Age_tranche+raisons_cdd_trouve_ps_cdi, dw_tot)
+lprop(tab_trouv_pas_cdi_age)
+tab_trouv_pas_cdi_age_emp <- svytable(~ Age_tranche+raisons_cdd_trouve_ps_cdi, dw_emp)
+lprop(tab_trouv_pas_cdi_age_emp)
+tab_trouv_pas_cdi_age_fem <- svytable(~ Age_tranche+raisons_cdd_trouve_ps_cdi, dw_fem)
+lprop(tab_trouv_pas_cdi_age_fem)
+tab_trouv_pas_cdi_age_fem_emp <- svytable(~ Age_tranche+raisons_cdd_trouve_ps_cdi, dw_emp_fem)
+lprop(tab_trouv_pas_cdi_age_fem_emp)
+# par année d'enquête : pas très intéressant, relativement stable - attention bug certaines années
+tab_trouv_pas_cdi_enquete <- svytable(~ Annee_enquete +raisons_cdd_trouve_ps_cdi, dw_tot)
+lprop(tab_trouv_pas_cdi_enquete)
+tab_trouv_pas_cdi_enquete_emp <- svytable(~ Annee_enquete+raisons_cdd_trouve_ps_cdi, dw_emp)
+lprop(tab_trouv_pas_cdi_enquete_emp)
+tab_trouv_pas_cdi_enquete_fem <- svytable(~ Annee_enquete +raisons_cdd_trouve_ps_cdi, dw_fem)
+lprop(tab_trouv_pas_cdi_enquete_fem)
+tab_trouv_pas_cdi_enquete_fem_emp <- svytable(~ Annee_enquete +raisons_cdd_trouve_ps_cdi, dw_emp_fem)
+lprop(tab_trouv_pas_cdi_enquete_fem_emp)
+# par sexe : pas trop d'écart 
+tab_trouv_pas_cdi_fh <- svytable(~ Sexe_1H_2F +raisons_cdd_trouve_ps_cdi, dw_emp)
+lprop(tab_trouv_pas_cdi_fh)
+
+# indice de précarité
+# par âge : les jeuens semblenty plus précaire -(diminue avec l'âge)
+tab_precarit_age_emp <- svytable(~ Age_tranche+indic_precarite_emp, dw_emp)
+lprop(tab_precarit_age_emp)
+tab_precarit_age_fem_emp <- svytable(~ Age_tranche+indic_precarite_emp, dw_emp_fem)
+lprop(tab_precarit_age_fem_emp)
+# par année d'enquête : augmentation de la précariation, en absolu et en intensité 
+tab_precarit_enquete_emp <- svytable(~ Annee_enquete+indic_precarite_emp, dw_emp)
+lprop(tab_precarit_enquete_emp)
+tab_precarit_enquete_fem_emp <- svytable(~ Annee_enquete +indic_precarite_emp, dw_emp_fem)
+lprop(tab_precarit_enquete_fem_emp)
+# par sexe : femmes plus précaires 
+tab_precarit_fh <- svytable(~ Sexe_1H_2F +indic_precarite_emp, dw_emp)
+lprop(tab_precarit_fh)
+
+# indice de penibilité : attention beaucoup d'indicateur dispo qu'a partir de 2006
+# par âge : 
+tab_penibilit_age_emp <- svytable(~ Age_tranche+indic_penibilite_emp, dw_emp)
+lprop(tab_autre_emp_age_emp)
+tab_penibilit_age_fem_emp <- svytable(~ Age_tranche+indic_penibilite_emp, dw_emp_fem)
+lprop(tab_penibilit_age_fem_emp)
+# par année d'enquête
+tab_penibilit_enquete_emp <- svytable(~ Annee_enquete+indic_penibilite_emp, dw_emp)
+lprop(tab_penibilit_enquete_emp)
+tab_penibilit_enquete_fem_emp <- svytable(~ Annee_enquete +indic_penibilite_emp, dw_emp_fem)
+lprop(tab_penibilit_enquete_fem_emp)
+# par sexe : il fait regrouper mais ca me semble proche 
+tab_penibilit_fh <- svytable(~ Sexe_1H_2F +indic_penibilite_emp, dw_emp)
+lprop(tab_penibilit_fh)
 
 # Si on voit une évolution marquante, regarder par qui elle est porté dans chaque sous-population : 
 # les familles monoparentales, les familles avec jeunes enfants, au contraire les personnes seules, les moins diplomées etc.
