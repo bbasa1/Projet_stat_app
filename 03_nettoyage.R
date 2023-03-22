@@ -750,6 +750,15 @@ table(data_merged$CSP_tot_1)
 data_merged <- data_merged[, CSP_tot_2:= str_sub(data_merged$CSP_TOT, 1, 2)] 
 table(data_merged$CSP_tot_2)
 
+# Travaille le weekend  
+data_merged <- data_merged[, trav_weekend := 0] 
+data_merged <- data_merged[travail_dimanche == "1" | travail_samedi == "2" |travail_dimanche == "2" | travail_samedi == "1", trav_weekend := 1] 
+table(data_merged$trav_weekend)
+
+# Travaille le soir ou la nuit  
+data_merged <- data_merged[, trav_soir_nuit := 0] 
+data_merged <- data_merged[travail_nuit == "1" | travail_nuit == "2" |travail_soiree == "2" | travail_soiree == "1", trav_soir_nuit := 1] 
+table(data_merged$trav_soir_nuit)
 
 # Création de l'indicateur précarité : 
 # On considère que tout enmploi qui n'est pas un CDI peut être considéré comme précaire
