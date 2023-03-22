@@ -954,6 +954,36 @@ lprop(tab_enq_alloc_absence_se_fem)
 ######################################################################################################################################
 
 #  idem commencer par les stats gloables pour avoir une vue d'ensemble 
+# Le statut dans l'emploi : 
+# par âge : entrepreuneur plus âgés
+tab_stat_emp_age <- svytable(~ Age_tranche+Statut_dans_emploi, dw_emp)
+lprop(tab_stat_emp_age)
+# par année d'enquête : petote hausse salariat vs entrepreuneur 
+tab_stat_emp_enquete <- svytable(~ Annee_enquete +Statut_dans_emploi, dw_emp)
+lprop(tab_stat_emp_enquete)
+# par sexe : Inégalité de genre (entrepreuneur vs travailleurs assitant fam)
+tab_FH_stat_emp <- svytable(~ Sexe_1H_2F +Statut_dans_emploi, dw_emp)
+lprop(tab_FH_stat_emp)
+# souhaite travailler  
+# par âge : 
+tab_souhait_emp_age <- svytable(~ Age_tranche+Souhaite_travailler, dw_sans_emp)
+lprop(tab_souhait_emp_age)
+# par année d'enquête : petote hausse salariat vs entrepreuneur 
+tab_souhait_emp_enquete <- svytable(~ Annee_enquete +Souhaite_travailler, dw_sans_emp)
+lprop(tab_souhait_emp_enquete)
+# par sexe : 
+tab_FH_souhait_emp <- svytable(~ Sexe_1H_2F +Souhaite_travailler, dw_sans_emp)
+lprop(tab_FH_souhait_emp)
+# dispo pour travailler  
+# par âge : 
+tab_dispo_emp_age <- svytable(~ Age_tranche+Disponible_pour_travailler, dw_sans_emp)
+lprop(tab_dispo_emp_age)
+# par année d'enquête : 
+tab_dispo_emp_enquete <- svytable(~ Annee_enquete +Disponible_pour_travailler, dw_sans_emp)
+lprop(tab_dispo_emp_enquete)
+# par sexe : 
+tab_FH_dispo_emp <- svytable(~ Sexe_1H_2F +Disponible_pour_travailler, dw_sans_emp)
+lprop(tab_FH_dispo_emp)
 # On peut regarder la variable CSP : la variable initiale est trés détaillé on a regourper a deux niveaux voir netoyage
 # La on utilise le niveau ? 1
 # Position sociale via la "CSP" attention c'est pas la même chose que la csp française 
