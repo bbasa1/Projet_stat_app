@@ -1032,6 +1032,21 @@ lprop(tab_cdi_enquete_fem_emp)
 # par sexe : la non réponse me parait étonnante et un peu elevé, mauvais signe ?
 tab_cdi_fh <- svytable(~ Sexe_1H_2F +Perennite_emploi, dw_emp)
 lprop(tab_cdi_fh)
+# Avoir un poste de manageur :commence en 2005, a nouveau beaucoup de non réponse, ca fait un peu peur
+# Peut être réflkechir sur ces pb est ce que c'est un filtre ?
+# par âge : 
+tab_manag_age_emp <- svytable(~ Age_tranche+travail_respon, dw_emp)
+lprop(tab_manag_age_emp)
+tab_manag_age_fem_emp <- svytable(~ Age_tranche+travail_respon, dw_emp_fem)
+lprop(tab_manag_age_fem_emp)
+# par année d'enquête : assez stable
+tab_manag_enquete_emp <- svytable(~ Annee_enquete+travail_respon, dw_emp)
+lprop(tab_manag_enquete_emp)
+tab_manag_enquete_fem_emp <- svytable(~ Annee_enquete +travail_respon, dw_emp_fem)
+lprop(tab_manag_enquete_fem_emp)
+# par sexe :  un cpetit écart femmes / hommes
+tab_manag_fh <- svytable(~ Sexe_1H_2F +travail_respon, dw_emp)
+lprop(tab_manag_fh)
 
 # idem autre type de contrat : CDD, intérim - voir comment cela change selon la législation par pays 
 # Travail en intérim : beaucoup de non réponse, pas sure que ce soit pertinent de la prendre en fait
@@ -1048,6 +1063,50 @@ lprop(tab_interim_enquete_fem_emp)
 # par sexe : pas trop d'écart 
 tab_interim_fh <- svytable(~ Sexe_1H_2F +travail_interim, dw_emp)
 lprop(tab_interim_fh)
+
+# Travail en 3/8 : beaucoup de non réponse, pas dispo pour toutes les années 
+# par âge : touche un peu plus les jeunes
+tab_3_8_age_emp <- svytable(~ Age_tranche+travail_3_8, dw_emp)
+lprop(tab_3_8_age_emp)
+tab_3_8_age_fem_emp <- svytable(~ Age_tranche+travail_3_8, dw_emp_fem)
+lprop(tab_3_8_age_fem_emp)
+# par année d'enquête : relativement stable même si petite hausse 2018 
+tab_3_8_enquete_emp <- svytable(~ Annee_enquete+travail_3_8, dw_emp)
+lprop(tab_3_8_enquete_emp)
+tab_3_8_enquete_fem_emp <- svytable(~ Annee_enquete +travail_3_8, dw_emp_fem)
+lprop(tab_3_8_enquete_fem_emp)
+# par sexe : pas trop d'écart 
+tab_3_8_fh <- svytable(~ Sexe_1H_2F +travail_3_8, dw_emp)
+lprop(tab_3_8_fh)
+
+# Travail en weekend : 
+tab_weekend_age_emp <- svytable(~ Age_tranche+trav_weekend, dw_emp)
+lprop(tab_weekend_age_emp)
+tab_weekend_age_fem_emp <- svytable(~ Age_tranche+trav_weekend, dw_emp_fem)
+lprop(tab_weekend_age_fem_emp)
+# par année d'enquête : relativement stable même si petite hausse 2018 
+tab_weekend_enquete_emp <- svytable(~ Annee_enquete+trav_weekend, dw_emp)
+lprop(tab_weekend_enquete_emp)
+tab_weekend_enquete_fem_emp <- svytable(~ Annee_enquete +trav_weekend, dw_emp_fem)
+lprop(tab_weekend_enquete_fem_emp)
+# par sexe : pas trop d'écart 
+tab_weekend_fh <- svytable(~ Sexe_1H_2F +trav_weekend, dw_emp)
+lprop(tab_weekend_fh)
+
+# Travail en soirée ou la nuit 
+# par âge : 
+tab_soir_nuit_age_emp <- svytable(~ Age_tranche+trav_soir_nuit, dw_emp)
+lprop(tab_soir_nuit_age_emp)
+tab_soir_nuit_age_fem_emp <- svytable(~ Age_tranche+trav_soir_nuit, dw_emp_fem)
+lprop(tab_soir_nuit_age_fem_emp)
+# par année d'enquête :  
+tab_soir_nuit_enquete_emp <- svytable(~ Annee_enquete+trav_soir_nuit, dw_emp)
+lprop(tab_soir_nuit_enquete_emp)
+tab_soir_nuit_enquete_fem_emp <- svytable(~ Annee_enquete +trav_soir_nuit, dw_emp_fem)
+lprop(tab_soir_nuit_enquete_fem_emp)
+# par sexe : 
+tab_soir_nuit_fh <- svytable(~ Sexe_1H_2F +trav_soir_nuit, dw_emp)
+lprop(tab_soir_nuit_fh)
 
 # existence de plusieurs emploi ?
 # par âge : peu de cumul, un peu plu sfréquent ches les jeunes mais pas sur qu ece soit signifi
