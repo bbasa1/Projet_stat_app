@@ -765,7 +765,10 @@ data_merged <- data_merged[Souhaite_davantage_travailler == "1", indic_precarite
 data_merged <- data_merged[exist_autre_emploi == "2", indic_precarite_emp := indic_precarite_emp + 1 ] 
 data_merged <- data_merged[Temps_partiel == "2", indic_precarite_emp := indic_precarite_emp + 1 ] 
 table(data_merged$indic_precarite_emp)
-# Voir si l'on fait trois est plus vu que les deux derniers sont faibles ?
+# Voir si l'on fait trois est plus vu que les deux derniers sont faibles ? Oui 
+data_merged <- data_merged[, indic_precarite_emp_tot := indic_precarite_emp] 
+data_merged <- data_merged[indic_precarite_emp == 4 | indic_precarite_emp == 5, indic_precarite_emp := 3 ] 
+# Ce sera donc 3 et trois ou plus 
 
 # Création de l'indicateur pénibilité : 
 # Pour la pénibilité on s'appuie sur les conditions de travail
@@ -786,3 +789,9 @@ data_merged <- data_merged[travail_3_8 == "1", indic_penibilite_emp := indic_pen
 data_merged <- data_merged[travail_3_8 == "2", indic_penibilite_emp := indic_penibilite_emp + 0.5 ] 
 table(data_merged$indic_penibilite_emp)
 # idem que pour l'indicateur précedent je pense qu'on pourrait faire des regroupements 
+# Je propose 0; 0,5-1 ; 1,5-2 ;2,5-3 ; plus de 3  
+data_merged <- data_merged[, indic_penibilite_emp_tot := indic_penibilite_emp] 
+data_merged <- data_merged[indic_penibilite_emp == 0.5 | indic_penibilite_emp == 1, indic_penibilite_emp := 1 ] 
+data_merged <- data_merged[indic_penibilite_emp == 1.5 | indic_penibilite_emp == 2, indic_penibilite_emp := 2 ] 
+data_merged <- data_merged[indic_penibilite_emp == 2.5 | indic_penibilite_emp == 3, indic_penibilite_emp := 3 ] 
+data_merged <- data_merged[indic_penibilite_emp == 3.5 | indic_penibilite_emp == 4 | indic_penibilite_emp == 4.5 | indic_penibilite_emp == 5 | indic_penibilite_emp == 5.5 | indic_penibilite_emp == 6, indic_penibilite_emp := 4 ] 
