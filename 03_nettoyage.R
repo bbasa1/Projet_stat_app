@@ -632,34 +632,41 @@ table(data_merged$statu_marital, data_merged$couple_cohab)
 # Enfants : 
 # Présence d'enfant de moins de trois ans 
 
-data_merged <- data_merged[, enf_m3ans := 0] 
-data_merged <- data_merged[Nb_enfants_moins_2_ans == "01", enf_m3ans := 1] 
-data_merged <- data_merged[Nb_enfants_moins_2_ans == "02", enf_m3ans := 1]
-data_merged <- data_merged[Nb_enfants_moins_2_ans == "03", enf_m3ans := 1]
-data_merged <- data_merged[Nb_enfants_moins_2_ans == "04", enf_m3ans := 1]
+try(data_merged <- data_merged[, enf_m3ans := 0], silent=TRUE)
+try(data_merged <- data_merged[Nb_enfants_moins_2_ans == "01", enf_m3ans := 1], silent=TRUE)
+try(data_merged <- data_merged[Nb_enfants_moins_2_ans == "02", enf_m3ans := 1], silent=TRUE)
+try(data_merged <- data_merged[Nb_enfants_moins_2_ans == "03", enf_m3ans := 1], silent=TRUE)
+try(data_merged <- data_merged[Nb_enfants_moins_2_ans == "04", enf_m3ans := 1], silent=TRUE)
 
 # Présence d'enfant de moins de six ans
-data_merged <- data_merged[, enf_m6ans := 0] 
-data_merged <- data_merged[Nb_enfants_entre_3_5_ans == "01", enf_m6ans := 1] 
-data_merged <- data_merged[Nb_enfants_entre_3_5_ans == "02", enf_m6ans := 1]
-data_merged <- data_merged[Nb_enfants_entre_3_5_ans == "03", enf_m6ans := 1]
-data_merged <- data_merged[Nb_enfants_entre_3_5_ans == "04", enf_m6ans := 1]
+try(data_merged <- data_merged[, enf_m6ans := 0] , silent=TRUE)
+try(data_merged <- data_merged[Nb_enfants_entre_3_5_ans == "01", enf_m6ans := 1] , silent=TRUE)
+try(data_merged <- data_merged[Nb_enfants_entre_3_5_ans == "02", enf_m6ans := 1], silent=TRUE)
+try(data_merged <- data_merged[Nb_enfants_entre_3_5_ans == "03", enf_m6ans := 1], silent=TRUE)
+try(data_merged <- data_merged[Nb_enfants_entre_3_5_ans == "04", enf_m6ans := 1], silent=TRUE)
 
 # Nombre d'enfants de moins de 24 ans dans le ménage
-data_merged <- data_merged[, nb_enf_tot:= as.numeric(Nb_enfants_entre_18_24_ans)+as.numeric(Nb_enfants_entre_15_17_ans)+as.numeric(Nb_enfants_entre_11_14_ans)+as.numeric(Nb_enfants_entre_9_11_ans)+as.numeric(Nb_enfants_entre_6_8_ans)+as.numeric(Nb_enfants_moins_2_ans)+as.numeric(Nb_enfants_entre_3_5_ans)] 
+try(data_merged <- data_merged[, nb_enf_tot:= as.numeric(
+  Nb_enfants_entre_18_24_ans)+
+    as.numeric(Nb_enfants_entre_15_17_ans)+
+    as.numeric(Nb_enfants_entre_11_14_ans)+
+    as.numeric(Nb_enfants_entre_9_11_ans)+
+    as.numeric(Nb_enfants_entre_6_8_ans)+
+    as.numeric(Nb_enfants_moins_2_ans)+
+    as.numeric(Nb_enfants_entre_3_5_ans)], silent=TRUE) 
 
 # Présence d'au moins un enfant
-data_merged <- data_merged[, enf := 0] 
-data_merged <- data_merged[nb_enf_tot >= 1, enf := 1] 
+try(data_merged <- data_merged[, enf := 0] , silent=TRUE)
+try(data_merged <- data_merged[nb_enf_tot >= 1, enf := 1] , silent=TRUE)
 
 # Nombre d'enfant avec 4 modalités : 0, 1, 2 ou plus de trois 
-data_merged <- data_merged[, nb_enf := "3 et plus"] 
-data_merged <- data_merged[nb_enf_tot == 0, nb_enf := "0"] 
-data_merged <- data_merged[nb_enf_tot == 1, nb_enf := "1"]
-data_merged <- data_merged[nb_enf_tot == 2, nb_enf := "2"]
+try(data_merged <- data_merged[, nb_enf := "3 et plus"] , silent=TRUE)
+try(data_merged <- data_merged[nb_enf_tot == 0, nb_enf := "0"] , silent=TRUE)
+try(data_merged <- data_merged[nb_enf_tot == 1, nb_enf := "1"], silent=TRUE)
+try(data_merged <- data_merged[nb_enf_tot == 2, nb_enf := "2"], silent=TRUE)
 
 # Test famille monop, ménage complexe en soustrayant enfant tot moins nombre de personne : 
-data_merged <- data_merged[, nb_adulte_tot:= as.numeric(nb_pers_men) - nb_enf_tot] 
+try(data_merged <- data_merged[, nb_adulte_tot:= as.numeric(nb_pers_men) - nb_enf_tot] , silent=TRUE)
 # Pas de nombre négatifs donc on peut travailler sur ca pour avoir une petite variable compo du ménage 
 
 # data_merged <- data_merged[, compo_men := "9999"] 
@@ -672,100 +679,100 @@ data_merged <- data_merged[, nb_adulte_tot:= as.numeric(nb_pers_men) - nb_enf_to
 # sans pondéré il me semble y avoir beaucoup de ménage complexe, on pourra comparer avec la variable de l'enquête 
 # ou se débrouiller en croisant les deux 
 # Finalement je pense que la variable n'est pas bonne, je vais plutot recoder celle de l'enquête
-data_merged <- data_merged[, compo_men := "9999"] 
-data_merged <- data_merged[compo_men_v1 == 11, compo_men := "fam_monop"] 
-data_merged <- data_merged[compo_men_v1 == 12, compo_men := "fam_monop"] 
-data_merged <- data_merged[compo_men_v1 == 10, compo_men := "celibataire"]
-data_merged <- data_merged[compo_men_v1 == 20, compo_men := "couple"]
-data_merged <- data_merged[compo_men_v1 == 21, compo_men := "couple_enf"]
-data_merged <- data_merged[compo_men_v1 == 22, compo_men := "couple_enf"]
-data_merged <- data_merged[compo_men_v1 == 13, compo_men := "men_complexe"]
-data_merged <- data_merged[compo_men_v1 == 23, compo_men := "men_complexe"]
-data_merged <- data_merged[compo_men_v1 == 30, compo_men := "men_complexe"]
-data_merged <- data_merged[compo_men_v1 == 31, compo_men := "men_complexe"]
-data_merged <- data_merged[compo_men_v1 == 32, compo_men := "men_complexe"]
-data_merged <- data_merged[compo_men_v1 == 33, compo_men := "men_complexe"]
+try(data_merged <- data_merged[, compo_men := "9999"] , silent=TRUE)
+try(data_merged <- data_merged[compo_men_v1 == 11, compo_men := "fam_monop"] , silent=TRUE)
+try(data_merged <- data_merged[compo_men_v1 == 12, compo_men := "fam_monop"] , silent=TRUE)
+try(data_merged <- data_merged[compo_men_v1 == 10, compo_men := "celibataire"], silent=TRUE)
+try(data_merged <- data_merged[compo_men_v1 == 20, compo_men := "couple"], silent=TRUE)
+try(data_merged <- data_merged[compo_men_v1 == 21, compo_men := "couple_enf"], silent=TRUE)
+try(data_merged <- data_merged[compo_men_v1 == 22, compo_men := "couple_enf"], silent=TRUE)
+try(data_merged <- data_merged[compo_men_v1 == 13, compo_men := "men_complexe"], silent=TRUE)
+try(data_merged <- data_merged[compo_men_v1 == 23, compo_men := "men_complexe"], silent=TRUE)
+try(data_merged <- data_merged[compo_men_v1 == 30, compo_men := "men_complexe"], silent=TRUE)
+try(data_merged <- data_merged[compo_men_v1 == 31, compo_men := "men_complexe"], silent=TRUE)
+try(data_merged <- data_merged[compo_men_v1 == 32, compo_men := "men_complexe"], silent=TRUE)
+try(data_merged <- data_merged[compo_men_v1 == 33, compo_men := "men_complexe"], silent=TRUE)
 # On pourrait aussi afiner avec la variable sur la présence d'enfant à l'exterieur mais je pense plus tot utiliser l'indicatrice directement 
 
 # Indicateur famille monop parmis les familles avec enfants :
-data_merged <- data_merged[, fam_monop := 9999] 
-data_merged <- data_merged[enf == 1, fam_monop := 0] 
-data_merged <- data_merged[compo_men == "fam_monop", fam_monop := 1] 
+try(data_merged <- data_merged[, fam_monop := 9999], silent=TRUE)
+try(data_merged <- data_merged[enf == 1, fam_monop := 0] , silent=TRUE)
+try(data_merged <- data_merged[compo_men == "fam_monop", fam_monop := 1], silent=TRUE) 
 
 # a un emploi :
-data_merged <- data_merged[, i_emploi := 0] 
-data_merged <- data_merged[Statut_emploi_1_emploi==1, i_emploi := 1]
+try(data_merged <- data_merged[, i_emploi := 0] , silent=TRUE)
+try(data_merged <- data_merged[Statut_emploi_1_emploi==1, i_emploi := 1], silent=TRUE)
 
 # est actif (emploi ou chômage):
-data_merged <- data_merged[, i_actif := 0] 
-data_merged <- data_merged[Statut_emploi_1_emploi %in% c("1","2"), i_actif := 1]
+try(data_merged <- data_merged[, i_actif := 0] , silent=TRUE)
+try(data_merged <- data_merged[Statut_emploi_1_emploi %in% c("1","2"), i_actif := 1], silent=TRUE)
 
 # Sur l'emploi occupé en lien avec la famille (creation d'indicatrice): 
 # A temps partiel pour s'occuper des enfants ou de sa famille
-data_merged <- data_merged[, raisons_tp_enf_fam := 0] 
-data_merged <- data_merged[Raisons_temps_partiel == 3, raisons_tp_enf_fam := 1] 
-data_merged <- data_merged[Raisons_temps_partiel == 4, raisons_tp_enf_fam := 1]
+try(data_merged <- data_merged[, raisons_tp_enf_fam := 0] , silent=TRUE)
+try(data_merged <- data_merged[Raisons_temps_partiel == 3, raisons_tp_enf_fam := 1] , silent=TRUE)
+try(data_merged <- data_merged[Raisons_temps_partiel == 4, raisons_tp_enf_fam := 1], silent=TRUE)
 
 # A un emploi mais ne travaille pas car en maternité ou en congé parental ou pour d'autres raisons personnelles ou familiales 
-data_merged <- data_merged[, raisons_emp_no_trav_enf_fam := 0] 
-data_merged <- data_merged[Raisons_emploi_mais_pas_travail == "05", raisons_emp_no_trav_enf_fam := 1] 
-data_merged <- data_merged[Raisons_emploi_mais_pas_travail == "06", raisons_emp_no_trav_enf_fam := 1]
-data_merged <- data_merged[Raisons_emploi_mais_pas_travail == "09", raisons_emp_no_trav_enf_fam := 1]
+try(data_merged <- data_merged[, raisons_emp_no_trav_enf_fam := 0] , silent=TRUE)
+try(data_merged <- data_merged[Raisons_emploi_mais_pas_travail == "05", raisons_emp_no_trav_enf_fam := 1] , silent=TRUE)
+try(data_merged <- data_merged[Raisons_emploi_mais_pas_travail == "06", raisons_emp_no_trav_enf_fam := 1], silent=TRUE)
+try(data_merged <- data_merged[Raisons_emploi_mais_pas_travail == "09", raisons_emp_no_trav_enf_fam := 1], silent=TRUE)
 
 # A du démissioner à cause des enfants ou pour raison familiale, y compris grossesse
-data_merged <- data_merged[, raison_dem_enf_fam := 0] 
-data_merged <- data_merged[Raisons_démission == "02", raison_dem_enf_fam := 1] 
-data_merged <- data_merged[Raisons_démission == "03", raison_dem_enf_fam := 1]
+try(data_merged <- data_merged[, raison_dem_enf_fam := 0] , silent=TRUE)
+try(data_merged <- data_merged[Raisons_démission == "02", raison_dem_enf_fam := 1] , silent=TRUE)
+try(data_merged <- data_merged[Raisons_démission == "03", raison_dem_enf_fam := 1], silent=TRUE)
 
 # Ne peut pas travailler à cause des enfants ou pour grossesse
-data_merged <- data_merged[, raison_no_trav_enf_fam := 0] 
-data_merged <- data_merged[Raisons_indisponibilité_travail == 4, raison_no_trav_enf_fam := 1] 
+try(data_merged <- data_merged[, raison_no_trav_enf_fam := 0] , silent=TRUE)
+try(data_merged <- data_merged[Raisons_indisponibilité_travail == 4, raison_no_trav_enf_fam := 1], silent=TRUE) 
 
 # Sur l'emploi occuper plus largement 
 # A temps partiel car ne trouve pas un temps plein
-data_merged <- data_merged[, raisons_tp_abs_plein := 0] 
-data_merged <- data_merged[Raisons_temps_partiel == 5, raisons_tp_abs_plein := 1] 
+try(data_merged <- data_merged[, raisons_tp_abs_plein := 0] , silent=TRUE)
+try(data_merged <- data_merged[Raisons_temps_partiel == 5, raisons_tp_abs_plein := 1] , silent=TRUE)
 
 # En CDD car ne trouve pas un emploi "pemranent"
-data_merged <- data_merged[, raisons_cdd_trouve_ps_cdi:= 0] 
-data_merged <- data_merged[raison_cdd == 2, raisons_cdd_trouve_ps_cdi := 1]
+try(data_merged <- data_merged[, raisons_cdd_trouve_ps_cdi:= 0] , silent=TRUE)
+try(data_merged <- data_merged[raison_cdd == 2, raisons_cdd_trouve_ps_cdi := 1], silent=TRUE)
 
 # Se déclare comme "au foyer"
-data_merged <- data_merged[, sit_pro_foyer:= 0] 
-data_merged <- data_merged[statut_travail == 7, sit_pro_foyer := 1]
+try(data_merged <- data_merged[, sit_pro_foyer:= 0] , silent=TRUE)
+try(data_merged <- data_merged[statut_travail == 7, sit_pro_foyer := 1], silent=TRUE)
 
 # A été "au foyer"
-data_merged <- data_merged[, sit_pro_avant_enq_foyer:= 0] 
-data_merged <- data_merged[sit_pro_avant_enq == 7, sit_pro_avant_enq_foyer := 1]
+try(data_merged <- data_merged[, sit_pro_avant_enq_foyer:= 0] , silent=TRUE)
+try(data_merged <- data_merged[sit_pro_avant_enq == 7, sit_pro_avant_enq_foyer := 1], silent=TRUE)
 
 # Depuis quand est ce que la personne est entrée sur le marché du travail totale (ie date enquête moins celle de fin d'étude)
-data_merged <- data_merged[, dure_marche_trav_tot:= as.numeric(Annee_enquete) - as.numeric(annee_fin_etude)] 
-data_merged <- data_merged[dure_marche_trav_tot <= 0, dure_marche_trav_tot := 0] 
+try(data_merged <- data_merged[, dure_marche_trav_tot:= as.numeric(Annee_enquete) - as.numeric(annee_fin_etude)], silent=TRUE) 
+try(data_merged <- data_merged[dure_marche_trav_tot <= 0, dure_marche_trav_tot := 0] , silent=TRUE)
 # A voir si les cas bizarre sortie des études depuis très très longtemps ne sont pas des points abérents : filtre sur l'âge
 # Avec la fin de l'année des études on pourrait calculer aussi le temps d'arriver des enfants etc
 
 # Regroupement la variable CSP en deux niveau 
-data_merged <- data_merged[, CSP_TOT := CSP] 
-data_merged <- data_merged[CSP == "999", CSP_TOT := CSP_dernier_job] 
-data_merged <- data_merged[CSP_TOT == "999", CSP_TOT := "NA"]
+try(data_merged <- data_merged[, CSP_TOT := CSP] , silent=TRUE)
+try(data_merged <- data_merged[CSP == "999", CSP_TOT := CSP_dernier_job] , silent=TRUE)
+try(data_merged <- data_merged[CSP_TOT == "999", CSP_TOT := "NA"], silent=TRUE)
 # Obligé de garder NA ici car les 0 correspondent à un niveau 
-table(data_merged$CSP_TOT)
+try(table(data_merged$CSP_TOT), silent=TRUE)
 # Niveau 1 : on ne garde que le premier chiffre:
-data_merged <- data_merged[, CSP_tot_1:= str_sub(data_merged$CSP_TOT, 1, 1)] 
-table(data_merged$CSP_tot_1)
+try(data_merged <- data_merged[, CSP_tot_1:= str_sub(data_merged$CSP_TOT, 1, 1)] , silent=TRUE)
+try(table(data_merged$CSP_tot_1), silent=TRUE)
 # Niveau 2 : on garde les deux premiers chiffres 
-data_merged <- data_merged[, CSP_tot_2:= str_sub(data_merged$CSP_TOT, 1, 2)] 
-table(data_merged$CSP_tot_2)
+try(data_merged <- data_merged[, CSP_tot_2:= str_sub(data_merged$CSP_TOT, 1, 2)] , silent=TRUE)
+try(table(data_merged$CSP_tot_2), silent=TRUE)
 
 # Travaille le weekend  
-data_merged <- data_merged[, trav_weekend := 0] 
-data_merged <- data_merged[travail_dimanche == "1" | travail_samedi == "2" |travail_dimanche == "2" | travail_samedi == "1", trav_weekend := 1] 
-table(data_merged$trav_weekend)
+try(data_merged <- data_merged[, trav_weekend := 0] , silent=TRUE)
+try(data_merged <- data_merged[travail_dimanche == "1" | travail_samedi == "2" |travail_dimanche == "2" | travail_samedi == "1", trav_weekend := 1] , silent=TRUE)
+try(table(data_merged$trav_weekend), silent=TRUE)
 
 # Travaille le soir ou la nuit  
-data_merged <- data_merged[, trav_soir_nuit := 0] 
-data_merged <- data_merged[travail_nuit == "1" | travail_nuit == "2" |travail_soiree == "2" | travail_soiree == "1", trav_soir_nuit := 1] 
-table(data_merged$trav_soir_nuit)
+try(data_merged <- data_merged[, trav_soir_nuit := 0] , silent=TRUE)
+try(data_merged <- data_merged[travail_nuit == "1" | travail_nuit == "2" |travail_soiree == "2" | travail_soiree == "1", trav_soir_nuit := 1] , silent=TRUE)
+try(table(data_merged$trav_soir_nuit), silent=TRUE)
 
 # Création de l'indicateur précarité : 
 # On considère que tout enmploi qui n'est pas un CDI peut être considéré comme précaire
@@ -774,16 +781,16 @@ table(data_merged$trav_soir_nuit)
 # On prend également en compte les personnes qui ont deux emplois ou plus 
 # On compte aussi les personnes qui recherchent un autre emploi car risque de pertes, car c'est que transitoire, parce qu'elles veulent plus d'heure ou un deuxième emploi
 
-data_merged <- data_merged[, indic_precarite_emp := 0] 
-data_merged <- data_merged[Perennite_emploi == "2", indic_precarite_emp := indic_precarite_emp + 1 ] 
-data_merged <- data_merged[raison_changer_job == "1" | raison_changer_job == "2" | raison_changer_job == "3" | raison_changer_job == "4", indic_precarite_emp := indic_precarite_emp + 1 ] 
-data_merged <- data_merged[Souhaite_davantage_travailler == "1", indic_precarite_emp := indic_precarite_emp + 1 ] 
-data_merged <- data_merged[exist_autre_emploi == "2", indic_precarite_emp := indic_precarite_emp + 1 ] 
-data_merged <- data_merged[Temps_partiel == "2", indic_precarite_emp := indic_precarite_emp + 1 ] 
-table(data_merged$indic_precarite_emp)
+try(data_merged <- data_merged[, indic_precarite_emp := 0] , silent=TRUE)
+try(data_merged <- data_merged[Perennite_emploi == "2", indic_precarite_emp := indic_precarite_emp + 1 ] , silent=TRUE)
+try(data_merged <- data_merged[raison_changer_job == "1" | raison_changer_job == "2" | raison_changer_job == "3" | raison_changer_job == "4", indic_precarite_emp := indic_precarite_emp + 1 ] , silent=TRUE)
+try(data_merged <- data_merged[Souhaite_davantage_travailler == "1", indic_precarite_emp := indic_precarite_emp + 1 ] , silent=TRUE)
+try(data_merged <- data_merged[exist_autre_emploi == "2", indic_precarite_emp := indic_precarite_emp + 1 ] , silent=TRUE)
+try(data_merged <- data_merged[Temps_partiel == "2", indic_precarite_emp := indic_precarite_emp + 1 ] , silent=TRUE)
+try(table(data_merged$indic_precarite_emp), silent=TRUE)
 # Voir si l'on fait trois est plus vu que les deux derniers sont faibles ? Oui 
-data_merged <- data_merged[, indic_precarite_emp_tot := indic_precarite_emp] 
-data_merged <- data_merged[indic_precarite_emp == 4 | indic_precarite_emp == 5, indic_precarite_emp := 3 ] 
+try(data_merged <- data_merged[, indic_precarite_emp_tot := indic_precarite_emp] , silent=TRUE)
+try(data_merged <- data_merged[indic_precarite_emp == 4 | indic_precarite_emp == 5, indic_precarite_emp := 3 ] , silent=TRUE)
 # Ce sera donc 3 et trois ou plus 
 
 # Création de l'indicateur pénibilité : 
@@ -792,22 +799,22 @@ data_merged <- data_merged[indic_precarite_emp == 4 | indic_precarite_emp == 5, 
 # On introduit aussi les emplois avec des horraires atypiques, 1 pour chaque modalité
 # telles que les 3/8, la nuits, les soirées et les weekends = il y a deux niveaux, on mets 0,5 au deuxième niveau
 # On considère aussi qu'il y a une pénibilité suplèmentaire a être intérimaire (changé souvent d'employeur)
-data_merged <- data_merged[, indic_penibilite_emp := 0] 
-data_merged <- data_merged[travail_interim == "1", indic_penibilite_emp := indic_penibilite_emp + 1 ] 
-data_merged <- data_merged[raison_changer_job == "5" | raison_changer_job == "6", indic_penibilite_emp := indic_penibilite_emp + 1 ] 
-data_merged <- data_merged[travail_dimanche == "1" | travail_samedi == "1", indic_penibilite_emp := indic_penibilite_emp + 1 ] 
-data_merged <- data_merged[travail_dimanche == "2" | travail_samedi == "2", indic_penibilite_emp := indic_penibilite_emp + 0.5 ] 
-data_merged <- data_merged[travail_nuit == "1", indic_penibilite_emp := indic_penibilite_emp + 1 ] 
-data_merged <- data_merged[travail_nuit == "2", indic_penibilite_emp := indic_penibilite_emp + 0.5 ] 
-data_merged <- data_merged[travail_soiree == "1", indic_penibilite_emp := indic_penibilite_emp + 1 ] 
-data_merged <- data_merged[travail_soiree == "2", indic_penibilite_emp := indic_penibilite_emp + 0.5] 
-data_merged <- data_merged[travail_3_8 == "1", indic_penibilite_emp := indic_penibilite_emp + 1 ] 
-data_merged <- data_merged[travail_3_8 == "2", indic_penibilite_emp := indic_penibilite_emp + 0.5 ] 
-table(data_merged$indic_penibilite_emp)
+try(data_merged <- data_merged[, indic_penibilite_emp := 0] , silent=TRUE)
+try(data_merged <- data_merged[travail_interim == "1", indic_penibilite_emp := indic_penibilite_emp + 1 ] , silent=TRUE)
+try(data_merged <- data_merged[raison_changer_job == "5" | raison_changer_job == "6", indic_penibilite_emp := indic_penibilite_emp + 1 ] , silent=TRUE)
+try(data_merged <- data_merged[travail_dimanche == "1" | travail_samedi == "1", indic_penibilite_emp := indic_penibilite_emp + 1 ] , silent=TRUE)
+try(data_merged <- data_merged[travail_dimanche == "2" | travail_samedi == "2", indic_penibilite_emp := indic_penibilite_emp + 0.5 ] , silent=TRUE)
+try(data_merged <- data_merged[travail_nuit == "1", indic_penibilite_emp := indic_penibilite_emp + 1 ] , silent=TRUE)
+try(data_merged <- data_merged[travail_nuit == "2", indic_penibilite_emp := indic_penibilite_emp + 0.5 ] , silent=TRUE)
+try(data_merged <- data_merged[travail_soiree == "1", indic_penibilite_emp := indic_penibilite_emp + 1 ] , silent=TRUE)
+try(data_merged <- data_merged[travail_soiree == "2", indic_penibilite_emp := indic_penibilite_emp + 0.5] , silent=TRUE)
+try(data_merged <- data_merged[travail_3_8 == "1", indic_penibilite_emp := indic_penibilite_emp + 1 ] , silent=TRUE)
+try(data_merged <- data_merged[travail_3_8 == "2", indic_penibilite_emp := indic_penibilite_emp + 0.5 ] , silent=TRUE)
+try(table(data_merged$indic_penibilite_emp), silent=TRUE)
 # idem que pour l'indicateur précedent je pense qu'on pourrait faire des regroupements 
 # Je propose 0; 0,5-1 ; 1,5-2 ;2,5-3 ; plus de 3  
-data_merged <- data_merged[, indic_penibilite_emp_tot := indic_penibilite_emp] 
-data_merged <- data_merged[indic_penibilite_emp == 0.5 | indic_penibilite_emp == 1, indic_penibilite_emp := 1 ] 
-data_merged <- data_merged[indic_penibilite_emp == 1.5 | indic_penibilite_emp == 2, indic_penibilite_emp := 2 ] 
-data_merged <- data_merged[indic_penibilite_emp == 2.5 | indic_penibilite_emp == 3, indic_penibilite_emp := 3 ] 
-data_merged <- data_merged[indic_penibilite_emp == 3.5 | indic_penibilite_emp == 4 | indic_penibilite_emp == 4.5 | indic_penibilite_emp == 5 | indic_penibilite_emp == 5.5 | indic_penibilite_emp == 6, indic_penibilite_emp := 4 ] 
+try(data_merged <- data_merged[, indic_penibilite_emp_tot := indic_penibilite_emp], silent=TRUE) 
+try(data_merged <- data_merged[indic_penibilite_emp == 0.5 | indic_penibilite_emp == 1, indic_penibilite_emp := 1 ], silent=TRUE) 
+try(data_merged <- data_merged[indic_penibilite_emp == 1.5 | indic_penibilite_emp == 2, indic_penibilite_emp := 2 ] , silent=TRUE)
+try(data_merged <- data_merged[indic_penibilite_emp == 2.5 | indic_penibilite_emp == 3, indic_penibilite_emp := 3 ] , silent=TRUE)
+try(data_merged <- data_merged[indic_penibilite_emp == 3.5 | indic_penibilite_emp == 4 | indic_penibilite_emp == 4.5 | indic_penibilite_emp == 5 | indic_penibilite_emp == 5.5 | indic_penibilite_emp == 6, indic_penibilite_emp := 4 ], silent=TRUE) 

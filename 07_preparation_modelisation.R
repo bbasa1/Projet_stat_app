@@ -5,7 +5,15 @@ liste_cols_tot <- c(liste_cols_dummies, liste_cols_cont, liste_cols_to_delete)
 if (!(all(colnames(data_merged) %in% liste_cols_tot))){
   print("Voici les colonnes qui n'ont pas été spécifiées :")
   print(colnames(data_merged)[!(colnames(data_merged) %in% liste_cols_tot)])
-  stop("Le traitement de toutes les colonnes présentes dans la table n'a pas été spécifié")
+  
+  if(planter_si_non_specifie){
+    stop("Le traitement de toutes les colonnes présentes dans la table n'a pas été spécifié")
+  }else{
+    print("Elles sont supprimées")
+    liste_cols <- colnames(data_merged)[!(colnames(data_merged) %in% liste_cols_tot)]
+    data_merged[, eval(liste_cols) :=NULL] 
+    
+  }
 }
 
 

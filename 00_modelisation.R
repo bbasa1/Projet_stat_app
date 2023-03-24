@@ -22,7 +22,7 @@ liste_pays <- c("FR", "ES", "IT", "DE", "DK", "HU")
 
 nom_fichier_html <- paste("Modelisation", liste_annees[1], liste_annees[length(liste_annees)], sep = "_")
 
-creer_base <- FALSE
+creer_base <- TRUE
 
 repo_prgm <- paste(repgen, "programmes/Projet_stat_app" , sep = "/")
 
@@ -52,8 +52,8 @@ liste_variables <- c('QHHNUM', #Identifiant ménage
 
 age_min <- 20
 age_max <- 59
-mettre_coeffs_nan_a_zero <- TRUE
-
+mettre_coeffs_nan_a_zero <- FALSE
+planter_si_non_specifie <- FALSE #Plante si toutes les varibales ne sont pas spécifiées (dummies, continues ou à supprimer). Autrement il supprime les non spécifiées
 
 ################################################################################
 #            B. PACKAGES              -------------------------------
