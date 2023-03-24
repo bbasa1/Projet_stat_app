@@ -73,7 +73,7 @@ fnt_creation_base_stats_des <- function(){
 
 fnt_creation_base_modelisation <- function(){
   
-  liste_pathes <- paste(repo_data, "/YearlyFiles_1998_2018/", liste_pays, annee,"_y.csv", sep = "")
+  liste_pathes <- paste(repo_data, "/YearlyFiles_1998_2018/", liste_pays, liste_annees,"_y.csv", sep = "")
   
   # Première importation
   data_merged <- read_csv(liste_pathes[1], 
@@ -81,7 +81,6 @@ fnt_creation_base_modelisation <- function(){
                           show_col_types = FALSE)
   data_merged <- as.data.table(data_merged)
   data_merged <- data_merged[,..liste_variables]
-  
   
   
   liste_longeurs <- list(nrow(data_merged))
@@ -124,10 +123,10 @@ fnt_creation_base_modelisation <- function(){
   
   
   if (file.exists(dir_base)){
-    nom_base <- paste(repo_data, "/data_intermediaire/base_", annee, ".Rdata", sep = "")
+    nom_base <- paste(repo_data, "/data_intermediaire/base_",  liste_annees[1],"_", liste_annees[length(liste_annees)], ".Rdata", sep = "")
   } else {
     dir.create(file.path(dir_base))
-    nom_base <- paste(repo_data, "/data_intermediaire/base_", annee, ".Rdata", sep = "")
+    nom_base <- paste(repo_data, "/data_intermediaire/base_",  liste_annees[1],"_", liste_annees[length(liste_annees)], ".Rdata", sep = "")
     
   }
   

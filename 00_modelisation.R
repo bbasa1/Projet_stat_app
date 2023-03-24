@@ -11,17 +11,18 @@
 ################################################################################
 #            A. PARAMETRES              -------------------------------
 ################################################################################
-# repgen <- "C:/Users/Benjamin/Desktop/Ensae/Projet_statapp"#BB
+repgen <- "C:/Users/Benjamin/Desktop/Ensae/Projet_statapp"#BB
 # repgen <- "C:/Users/Lenovo/Desktop/statapp22"#LP
-repgen <- "/Users/charlottecombier/Desktop/ENSAE/Projet_statapp"
+# repgen <- "/Users/charlottecombier/Desktop/ENSAE/Projet_statapp"
 
 
-annee <- 2000
+liste_annees <- 2000:2002
+
 liste_pays <- c("FR", "ES", "IT", "DE", "DK", "HU")
 
-nom_fichier_html <- paste("Modelisation", annee, sep = "_")
+nom_fichier_html <- paste("Modelisation", liste_annees[1], liste_annees[length(liste_annees)], sep = "_")
 
-creer_base <- TRUE
+creer_base <- FALSE
 
 repo_prgm <- paste(repgen, "programmes/Projet_stat_app" , sep = "/")
 
@@ -70,7 +71,7 @@ source(paste(repo_prgm , "02_creation_base.R" , sep = "/"))
 if(creer_base){
   data_merged <- fnt_creation_base_modelisation()
 }else{
-  nom_base <- paste(repo_data, "/data_intermediaire/base_", annee, ".Rdata", sep = "")
+  nom_base <- paste(repo_data, "/data_intermediaire/base_", liste_annees[1],"_", liste_annees[length(liste_annees)], ".Rdata", sep = "")
   load(file = nom_base)
 }
 
@@ -87,9 +88,11 @@ data_merged <- calcul_index_conservatisme(data_merged)
 #            III. PREPARATION DE LA MODELISATION             ===============================
 ################################################################################
 
-liste_cols_dummies <- c("Niveau_education", "Perennite_emploi", "Temps_partiel", "Dregre_urbanisation", "Souhaite_davantage_travailler", "Souhaite_travailler", "Statut_semaine", "Statut_emploi_1_emploi", "Sexe_1H_2F", "Pays")
+liste_cols_dummies <- c("Niveau_education", "Perennite_emploi", "Annee_enquete", "Temps_partiel", "Dregre_urbanisation", "Souhaite_davantage_travailler", "Souhaite_travailler", "Statut_semaine", "Statut_emploi_1_emploi", "Sexe_1H_2F", "Pays")
 liste_cols_cont <- c("Nb_enfants_moins_2_ans", "Age_tranche", "Index_conservatisme")
-liste_cols_to_delete <- c('Identifiant_menage', 'Annee_enquete', "Sexe_1H_2F")
+liste_cols_to_delete <- c('Identifiant_menage', "Sexe_1H_2F")
+
+
 
 
 liste_var_sup <- c("Pays_AT", "Pays_DE", "Pays_DK", "Pays_ES", "Pays_FR", "Pays_IT") #Pour le cercle des corrélations
@@ -155,7 +158,7 @@ fviz_cluster(resKM, sample)
 
 
 
-resKM <- kmeans(data_merged_scale, centers=2, nstart=20)
+resKM <- kmeans(data_merged_scale, centers=4, nstart=20)
 resKM
 fviz_cluster(resKM, data_merged_scale)
 

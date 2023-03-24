@@ -959,6 +959,8 @@ lprop(tab_enq_alloc_absence_se_fem)
 #            IX. Analyse de l'évolution de la qualité de l'emploi et de la position sur le marché du travail             ============
 ######################################################################################################################################
 
+### Proposer un indicateur de précarité ? Et de pénibilité ?
+
 #  idem commencer par les stats gloables pour avoir une vue d'ensemble 
 # Le statut dans l'emploi : 
 # par âge : entrepreuneur plus âgés
