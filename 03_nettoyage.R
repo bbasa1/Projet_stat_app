@@ -25,6 +25,8 @@ try(setnames(data_merged,'STAPRO',"Statut_dans_emploi"), silent=TRUE)
 try(setnames(data_merged,'FTPT',"Temps_partiel"), silent=TRUE)
 
 try(setnames(data_merged,'ISCO3D',"CSP"), silent=TRUE)
+try(setnames(data_merged,'ISCOPR3D',"CSP_dernier_job"), silent=TRUE)
+
 try(setnames(data_merged,'TEMP',"Perennite_emploi"), silent=TRUE)
 try(setnames(data_merged,'TEMPDUR',"Duree_contrat"), silent=TRUE)
 try(setnames(data_merged,'HWWISH',"Volume_travail_souhaite"), silent=TRUE)
@@ -43,7 +45,6 @@ try(setnames(data_merged,'HHNBCH17',"Nb_enfants_entre_15_17_ans"), silent=TRUE)
 try(setnames(data_merged,'HHNBCH24',"Nb_enfants_entre_18_24_ans"), silent=TRUE)
 
 try(setnames(data_merged,'FTPTREAS',"Raisons_temps_partiel"), silent=TRUE)
-# try(setnames(data_merged,'SEEKREAS',"Raisons_recherche_emploi"), silent=TRUE)
 try(setnames(data_merged,'NOWKREAS',"Raisons_emploi_mais_pas_travail"), silent=TRUE)
 try(setnames(data_merged,'LEAVREAS',"Raisons_démission"), silent=TRUE)
 try(setnames(data_merged,'AVAIREAS',"Raisons_indisponibilité_travail"), silent=TRUE)
@@ -742,3 +743,71 @@ data_merged <- data_merged[, dure_marche_trav_tot:= as.numeric(Annee_enquete) - 
 data_merged <- data_merged[dure_marche_trav_tot <= 0, dure_marche_trav_tot := 0] 
 # A voir si les cas bizarre sortie des études depuis très très longtemps ne sont pas des points abérents : filtre sur l'âge
 # Avec la fin de l'année des études on pourrait calculer aussi le temps d'arriver des enfants etc
+
+# Regroupement la variable CSP en deux niveau 
+data_merged <- data_merged[, CSP_TOT := CSP] 
+data_merged <- data_merged[CSP == "999", CSP_TOT := CSP_dernier_job] 
+data_merged <- data_merged[CSP_TOT == "999", CSP_TOT := "NA"]
+# Obligé de garder NA ici car les 0 correspondent à un niveau 
+table(data_merged$CSP_TOT)
+# Niveau 1 : on ne garde que le premier chiffre:
+data_merged <- data_merged[, CSP_tot_1:= str_sub(data_merged$CSP_TOT, 1, 1)] 
+table(data_merged$CSP_tot_1)
+# Niveau 2 : on garde les deux premiers chiffres 
+data_merged <- data_merged[, CSP_tot_2:= str_sub(data_merged$CSP_TOT, 1, 2)] 
+table(data_merged$CSP_tot_2)
+
+# Travaille le weekend  
+data_merged <- data_merged[, trav_weekend := 0] 
+data_merged <- data_merged[travail_dimanche == "1" | travail_samedi == "2" |travail_dimanche == "2" | travail_samedi == "1", trav_weekend := 1] 
+table(data_merged$trav_weekend)
+
+# Travaille le soir ou la nuit  
+data_merged <- data_merged[, trav_soir_nuit := 0] 
+data_merged <- data_merged[travail_nuit == "1" | travail_nuit == "2" |travail_soiree == "2" | travail_soiree == "1", trav_soir_nuit := 1] 
+table(data_merged$trav_soir_nuit)
+
+# Création de l'indicateur précarité : 
+# On considère que tout enmploi qui n'est pas un CDI peut être considéré comme précaire
+# On ajoute également un point pour les personnes qui souhaiteraient travailler plus  
+# On considère que le temps partiel est aussi une forme de précarité même si non subi
+# On prend également en compte les personnes qui ont deux emplois ou plus 
+# On compte aussi les personnes qui recherchent un autre emploi car risque de pertes, car c'est que transitoire, parce qu'elles veulent plus d'heure ou un deuxième emploi
+
+data_merged <- data_merged[, indic_precarite_emp := 0] 
+data_merged <- data_merged[Perennite_emploi == "2", indic_precarite_emp := indic_precarite_emp + 1 ] 
+data_merged <- data_merged[raison_changer_job == "1" | raison_changer_job == "2" | raison_changer_job == "3" | raison_changer_job == "4", indic_precarite_emp := indic_precarite_emp + 1 ] 
+data_merged <- data_merged[Souhaite_davantage_travailler == "1", indic_precarite_emp := indic_precarite_emp + 1 ] 
+data_merged <- data_merged[exist_autre_emploi == "2", indic_precarite_emp := indic_precarite_emp + 1 ] 
+data_merged <- data_merged[Temps_partiel == "2", indic_precarite_emp := indic_precarite_emp + 1 ] 
+table(data_merged$indic_precarite_emp)
+# Voir si l'on fait trois est plus vu que les deux derniers sont faibles ? Oui 
+data_merged <- data_merged[, indic_precarite_emp_tot := indic_precarite_emp] 
+data_merged <- data_merged[indic_precarite_emp == 4 | indic_precarite_emp == 5, indic_precarite_emp := 3 ] 
+# Ce sera donc 3 et trois ou plus 
+
+# Création de l'indicateur pénibilité : 
+# Pour la pénibilité on s'appuie sur les conditions de travail
+# On retient les personnes qui veulent changé de travail pour leurs conditions ou pour travailler moins 
+# On introduit aussi les emplois avec des horraires atypiques, 1 pour chaque modalité
+# telles que les 3/8, la nuits, les soirées et les weekends = il y a deux niveaux, on mets 0,5 au deuxième niveau
+# On considère aussi qu'il y a une pénibilité suplèmentaire a être intérimaire (changé souvent d'employeur)
+data_merged <- data_merged[, indic_penibilite_emp := 0] 
+data_merged <- data_merged[travail_interim == "1", indic_penibilite_emp := indic_penibilite_emp + 1 ] 
+data_merged <- data_merged[raison_changer_job == "5" | raison_changer_job == "6", indic_penibilite_emp := indic_penibilite_emp + 1 ] 
+data_merged <- data_merged[travail_dimanche == "1" | travail_samedi == "1", indic_penibilite_emp := indic_penibilite_emp + 1 ] 
+data_merged <- data_merged[travail_dimanche == "2" | travail_samedi == "2", indic_penibilite_emp := indic_penibilite_emp + 0.5 ] 
+data_merged <- data_merged[travail_nuit == "1", indic_penibilite_emp := indic_penibilite_emp + 1 ] 
+data_merged <- data_merged[travail_nuit == "2", indic_penibilite_emp := indic_penibilite_emp + 0.5 ] 
+data_merged <- data_merged[travail_soiree == "1", indic_penibilite_emp := indic_penibilite_emp + 1 ] 
+data_merged <- data_merged[travail_soiree == "2", indic_penibilite_emp := indic_penibilite_emp + 0.5] 
+data_merged <- data_merged[travail_3_8 == "1", indic_penibilite_emp := indic_penibilite_emp + 1 ] 
+data_merged <- data_merged[travail_3_8 == "2", indic_penibilite_emp := indic_penibilite_emp + 0.5 ] 
+table(data_merged$indic_penibilite_emp)
+# idem que pour l'indicateur précedent je pense qu'on pourrait faire des regroupements 
+# Je propose 0; 0,5-1 ; 1,5-2 ;2,5-3 ; plus de 3  
+data_merged <- data_merged[, indic_penibilite_emp_tot := indic_penibilite_emp] 
+data_merged <- data_merged[indic_penibilite_emp == 0.5 | indic_penibilite_emp == 1, indic_penibilite_emp := 1 ] 
+data_merged <- data_merged[indic_penibilite_emp == 1.5 | indic_penibilite_emp == 2, indic_penibilite_emp := 2 ] 
+data_merged <- data_merged[indic_penibilite_emp == 2.5 | indic_penibilite_emp == 3, indic_penibilite_emp := 3 ] 
+data_merged <- data_merged[indic_penibilite_emp == 3.5 | indic_penibilite_emp == 4 | indic_penibilite_emp == 4.5 | indic_penibilite_emp == 5 | indic_penibilite_emp == 5.5 | indic_penibilite_emp == 6, indic_penibilite_emp := 4 ] 
