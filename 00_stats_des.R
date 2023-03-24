@@ -576,7 +576,7 @@ sapply(pop_en_emploi, class) # Check classes of data table columns
 pop_en_emploi <- pop_en_emploi[ , Decile_salaire := as.numeric(Decile_salaire)]
 
 sous_pop <- pop_en_emploi[, .("Pop_totale_ETP" = sum(Poids_final, na.rm = TRUE),
-                              "Pop_totale" = median(COEFF, na.rm = TRUE)),
+                              "Pop_totale" = sum(COEFF, na.rm = TRUE)),
                           by = .(Sexe_1H_2F, Annee_enquete, Decile_salaire)]
 
 sous_pop
