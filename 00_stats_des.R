@@ -1109,12 +1109,13 @@ lprop(tab_3_8_enquete_fem_emp)
 tab_3_8_fh <- svytable(~ Sexe_1H_2F +travail_3_8, dw_emp)
 lprop(tab_3_8_fh)
 
-# Travail en weekend : 
+# Travail en weekend : attention il manque des années 
+# age : diminue un peu avec l'age 
 tab_weekend_age_emp <- svytable(~ Age_tranche+trav_weekend, dw_emp)
 lprop(tab_weekend_age_emp)
 tab_weekend_age_fem_emp <- svytable(~ Age_tranche+trav_weekend, dw_emp_fem)
 lprop(tab_weekend_age_fem_emp)
-# par année d'enquête : relativement stable même si petite hausse 2018 
+# par année d'enquête : relativement stable 
 tab_weekend_enquete_emp <- svytable(~ Annee_enquete+trav_weekend, dw_emp)
 lprop(tab_weekend_enquete_emp)
 tab_weekend_enquete_fem_emp <- svytable(~ Annee_enquete +trav_weekend, dw_emp_fem)
@@ -1123,18 +1124,18 @@ lprop(tab_weekend_enquete_fem_emp)
 tab_weekend_fh <- svytable(~ Sexe_1H_2F +trav_weekend, dw_emp)
 lprop(tab_weekend_fh)
 
-# Travail en soirée ou la nuit 
-# par âge : 
+# Travail en soirée ou la nuit : attention il manque des années 
+# par âge : plutot stable alors que pour les femmes on voit que ca diminue un peu avec l'âge 
 tab_soir_nuit_age_emp <- svytable(~ Age_tranche+trav_soir_nuit, dw_emp)
 lprop(tab_soir_nuit_age_emp)
 tab_soir_nuit_age_fem_emp <- svytable(~ Age_tranche+trav_soir_nuit, dw_emp_fem)
 lprop(tab_soir_nuit_age_fem_emp)
-# par année d'enquête :  
+# par année d'enquête :  très stable 
 tab_soir_nuit_enquete_emp <- svytable(~ Annee_enquete+trav_soir_nuit, dw_emp)
 lprop(tab_soir_nuit_enquete_emp)
 tab_soir_nuit_enquete_fem_emp <- svytable(~ Annee_enquete +trav_soir_nuit, dw_emp_fem)
 lprop(tab_soir_nuit_enquete_fem_emp)
-# par sexe : 
+# par sexe : différence FH : plus fréquent H
 tab_soir_nuit_fh <- svytable(~ Sexe_1H_2F +trav_soir_nuit, dw_emp)
 lprop(tab_soir_nuit_fh)
 
@@ -1216,17 +1217,18 @@ tab_precarit_fh <- svytable(~ Sexe_1H_2F +indic_precarite_emp, dw_emp)
 lprop(tab_precarit_fh)
 
 # indice de penibilité : attention beaucoup d'indicateur dispo qu'a partir de 2006
-# par âge : 
+# par âge : ca décroit avec l'age globalement mais certaines intensités sont peut être plus stables 
+# Pas toute a fait la même chose pour les femmes, c'est plus marqué 
 tab_penibilit_age_emp <- svytable(~ Age_tranche+indic_penibilite_emp, dw_emp)
-lprop(tab_autre_emp_age_emp)
+lprop(tab_penibilit_age_emp)
 tab_penibilit_age_fem_emp <- svytable(~ Age_tranche+indic_penibilite_emp, dw_emp_fem)
 lprop(tab_penibilit_age_fem_emp)
-# par année d'enquête
+# par année d'enquête : augmentation de la penibilité mais plus subtil/stable pourles femmes
 tab_penibilit_enquete_emp <- svytable(~ Annee_enquete+indic_penibilite_emp, dw_emp)
 lprop(tab_penibilit_enquete_emp)
 tab_penibilit_enquete_fem_emp <- svytable(~ Annee_enquete +indic_penibilite_emp, dw_emp_fem)
 lprop(tab_penibilit_enquete_fem_emp)
-# par sexe : il fait regrouper mais ca me semble proche 
+# par sexe : ca me semble proche mais attention si on enlève les années a pb (avec l'analyse par periode)
 tab_penibilit_fh <- svytable(~ Sexe_1H_2F +indic_penibilite_emp, dw_emp)
 lprop(tab_penibilit_fh)
 
