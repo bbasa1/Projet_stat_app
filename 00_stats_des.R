@@ -623,6 +623,12 @@ dw_emp_fem <- svydesign(ids = ~1, data = sous_data_merged_emp_fem, weights = ~ s
 sous_data_merged_emp_hom <- sous_data_merged_hom[i_emploi==1, ]
 dw_emp_hom <- svydesign(ids = ~1, data = sous_data_merged_emp_hom, weights = ~ sous_data_merged_emp_hom$COEFF)
 
+# Femme sans emploi
+sous_data_merged_sans_emp_fem <- sous_data_merged_fem[i_emploi==0, ]
+dw_sans_emp_fem <- svydesign(ids = ~1, data = sous_data_merged_sans_emp_fem, weights = ~ sous_data_merged_sans_emp_fem$COEFF)
+# Homme sans emploi 
+sous_data_merged_sans_emp_hom <- sous_data_merged_hom[i_emploi==0, ]
+dw_sans_emp_hom <- svydesign(ids = ~1, data = sous_data_merged_sans_emp_hom, weights = ~ sous_data_merged_sans_emp_hom$COEFF)
 
 # Faire les stats de base : 
 
@@ -964,26 +970,36 @@ lprop(tab_stat_emp_enquete)
 # par sexe : Inégalité de genre (entrepreuneur vs travailleurs assitant fam)
 tab_FH_stat_emp <- svytable(~ Sexe_1H_2F +Statut_dans_emploi, dw_emp)
 lprop(tab_FH_stat_emp)
-# souhaite travailler  
-# par âge : 
+# souhaite travailler : attention à la non réponse, vérifier les filtres 
+# Comme pour les autres sans emploi souvent filtré sur SEEKWORK ce qui créer de la non réponse (voir si on veut reponderer pour l'utiliser ou si on distingue comme ca un troisième groupe)
+# par âge : stable mais femmes plus nombreuses 
 tab_souhait_emp_age <- svytable(~ Age_tranche+Souhaite_travailler, dw_sans_emp)
 lprop(tab_souhait_emp_age)
-# par année d'enquête : petote hausse salariat vs entrepreuneur 
+tab_souhait_emp_age_fem <- svytable(~ Age_tranche+Souhaite_travailler, dw_sans_emp_fem)
+lprop(tab_souhait_emp_age_fem)
+# par année d'enquête :  plutot diminution /stabilisation avec le décalage de points pour les femmes
 tab_souhait_emp_enquete <- svytable(~ Annee_enquete +Souhaite_travailler, dw_sans_emp)
 lprop(tab_souhait_emp_enquete)
-# par sexe : 
+tab_souhait_emp_enquete_fem <- svytable(~ Annee_enquete +Souhaite_travailler, dw_sans_emp_fem)
+lprop(tab_souhait_emp_enquete_fem)
+# par sexe : gros écart (attention année) donc on va analyse juste du point des femmes aussi
 tab_FH_souhait_emp <- svytable(~ Sexe_1H_2F +Souhaite_travailler, dw_sans_emp)
 lprop(tab_FH_souhait_emp)
 # dispo pour travailler  
-# par âge : 
+# par âge : décroissance avec l'âge 
 tab_dispo_emp_age <- svytable(~ Age_tranche+Disponible_pour_travailler, dw_sans_emp)
 lprop(tab_dispo_emp_age)
-# par année d'enquête : 
+tab_dispo_emp_age_fem <- svytable(~ Age_tranche+Disponible_pour_travailler, dw_sans_emp_fem)
+lprop(tab_dispo_emp_age_fem)
+# par année d'enquête : forte croissance, politique de l'emploi ? Différence F/H
 tab_dispo_emp_enquete <- svytable(~ Annee_enquete +Disponible_pour_travailler, dw_sans_emp)
 lprop(tab_dispo_emp_enquete)
-# par sexe : 
+tab_dispo_emp_enquete_fem <- svytable(~ Annee_enquete +Disponible_pour_travailler, dw_sans_emp_fem)
+lprop(tab_dispo_emp_enquete_fem)
+# par sexe : petit écart, je ne sais pas si c'est significatf (surtout vu les NA verif les filtres)
 tab_FH_dispo_emp <- svytable(~ Sexe_1H_2F +Disponible_pour_travailler, dw_sans_emp)
 lprop(tab_FH_dispo_emp)
+
 # On peut regarder la variable CSP : la variable initiale est trés détaillé on a regourper a deux niveaux voir netoyage
 # La on utilise le niveau ? 1
 # Position sociale via la "CSP" attention c'est pas la même chose que la csp française 
@@ -1040,6 +1056,7 @@ tab_tp_enquete_fem <- svytable(~ Annee_enquete +Temps_partiel_clean, dw_fem)
 lprop(tab_tp_enquete_fem)
 tab_tp_enquete_fem_emp <- svytable(~ Annee_enquete +Temps_partiel_clean, dw_emp_fem)
 lprop(tab_tp_enquete_fem_emp)
+
 # Comment varie la proportion de CDI dans le temps selon l'âge et le sexe ? 
 # par âge : Moins de cdi autour de 3à-40 mais les femmes ca semble etre moins le cas après 
 tab_cdi_age <- svytable(~ Age_tranche+Perennite_emploi, dw_tot)
@@ -1062,6 +1079,7 @@ lprop(tab_cdi_enquete_fem_emp)
 # par sexe : la non réponse me parait étonnante et un peu elevé, mauvais signe ?
 tab_cdi_fh <- svytable(~ Sexe_1H_2F +Perennite_emploi, dw_emp)
 lprop(tab_cdi_fh)
+
 # Avoir un poste de manageur :commence en 2005, a nouveau beaucoup de non réponse, ca fait un peu peur
 # Peut être réflkechir sur ces pb est ce que c'est un filtre ?
 # par âge : 
@@ -1154,7 +1172,8 @@ lprop(tab_autre_emp_enquete_fem_emp)
 tab_autre_emp_fh <- svytable(~ Sexe_1H_2F +exist_autre_emploi, dw_emp)
 lprop(tab_autre_emp_fh)
 
-# Faire les different croisements avec les variables de postes atypiques
+# Faire les different croisements avec les variables de postes atypiques ?
+# Peut être pas si intéressant vu les premiers résultats, on va plutot travailler sur les indicateurs
 
 # Narrive pas a trouver un temps plein et donc est en tp 
 # par âge : de moins en mois de difficulté avec l'âge mais etonnameent pas la même chose pour les femmes (plus stable)
