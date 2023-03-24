@@ -12,9 +12,8 @@
 ################################################################################
 #            A. PARAMETRES              -------------------------------
 ################################################################################
-# repgen <- "C:/Users/Benjamin/Desktop/Ensae/Projet_statapp"#BB
-
-repgen <- "C:/Users/Lenovo/Desktop/statapp22"#LP
+repgen <- "C:/Users/Benjamin/Desktop/Ensae/Projet_statapp"#BB
+# repgen <- "C:/Users/Lenovo/Desktop/statapp22"#LP
 # repgen <- "/Users/charlottecombier/Desktop/ENSAE/Projet_statapp"
 
 
@@ -28,7 +27,7 @@ liste_annees <- 1998:2018
 # 2016-2018 = référence ?
 # Benjamin avait parlé de liste, on pourrait aussi pour la modélisation 
 # créer une variable indicatrice par période ou à six modalités 
-pays <- "ES"
+pays <- "FR"
 
 nom_fichier_html <- paste("Taux_activite", pays, sep = "_")
 
@@ -121,7 +120,7 @@ liste_variables <- c('QHHNUM', #Identifiant ménage
                      'HHCOMP', # Composition du foyer = mais vraible a retraiter 
                      'HHLINK',# lien pers de réf
                      'HHPRIV' # Classification of individuals (private household members) - voir si on devreait pas filtré que sur les ménages ordinaires 
-
+      
 )
 
 age_min <- 20
@@ -152,23 +151,24 @@ if(creer_base){
 ################################################################################
 #            II. NETTOYAGE, PREPARATION                        ===============================
 ################################################################################
+### Note Benja : Pour la France (au moins) il ne trouve pas HHPRIV, HHLINK & HATYEAR
 
-  # On filtre sur la population d'intérêt :
-  data_merged <- data_merged[AGE - 2 >= age_min, ]
-  data_merged <- data_merged[AGE + 2 <= age_max, ]
-  data_merged <- data_merged[HHPRIV==1, ]
-  data_merged <- data_merged[HHLINK==1 | HHLINK==2, ]
-  # on filtre aussi sur les gens qui sont sorti d'études : ie l'année d'enquête est plus grande que l'année de fin d'études
-  # normalement les 9999 disparaissent et on a que 1555 cas de personnes qui finissent leurs études l'année d'enquête
-  # Ca me parait ok : table(data_merged$annee_fin_etude==data_merged$Annee_enquete )
-  data_merged <- data_merged[YEAR > HATYEAR, ]
+# On filtre sur la population d'intérêt :
+data_merged <- data_merged[AGE - 2 >= age_min, ]
+data_merged <- data_merged[AGE + 2 <= age_max, ]
+data_merged <- data_merged[HHPRIV==1, ]
+data_merged <- data_merged[HHLINK==1 | HHLINK==2, ]
+# on filtre aussi sur les gens qui sont sorti d'études : ie l'année d'enquête est plus grande que l'année de fin d'études
+# normalement les 9999 disparaissent et on a que 1555 cas de personnes qui finissent leurs études l'année d'enquête
+# Ca me parait ok : table(data_merged$annee_fin_etude==data_merged$Annee_enquete )
+data_merged <- data_merged[YEAR > HATYEAR, ]
 # La version avec les variable renommées si besoin
-  # data_merged <- data_merged[Age_tranche - 2 >= age_min, ]
-  # data_merged <- data_merged[Age_tranche + 2 <= age_max, ]
-  # data_merged <- data_merged[menage_ordinaire==1, ]
-  # data_merged <- data_merged[lien_pers_ref==1 | lien_pers_ref==2, ]
-  # data_merged <- data_merged[Annee_enquete > annee_fin_etude, ]
-  
+# data_merged <- data_merged[Age_tranche - 2 >= age_min, ]
+# data_merged <- data_merged[Age_tranche + 2 <= age_max, ]
+# data_merged <- data_merged[menage_ordinaire==1, ]
+# data_merged <- data_merged[lien_pers_ref==1 | lien_pers_ref==2, ]
+# data_merged <- data_merged[Annee_enquete > annee_fin_etude, ]
+
 source(paste(repo_prgm , "03_nettoyage.R" , sep = "/"))
 # 100 * nrow(data_merged[is.na(COEFF), ])/nrow(data_merged)
 
@@ -194,9 +194,9 @@ liste_var <- c("Age_tranche", "Sexe_1H_2F")
 calculs_age <- calcul_taux_emplois_activite(liste_var_groupby = liste_var, data_loc = data_merged)
 # Sauf erreur il faut multiplir le taux d'emploi en etp par 100 (la population aussi ?):
 # Non a priori problème 
-calculs_age$tx_emploi_etp <- calculs_age$tx_emploi_etp*100 
-calculs_age$population_emplois_etp <- calculs_age$population_emplois_etp*100 
-calculs_age
+# calculs_age$tx_emploi_etp <- calculs_age$tx_emploi_etp*100 
+# calculs_age$population_emplois_etp <- calculs_age$population_emplois_etp*100 
+# calculs_age
 
 #           III.B CONSTRUCTION GRAPHIQUES               ------------------
 source(paste(repo_prgm , "05_sorties_graphiques.R" , sep = "/"))
@@ -254,6 +254,7 @@ fill <- "Sexe"
 xlabel <-"Tranche d'âge"
 ylabel <-"Taux d'emploi"
 
+
 graph <- trace_barplot(calculs_age, x, sortby_x, y, fill, xlabel, ylabel, titre, titre_save)
 list_graph[[longueur_liste + 1]] <- graph
 longueur_liste <- longueur_liste + 1
@@ -278,6 +279,7 @@ head(data_merged$EQTP,20)
 # On calcule les taux d'activités et d'emplois par âge et sexe
 liste_var <- c("Age_tranche", "Sexe_1H_2F", "Annee_enquete")
 calculs_annee <- calcul_taux_emplois_activite(liste_var_groupby = liste_var, data_loc = data_merged)
+
 
 #            IV.B CONSTRUCTION GRAPHIQUES               ------------------
 calculs_annee

@@ -13,7 +13,7 @@ calcul_taux_emplois_activite <- function(liste_var_groupby, data_loc){
                population_emplois_etp =sum(Poids_final * (Statut_emploi_1_emploi==1)) ) %>% 
     dplyr::mutate(tx_activite = round(100 * population_active/population , 3),
                   tx_emploi = round(100 * population_emplois/population , 3),
-                  tx_emploi_etp = round(100 * population_emplois_etp/population , 3),
+                  tx_emploi_etp = round(100 * population_emplois_etp/population , 3), 
                   population = round(population / 1000 , 2),
                   population_active = round(population_active / 1000 , 2),
                   population_emplois = round(population_emplois / 1000 , 2),
