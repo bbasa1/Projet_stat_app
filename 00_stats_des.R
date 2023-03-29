@@ -824,7 +824,7 @@ lprop(tab_sect_etu_age)
 # Est ce que le fait d'être en d'activité, d'emploi et d'emploi ETP des femmes et des hommes varient selon le statut martital ?
 # Tester en couple, en couple cohabitant et mariés si possible : on a pas encore toutes les variables, on teste juste mariés
 # Femmes
-# En emploi : 
+# En emploi :  2 mariés, 1 celibataire, 0 veuf/divorcé/séparé
 tab_fem_stat_mar_emploi <- svytable(~ statu_marital+i_emploi, dw_fem)
 lprop(tab_fem_stat_mar_emploi)
 # Actif : 
@@ -907,6 +907,15 @@ lprop(tab_tp_sexe)
 tab_tp_sexe <- svytable(~ Temps_partiel_clean + Sexe_1H_2F, dw_tp)
 lprop(tab_tp_sexe)
 # Temps partiel raison 
+# 1 = person is undergoing school education or training
+# 2 = Of own illness or disability
+# 3 = Looking after children or incapacitated adults
+# 4 = Other family or personal reasons (from 2006)
+# 5 = Person could not find a full-time job
+# 6 = Of other reasons
+# 9 = Not applicable (FTPT2)
+## Dans la suite = Raisons fam : on prend 3 ou 4 .
+
 tab_sexe_tp <- svytable(~ Sexe_1H_2F +Raisons_temps_partiel, dw_tp)
 lprop(tab_sexe_tp)
 # A temps partiel pour raison familiale selon le nb d'enfants : pas vraiment de différences entre 2 et 3
