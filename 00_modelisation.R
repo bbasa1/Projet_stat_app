@@ -146,36 +146,39 @@ sample <- remove_constant(sample, na.rm = FALSE, quiet = FALSE)
 data_merged_scale <- remove_constant(data_merged_scale, na.rm = FALSE, quiet = FALSE)
 
 
-
-
 ### Pour trouver le nombre de clusters ==> Ne marche pas terrible et prend 50 ans à tourner...
 # factoextra::fviz_nbclust(sample, FUNcluster =factoextra::hcut, method = "silhouette",hc_method = "average", hc_metric = "euclidean", stand = TRUE) 
 
 sample
-resKM <- kmeans(sample, centers=2, nstart=20)
-resKM
-fviz_cluster(resKM, sample)
+resKM_sample <- kmeans(sample, centers=3, nstart=20)
+resKM_sample
+fviz_cluster(resKM_sample, sample)
 
-summary(resKM)
-# plot(sample, col = resKM$cluster,pch=16,cex=1.2,main="Regroupement par les k-means")
+summary(resKM_sample)
+# plot(sample, col = resKM_sample$cluster,pch=16,cex=1.2,main="Regroupement par les k-means")
 
 
-
-variable_purity <- 'Pays_IT'
-
-table(sample[[variable_purity]], resKM$cluster)
-plot(table(sample[[variable_purity]], wineK3N25$cluster),
-     main= paste("Confusion Matrix pour", variable_purity, sep = " "),
-     xlab=variable_purity, ylab="Cluster")
 
 
 resKM <- kmeans(data_merged_scale, centers=4, nstart=20)
 resKM
 fviz_cluster(resKM, data_merged_scale)
 
+################################################################################
+########## ANALYSE DU CLUSTERING ###############################################
+################################################################################
+source(paste(repo_prgm , "08_analyse_modelisation" , sep = "/"))
 
-##### CLUSTERING GAP
 
+df_analyse_cluster_sample <- fonction_calcul_scoring_kmeans(sample, resKM_sample)
+df_analyse_cluster <- fonction_calcul_scoring_kmeans(data_merged_scale, resKM)
+
+
+
+
+################################################################################
+##### CLUSTERING GAP ###########################################################
+################################################################################
 etude_clus <- clusGap(sample, FUNcluster=pam, K.max=7)
 etude_clus_DF <- as.data.frame(etude_clus$Tab) 
 

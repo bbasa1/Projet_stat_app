@@ -39,6 +39,10 @@ library(janitor)
 library(survey)
 # install.packages("questionr")
 library(questionr)
+# install.packages("funtimes")
+library(funtimes)
+# install.packages("aricode")
+library(aricode)
 
 ### Liste des pays possibles (dico sur https://www.iban.com/country-codes )###
 dico_pays <- c(
