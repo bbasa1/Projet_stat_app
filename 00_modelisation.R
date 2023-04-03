@@ -131,7 +131,7 @@ fviz_pca_var(resultats_acp,  choix = "var")
 sample <- as.data.table(sapply(data_merged[], sample, n_sample))
 
 
-### On normalise tout ça
+### On standardise tout ça
 data_merged_scale <- scale(data_merged)
 data_merged_scale <- as.data.table(data_merged_scale)
 data_merged_scale[is.na(data_merged_scale)] <- 0
@@ -151,11 +151,22 @@ data_merged_scale <- remove_constant(data_merged_scale, na.rm = FALSE, quiet = F
 ### Pour trouver le nombre de clusters ==> Ne marche pas terrible et prend 50 ans à tourner...
 # factoextra::fviz_nbclust(sample, FUNcluster =factoextra::hcut, method = "silhouette",hc_method = "average", hc_metric = "euclidean", stand = TRUE) 
 
-
+sample
 resKM <- kmeans(sample, centers=2, nstart=20)
 resKM
 fviz_cluster(resKM, sample)
 
+summary(resKM)
+# plot(sample, col = resKM$cluster,pch=16,cex=1.2,main="Regroupement par les k-means")
+
+
+
+variable_purity <- 'Pays_IT'
+
+table(sample[[variable_purity]], resKM$cluster)
+plot(table(sample[[variable_purity]], wineK3N25$cluster),
+     main= paste("Confusion Matrix pour", variable_purity, sep = " "),
+     xlab=variable_purity, ylab="Cluster")
 
 
 resKM <- kmeans(data_merged_scale, centers=4, nstart=20)
@@ -163,7 +174,7 @@ resKM
 fviz_cluster(resKM, data_merged_scale)
 
 
-
+##### CLUSTERING GAP
 
 etude_clus <- clusGap(sample, FUNcluster=pam, K.max=7)
 etude_clus_DF <- as.data.frame(etude_clus$Tab) 
@@ -185,6 +196,20 @@ ggplot(etude_clus_DF, aes(x=1:nrow(etude_clus_DF))) +
   labs(x="Number of Clusters", y="Gap", "Ecart statistique entre les deux")
 
 
+
+########## Dendogrammes
+hclust_sample <- hclust(d=dist(sample, method="euclidean"))
+plot(hclust_sample) ##ASsez illisible...
+
+
+distMatrix <- dist(sample, method="euclidean")
+groups <- hclust(distMatrix,method="ward.D")
+fviz_dend(groups, cex = 0.8, lwd = 0.8, k = 3, 
+          rect = TRUE, 
+          k_colors = "jco", 
+          rect_border = "jco", 
+          rect_fill = TRUE,
+          ggtheme = theme_gray(),labels=F)
 
 
 ########## BROUILLON #######################
