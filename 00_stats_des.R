@@ -31,7 +31,7 @@ pays <- "FR"
 
 nom_fichier_html <- paste("Taux_activite", pays, sep = "_")
 
-creer_base <- TRUE
+creer_base <- FALSE
 mettre_coeffs_nan_a_zero <- TRUE
 
 
@@ -1042,14 +1042,19 @@ lprop(tab_enq_alloc_absence_se_fem)
 
 #  idem commencer par les stats gloables pour avoir une vue d'ensemble 
 # Le statut dans l'emploi : 
+# 0 = auto-entrepreneur/artisan
+# 1 = Idem, avec un ou des employés
+# 2 = Idem, sans aucun employé
+# 3 = Employé
+# 4 = Travailleur familial
 # par âge : entrepreuneur plus âgés
 tab_stat_emp_age <- svytable(~ Age_tranche+Statut_dans_emploi, dw_emp)
 lprop(tab_stat_emp_age)
-# par année d'enquête : petote hausse salariat vs entrepreuneur 
+# par année d'enquête : petite hausse salariat vs entrepreuneur 
 tab_stat_emp_enquete <- svytable(~ Annee_enquete +Statut_dans_emploi, dw_emp)
 lprop(tab_stat_emp_enquete)
 # par sexe : Inégalité de genre (entrepreuneur vs travailleurs assitant fam)
-tab_FH_stat_emp <- svytable(~ Sexe_1H_2F +Statut_dans_emploi, dw_emp)
+tab_FH_stat_emp <- svytable(~ Sexe_1H_2F +, dw_emp)
 lprop(tab_FH_stat_emp)
 # souhaite travailler : attention à la non réponse, vérifier les filtres 
 # Comme pour les autres sans emploi souvent filtré sur SEEKWORK ce qui créer de la non réponse (voir si on veut reponderer pour l'utiliser ou si on distingue comme ca un troisième groupe)
@@ -1066,7 +1071,8 @@ lprop(tab_souhait_emp_enquete_fem)
 # par sexe : gros écart (attention année) donc on va analyse juste du point des femmes aussi
 tab_FH_souhait_emp <- svytable(~ Sexe_1H_2F +Souhaite_travailler, dw_sans_emp)
 lprop(tab_FH_souhait_emp)
-# dispo pour travailler  
+# dispo pour travailler
+# 1 = Oui | 2 = Non
 # par âge : décroissance avec l'âge 
 tab_dispo_emp_age <- svytable(~ Age_tranche+Disponible_pour_travailler, dw_sans_emp)
 lprop(tab_dispo_emp_age)
@@ -1119,6 +1125,8 @@ lprop(tab_hom_enf_csp)
 # Comment varie la proportion de temps partiel dans le temps selon l'âge et le sexe ?
 # On a deja analysé les dimension fam précédement (y compris sexe) : trés femini, ca vaut le coup de regarder que chez les femmes aussi
 # On va garder un focus femme
+# 1 = Full time 
+# 2 = Part time
 # par âge : 
 tab_tp_age <- svytable(~ Age_tranche+Temps_partiel_clean, dw_tot)
 lprop(tab_tp_age)
