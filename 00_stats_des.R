@@ -14,8 +14,8 @@
 ################################################################################
 # repgen <- "C:/Users/Benjamin/Desktop/Ensae/Projet_statapp"#BB
 
-repgen <- "C:/Users/Lenovo/Desktop/statapp22"#LP
-# repgen <- "/Users/charlottecombier/Desktop/ENSAE/Projet_statapp"
+# repgen <- "C:/Users/Lenovo/Desktop/statapp22"#LP
+repgen <- "/Users/charlottecombier/Desktop/ENSAE/Projet_statapp"
 
 
 liste_annees <- 1998:2018
@@ -28,11 +28,11 @@ liste_annees <- 1998:2018
 # 2016-2018 = référence ?
 # Benjamin avait parlé de liste, on pourrait aussi pour la modélisation 
 # créer une variable indicatrice par période ou à six modalités 
-pays <- "ES"
+pays <- "HU"
 
 nom_fichier_html <- paste("Taux_activite", pays, sep = "_")
 
-creer_base <- FALSE
+creer_base <- TRUE
 mettre_coeffs_nan_a_zero <- TRUE
 
 
