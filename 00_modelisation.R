@@ -4,7 +4,7 @@
 
 
 ################################################################################
- #                      PREAMBULE               ===============================
+#                      PREAMBULE               ===============================
 ################################################################################
 
 
@@ -131,55 +131,126 @@ fviz_pca_var(resultats_acp,  choix = "var")
 sample <- as.data.table(sapply(data_merged[], sample, n_sample))
 
 
-### On standardise tout ça
-data_merged_scale <- scale(data_merged)
-data_merged_scale <- as.data.table(data_merged_scale)
-data_merged_scale[is.na(data_merged_scale)] <- 0
+### On standardise tout ça ===> Attention on va garder les paramètres du scaler en mémoire pour faire un inverse scale après !
 
-sample_ <- scale(sample)
-sample <- as.data.table(sample)
-sample[is.na(sample)] <- 0
+
+
+data_merged_scaled <- scale(data_merged)
+# data_merged.orig = t(apply(data_merged_scaled, 1, function(r)r*attr(data_merged_scaled,'scaled:scale') + attr(data_merged_scaled, 'scaled:center')))
+data_merged_scaled <- as.data.table(data_merged_scaled)
+data_merged_scaled[is.na(data_merged_scaled)] <- 0
+
+
+sample_scaled <- scale(sample)
+# sample.orig = t(apply(sample, 1, function(r)r*attr(sample,'scaled:scale') + attr(sample, 'scaled:center')))
+sample_scaled <- as.data.table(sample_scaled)
+sample_scaled[is.na(sample_scaled)] <- 0
 
 
 # Il faut retirer les colonnes cstes pour pas faire bug l'ACP...
-sample <- remove_constant(sample, na.rm = FALSE, quiet = FALSE)
-data_merged_scale <- remove_constant(data_merged_scale, na.rm = FALSE, quiet = FALSE)
-
-
-### Pour trouver le nombre de clusters ==> Ne marche pas terrible et prend 50 ans à tourner...
-# factoextra::fviz_nbclust(sample, FUNcluster =factoextra::hcut, method = "silhouette",hc_method = "average", hc_metric = "euclidean", stand = TRUE) 
-
-sample
-resKM_sample <- kmeans(sample, centers=3, nstart=20)
-resKM_sample
-fviz_cluster(resKM_sample, sample)
-
-summary(resKM_sample)
-# plot(sample, col = resKM_sample$cluster,pch=16,cex=1.2,main="Regroupement par les k-means")
+sample_scaled <- remove_constant(sample_scaled, na.rm = FALSE, quiet = FALSE)
+data_merged_scale <- remove_constant(data_merged_scaled, na.rm = FALSE, quiet = FALSE)
 
 
 
+########## Si votre PC tient le coup : pour trouver le nombre de clusters optimal ""à la main""
+k2 <- kmeans(data_merged_scale, centers = 2, nstart = 25)
+k3 <- kmeans(data_merged_scale, centers = 3, nstart = 25)
+k4 <- kmeans(data_merged_scale, centers = 4, nstart = 25)
+k5 <- kmeans(data_merged_scale, centers = 5, nstart = 25)
 
-resKM <- kmeans(data_merged_scale, centers=4, nstart=20)
+# plots to compare
+p1 <- fviz_cluster(k2, geom = "point", data = data_merged_scale) + ggtitle("k = 2")
+p2 <- fviz_cluster(k3, geom = "point",  data = data_merged_scale) + ggtitle("k = 3")
+p3 <- fviz_cluster(k4, geom = "point",  data = data_merged_scale) + ggtitle("k = 4")
+p4 <- fviz_cluster(k5, geom = "point",  data = data_merged_scale) + ggtitle("k = 5")
+
+p <- grid.arrange(p1, p2, p3, p4, nrow = 2)
+
+ggsave(paste(repo_sorties, "00_graphe_clustering.pdf", sep = "/"), p ,  width = 297, height = 210, units = "mm")
+
+
+###### Une fois qu'on a trouvé le nb de clusters ####
+nb_clusters <- 4
+
+
+# Sur le sample_scaled
+sample_scaled
+resKM_sample_scaled <- kmeans(sample_scaled, centers=nb_clusters, nstart=20)
+resKM_sample_scaled
+fviz_cluster(resKM_sample_scaled, sample_scaled)
+
+# summary(resKM_sample_scaled)
+# plot(sample_scaled, col = resKM_sample_scaled$cluster,pch=16,cex=1.2,main="Regroupement par les k-means")
+
+
+
+# Sur toute la table
+resKM <- kmeans(data_merged_scale, centers=nb_clusters, nstart=20)
 resKM
-fviz_cluster(resKM, data_merged_scale)
+p <- fviz_cluster(resKM, data_merged_scale)
+ggsave(paste(repo_sorties, "01_graphe_clustering.pdf", sep = "/"), p ,  width = 297, height = 210, units = "mm")
 
 ################################################################################
 ########## ANALYSE DU CLUSTERING ###############################################
 ################################################################################
-source(paste(repo_prgm , "08_analyse_modelisation" , sep = "/"))
+source(paste(repo_prgm , "08_analyse_modelisation.R" , sep = "/"))
 
 
-df_analyse_cluster_sample <- fonction_calcul_scoring_kmeans(sample, resKM_sample)
+df_analyse_cluster_sample_scaled <- fonction_calcul_scoring_kmeans(sample_scaled, resKM_sample_scaled)
 df_analyse_cluster <- fonction_calcul_scoring_kmeans(data_merged_scale, resKM)
 
+df_analyse_cluster_sample_scaled
+df_analyse_cluster
+
+
+100*resKM_sample_scaled$size/nrow(sample_scaled) ## La taille des clusters en % de l'effectif (sample_scaled)
+100*resKM$size/nrow(data_merged_scale) ## La taille des clusters en % de l'effectif
+
+
+################################################################################
+#### Distribution par cluster ===> Pour faire des profils-types de femmes !!! ##
+################################################################################
+data_merged_copy <- copy(data_merged)
+
+# On ajoute la prédiction du numéro de cluster
+data_merged_copy$clustering <- resKM$cluster
+sample$clustering <- resKM_sample_scaled$cluster
+
+
+
+## Analyse d'une variable continue
+variable <- "Age_tranche"
+tapply(data_merged_copy[[variable]] , data_merged_copy$clustering, summary)  
+
+
+## Analyse d'une variable catégorielle
+variable <- "Niveau_education_H"
+counted_occurences <- as.data.table(data_merged_copy %>% count(clustering, !! rlang::sym(variable)))
+counted_occurences[, n_norm_by_cluster := 100*n/sum(n), by = clustering]
+counted_occurences[, n_norm_by_var := 100*n/sum(n), by = variable]
+counted_occurences
+
+
+
+## Pour tout regarder
+# Option 1 : 
+describeBy(data_merged_copy, group="clustering")
+
+# Option 2 : 
+data_merged_copy %>% 
+  split(.$clustering) %>% 
+  map(summary)
+
+
+
 
 
 
 ################################################################################
-##### CLUSTERING GAP ###########################################################
+##### BROUILLON : CLUSTERING GAP ###############################################
 ################################################################################
-etude_clus <- clusGap(sample, FUNcluster=pam, K.max=7)
+etude_clus <- clusGap(sample_scaled, FUNcluster=pam, K.max=7)
 etude_clus_DF <- as.data.frame(etude_clus$Tab) 
 
 # Voir https://towardsdatascience.com/k-means-clustering-and-the-gap-statistics-4c5d414acd29 pour détails
@@ -201,11 +272,11 @@ ggplot(etude_clus_DF, aes(x=1:nrow(etude_clus_DF))) +
 
 
 ########## Dendogrammes
-hclust_sample <- hclust(d=dist(sample, method="euclidean"))
-plot(hclust_sample) ##ASsez illisible...
+hclust_sample_scaled <- hclust(d=dist(sample_scaled, method="euclidean"))
+plot(hclust_sample_scaled) ##ASsez illisible...
 
 
-distMatrix <- dist(sample, method="euclidean")
+distMatrix <- dist(sample_scaled, method="euclidean")
 groups <- hclust(distMatrix,method="ward.D")
 fviz_dend(groups, cex = 0.8, lwd = 0.8, k = 3, 
           rect = TRUE, 
@@ -218,10 +289,10 @@ fviz_dend(groups, cex = 0.8, lwd = 0.8, k = 3,
 ########## BROUILLON #######################
 
 
-# summary(sample)
+# summary(sample_scaled)
 
 
-fviz_cluster(resKM, sample)
+fviz_cluster(resKM, sample_scaled)
 
 # 
 # data_merged_scale[, lapply(.SD, function(x) sum(is.na(x)))]
@@ -234,24 +305,24 @@ resKM
 
 # factoextra::fviz_nbclust(data_merged_scale, FUNcluster =factoextra::hcut, method = "silhouette",hc_method = "average", hc_metric = "euclidean", stand = TRUE)
 
-sample <- as.data.table(sapply(data_merged_scale[], sample, 10000))
+sample_scaled <- as.data.table(sapply(data_merged_scale[], sample_scaled, 10000))
 
 
-# factoextra::fviz_nbclust(sample, FUNcluster =factoextra::hcut, method = "silhouette",hc_method = "average", hc_metric = "euclidean", stand = TRUE)
+# factoextra::fviz_nbclust(sample_scaled, FUNcluster =factoextra::hcut, method = "silhouette",hc_method = "average", hc_metric = "euclidean", stand = TRUE)
 
 
-# sample[, eval(c("Nb_enfants_moins_2_ans_9999", "Age_tranche_9999", "Sexe_1H_2F_2")) := NULL]
+# sample_scaled[, eval(c("Nb_enfants_moins_2_ans_9999", "Age_tranche_9999", "Sexe_1H_2F_2")) := NULL]
 
-sample
+sample_scaled
 # , kmeans_init_iter_max=10000
-resKM <- kmeans(sample, centers=2, nstart=20)
+resKM <- kmeans(sample_scaled, centers=2, nstart=20)
 resKM
 
 
-# summary(sample)
+# summary(sample_scaled)
 
 
-fviz_cluster(resKM, sample)
+fviz_cluster(resKM, sample_scaled)
 # 
 # fviz_cluster(res.km, data = df[, -5],
 #              palette = c("#2E9FDF", "#00AFBB", "#E7B800"), 
@@ -262,7 +333,7 @@ fviz_cluster(resKM, sample)
 
 # 
 # ########### Et un peu de KNN
-# ran <- sample(1:nrow(data_merged), 0.9 * nrow(data_merged)) 
+# ran <- sample_scaled(1:nrow(data_merged), 0.9 * nrow(data_merged)) 
 # 
 # ##the normalization function is created
 # nor <-function(x) { (x -min(x))/(max(x)-min(x))   }

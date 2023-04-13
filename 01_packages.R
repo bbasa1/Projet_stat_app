@@ -43,6 +43,9 @@ library(questionr)
 library(funtimes)
 # install.packages("aricode")
 library(aricode)
+library(gridExtra)
+library(psych)
+
 
 ### Liste des pays possibles (dico sur https://www.iban.com/country-codes )###
 dico_pays <- c(
