@@ -18,11 +18,11 @@ repgen <- "C:/Users/Benjamin/Desktop/Ensae/Projet_statapp"#BB
 
 liste_annees <- 2000:2002
 
-liste_pays <- c("FR", "ES", "IT", "DE", "DK", "HU")
+liste_pays <- c("FR", "ES", "IT", "DE", "PT", "HU")
 
 nom_fichier_html <- paste("Modelisation", liste_annees[1], liste_annees[length(liste_annees)], sep = "_")
 
-creer_base <- TRUE
+creer_base <- FALSE
 
 repo_prgm <- paste(repgen, "programmes/Projet_stat_app" , sep = "/")
 
@@ -47,7 +47,11 @@ liste_variables <- c('QHHNUM', #Identifiant ménage
                      'FTPT', # 1 = Full-time. 2 = Part-time job.
                      'TEMP', # 1 = CDI. 2 = CDD
                      'HATLEV1D', # Level of education. L = low. M = Medium. H = High
-                     'HHNBCH2' # Number of children [0,2] years in the household
+                     'HHNBCH2', # Number of children [0,2] years in the household
+                     'HHNBCH5',
+                     'FTPTREAS',
+                     'ISCO3D'
+                     
 )
 
 age_min <- 20
@@ -88,16 +92,34 @@ data_merged <- calcul_index_conservatisme(data_merged)
 #            III. PREPARATION DE LA MODELISATION             ===============================
 ################################################################################
 
-liste_cols_dummies <- c("Niveau_education", "Perennite_emploi", "Annee_enquete", "Temps_partiel", "Dregre_urbanisation", "Souhaite_davantage_travailler", "Souhaite_travailler", "Statut_semaine", "Statut_emploi_1_emploi", "Sexe_1H_2F", "Pays")
-liste_cols_cont <- c("Nb_enfants_moins_2_ans", "Age_tranche", "Index_conservatisme")
+# [] Age
+# [] Pays
+# [] Diplôme
+# [] 3 enfants et plus (à discuter sur 2 enfants et plus : Italie plus pour 2 mais Hongrie plus pour 3 )
+# [] Enfants de moins de 3 ans
+# [] Temps partiel (surtout modalité pour raisons
+# [] CSP
+# [] Poste de manager
+liste_cols_cont <- c("Nb_enfants_moins_2_ans","Nb_enfants_entre_3_5_ans", "Age_tranche")
+liste_cols_dummies <- c("Niveau_education", "Temps_partiel", "Pays", "Raisons_temps_partiel", "CSP")
 liste_cols_to_delete <- c('Identifiant_menage', "Sexe_1H_2F")
 
 
+# liste_cols_dummies <- c("Niveau_education", "Perennite_emploi", "Annee_enquete", "Temps_partiel", "Dregre_urbanisation", "Souhaite_davantage_travailler", "Souhaite_travailler", "Statut_semaine", "Statut_emploi_1_emploi", "Sexe_1H_2F", "Pays")
+# liste_cols_cont <- c("Nb_enfants_moins_2_ans", "Age_tranche", "Index_conservatisme")
+# liste_cols_to_delete <- c('Identifiant_menage', "Sexe_1H_2F")
 
 
-liste_var_sup <- c("Pays_AT", "Pays_DE", "Pays_DK", "Pays_ES", "Pays_FR", "Pays_IT") #Pour le cercle des corrélations
 
-n_sample <- 1000 #La taille de l'échantillon pour la PCA (déso Laurie sans doute que si tu mets plus que 10 ton PC va mourir mdr)
+
+liste_var_sup <- c("Pays_HU", "Pays_DE", "Pays_DK", "Pays_ES", "Pays_FR", "Pays_IT") #Pour le cercle des corrélations
+
+n_sample <- 10000 #La taille de l'échantillon pour la PCA 
+methode <- "euclidean"
+#manhattan = distance L1
+#euclidean = distance L2
+#Chebychev = disrance L^infini
+inter_max <- 25 #Le nb de fois qu'il itère au maximum
 
 data_merged
 
@@ -108,9 +130,6 @@ source(paste(repo_prgm , "07_preparation_modelisation.R" , sep = "/"))
 #            IV. MODELISATION             ===============================
 ################################################################################
 data_merged
-
-### NOTE : Je laisse le script 08_modelisation.R vide pour le moment. 
-# Quand on aura une idée de la façon dont on veut l'organiser on pourra le remplir avec le script en dessous :
 
 
 ####### LA PCA #######################
@@ -125,24 +144,18 @@ fviz_eig(resultats_acp, addlabels = TRUE)
 fviz_pca_var(resultats_acp,  choix = "var")
 
 
-######### Les KMEANS ######################
+######### Les Kmeans ######################
 
 #On prépare tout d'abord un petit échantillon au cas où
 sample <- as.data.table(sapply(data_merged[], sample, n_sample))
 
 
-### On standardise tout ça ===> Attention on va garder les paramètres du scaler en mémoire pour faire un inverse scale après !
-
-
-
 data_merged_scaled <- scale(data_merged)
-# data_merged.orig = t(apply(data_merged_scaled, 1, function(r)r*attr(data_merged_scaled,'scaled:scale') + attr(data_merged_scaled, 'scaled:center')))
 data_merged_scaled <- as.data.table(data_merged_scaled)
 data_merged_scaled[is.na(data_merged_scaled)] <- 0
 
 
 sample_scaled <- scale(sample)
-# sample.orig = t(apply(sample, 1, function(r)r*attr(sample,'scaled:scale') + attr(sample, 'scaled:center')))
 sample_scaled <- as.data.table(sample_scaled)
 sample_scaled[is.na(sample_scaled)] <- 0
 
@@ -152,12 +165,34 @@ sample_scaled <- remove_constant(sample_scaled, na.rm = FALSE, quiet = FALSE)
 data_merged_scale <- remove_constant(data_merged_scaled, na.rm = FALSE, quiet = FALSE)
 
 
+# row_sub = apply(data_merged_scaled, 1, function(row) any(row !=0 )) ##Subset
+# data_merged_scale_without_zero_row <- data_merged_scaled[row_sub,]
+# data_merged_scale_without_zero_row <-
+# remove_constant(data_merged_scale_without_zero_row, na.rm = FALSE, quiet = FALSE)
+# 
+# 
+# res.mca <- MCA(data_merged_scale_without_zero_row, graph=FALSE)
+# 
+# eig.val <- res.mca$eig
+# barplot(eig.val[, 2], 
+#         names.arg = 1:nrow(eig.val), 
+#         main = "Variances Explained by Dimensions (%)",
+#         xlab = "Principal Dimensions",
+#         ylab = "Percentage of variances",
+#         col ="steelblue")
+# # Add connected line segments to the plot
+# lines(x = 1:nrow(eig.val), eig.val[, 2], 
+#       type = "b", pch = 19, col = "red")
+
+
+############ POUR UNE RAISON QUI M'ECHAPPE LA FONCTION kmeans A L'AIR DE FAIRE DES CLUSTERS PLUS JOLIS############
+
 
 ########## Si votre PC tient le coup : pour trouver le nombre de clusters optimal ""à la main""
-k2 <- kmeans(data_merged_scale, centers = 2, nstart = 25)
-k3 <- kmeans(data_merged_scale, centers = 3, nstart = 25)
-k4 <- kmeans(data_merged_scale, centers = 4, nstart = 25)
-k5 <- kmeans(data_merged_scale, centers = 5, nstart = 25)
+k2 <- Kmeans(data_merged_scale, centers = 2, nstart = 25, method = methode, iter.max=inter_max)
+k3 <- Kmeans(data_merged_scale, centers = 3, nstart = 25, method = methode, iter.max=inter_max)
+k4 <- Kmeans(data_merged_scale, centers = 4, nstart = 25, method = methode, iter.max=inter_max)
+k5 <- Kmeans(data_merged_scale, centers = 5, nstart = 25, method = methode, iter.max=inter_max)
 
 # plots to compare
 p1 <- fviz_cluster(k2, geom = "point", data = data_merged_scale) + ggtitle("k = 2")
@@ -167,16 +202,43 @@ p4 <- fviz_cluster(k5, geom = "point",  data = data_merged_scale) + ggtitle("k =
 
 p <- grid.arrange(p1, p2, p3, p4, nrow = 2)
 
-ggsave(paste(repo_sorties, "00_graphe_clustering.pdf", sep = "/"), p ,  width = 297, height = 210, units = "mm")
+
+nom_graphe <- paste("00_graphe_clustering_", methode, ".pdf", sep = "")
+ggsave(paste(repo_sorties, nom_graphe, sep = "/"), p ,  width = 297, height = 210, units = "mm")
+
+####################### VERIFICATION DU NB DE CLUSTERS OPTI ####################### 
+
+# Elbow method
+fviz_nbclust(sample_scaled, Kmeans, method = "wss") +
+  # geom_vline(xintercept = 2, linetype = 2)+
+  labs(subtitle = "Elbow method")
+# For each value of K, we are calculating WCSS (Within-Cluster Sum of Square). 
+# Kopti = le point d'inflexion ==> Moyen visible ici je trouve
+
+# Silhouette method
+fviz_nbclust(sample_scaled, Kmeans, method = "silhouette")+
+  labs(subtitle = "Silhouette method")
+# In short, the average silhouette approach measures the quality of a clustering. That is, it determines how well each object lies within its cluster. A high average silhouette width indicates a good clustering. The average silhouette method computes the average silhouette of observations for different values of k. The optimal number of clusters k is the one that maximizes the average silhouette over a range of possible values for k.
+# Donne Kopti = 6
+
+# Gap statistic ==> Plus long à tourner attention
+# nboot = 50 to keep the function speedy. 
+# recommended value: nboot= 500 for your analysis.
+# Use verbose = FALSE to hide computing progression.
+set.seed(123)
+fviz_nbclust(sample_scaled, Kmeans, nstart = 25,  method = "gap_stat", nboot = 50)+
+  labs(subtitle = "Gap statistic method")
+# The gap statistic compares the total intracluster variation for different values of k with their expected values under null reference distribution of the data (i.e. a distribution with no obvious clustering)
+# Donne Kopti = 6
 
 
-###### Une fois qu'on a trouvé le nb de clusters ####
-nb_clusters <- 4
+####################### Une fois qu'on a trouvé le nb de clusters ####################### 
+nb_clusters <- 6
 
 
 # Sur le sample_scaled
 sample_scaled
-resKM_sample_scaled <- kmeans(sample_scaled, centers=nb_clusters, nstart=20)
+resKM_sample_scaled <- Kmeans(sample_scaled, centers=nb_clusters, nstart=30, method = methode)
 resKM_sample_scaled
 fviz_cluster(resKM_sample_scaled, sample_scaled)
 
@@ -186,10 +248,12 @@ fviz_cluster(resKM_sample_scaled, sample_scaled)
 
 
 # Sur toute la table
-resKM <- kmeans(data_merged_scale, centers=nb_clusters, nstart=20)
+resKM <- Kmeans(data_merged_scale, centers=nb_clusters, nstart=30, method = methode)
 resKM
 p <- fviz_cluster(resKM, data_merged_scale)
-ggsave(paste(repo_sorties, "01_graphe_clustering.pdf", sep = "/"), p ,  width = 297, height = 210, units = "mm")
+nom_graphe <- paste("01_graphe_", methode,"_",nb_clusters, "_clusters", ".pdf", sep = "")
+ggsave(paste(repo_sorties, nom_graphe, sep = "/"), p ,  width = 297, height = 210, units = "mm")
+
 
 ################################################################################
 ########## ANALYSE DU CLUSTERING ###############################################
@@ -202,6 +266,9 @@ df_analyse_cluster <- fonction_calcul_scoring_kmeans(data_merged_scale, resKM)
 
 df_analyse_cluster_sample_scaled
 df_analyse_cluster
+summary(df_analyse_cluster)
+titre <- paste("Analyse_cluster_score_", methode,"_",nb_clusters, "_clusters", ".xlsx", sep = "")
+write.xlsx(df_analyse_cluster, paste(repo_sorties,titre, sep = "/"))
 
 
 100*resKM_sample_scaled$size/nrow(sample_scaled) ## La taille des clusters en % de l'effectif (sample_scaled)
@@ -221,7 +288,7 @@ sample$clustering <- resKM_sample_scaled$cluster
 
 ## Analyse d'une variable continue
 variable <- "Age_tranche"
-tapply(data_merged_copy[[variable]] , data_merged_copy$clustering, summary)  
+tapply(data_merged_copy[[variable]] , data_merged_copy$clustering, summary)
 
 
 ## Analyse d'une variable catégorielle
@@ -230,6 +297,43 @@ counted_occurences <- as.data.table(data_merged_copy %>% count(clustering, !! rl
 counted_occurences[, n_norm_by_cluster := 100*n/sum(n), by = clustering]
 counted_occurences[, n_norm_by_var := 100*n/sum(n), by = variable]
 counted_occurences
+
+
+
+## Analyse de toutes les variables catégorielles
+liste_cols_dummies <- colnames(data_merged_copy)
+
+# On ne garde que les cols catégorielles avec leurs modalités
+# liste_cols_dummies <- liste_cols_dummies[! liste_cols_dummies %in% liste_cols_cont]
+liste_cols_dummies <- liste_cols_dummies[! liste_cols_dummies %in% liste_cols_to_delete]
+liste_cols_dummies <- liste_cols_dummies[! liste_cols_dummies %in% c('clustering')]
+liste_cols_dummies
+
+# Initialisation
+variable <- liste_cols_dummies[1]
+counted_occurences <- as.data.table(data_merged_copy %>% count(clustering, !! rlang::sym(variable)))
+counted_occurences[, Pourcent_by_cluster := 100*n/sum(n), by = clustering]
+counted_occurences[, Pourcent_by_modalite_var := 100*n/sum(n), by = variable]
+setnames(counted_occurences, variable, "valeur_variable")
+counted_occurences[, variable := variable]
+counted_occurences_all <- counted_occurences
+
+# Boucle sur toutes les colonnes
+for (variable in liste_cols_dummies[c(-1)]){
+  # print(variable)
+  counted_occurences <- as.data.table(data_merged_copy %>% count(clustering, !! rlang::sym(variable)))
+  counted_occurences[, Pourcent_by_cluster := 100*n/sum(n), by = clustering]
+  counted_occurences[, Pourcent_by_modalite_var := 100*n/sum(n), by = variable]
+  setnames(counted_occurences, variable, "valeur_variable")
+  counted_occurences[, variable := variable]
+  counted_occurences_all <- rbindlist(list(counted_occurences_all,
+                                         counted_occurences), fill = TRUE)
+}
+  
+counted_occurences_all
+titre <- paste("Analyse_cluster_contenu_", methode,"_",nb_clusters, "_clusters", ".xlsx", sep = "")
+write.xlsx(counted_occurences_all, paste(repo_sorties,titre, sep = "/"))
+# write.xlsx(counted_occurences_all, paste(repo_sorties,"Analyse_cluster_contenu_cat_0.xlsx", sep = "/"))
 
 
 
@@ -243,6 +347,12 @@ data_merged_copy %>%
   map(summary)
 
 
+
+##### Avec le package survey ==> Bon ça marche pas
+data_merged_copy
+table_survey <- svydesign(ids = ~1, data = data_merged_copy, weights = 1)
+table <- svytable(~ Niveau_education_H+clustering, table_survey)
+lprop(table)
 
 
 
@@ -300,7 +410,7 @@ fviz_cluster(resKM, sample_scaled)
 # data_merged_scale
 # str(data_merged_scale)
 
-resKM <- kmeans(data_merged_scale, centers=3,nstart=20)
+resKM <- Kmeans(data_merged_scale, centers=3,nstart=20)
 resKM
 
 # factoextra::fviz_nbclust(data_merged_scale, FUNcluster =factoextra::hcut, method = "silhouette",hc_method = "average", hc_metric = "euclidean", stand = TRUE)
@@ -314,8 +424,8 @@ sample_scaled <- as.data.table(sapply(data_merged_scale[], sample_scaled, 10000)
 # sample_scaled[, eval(c("Nb_enfants_moins_2_ans_9999", "Age_tranche_9999", "Sexe_1H_2F_2")) := NULL]
 
 sample_scaled
-# , kmeans_init_iter_max=10000
-resKM <- kmeans(sample_scaled, centers=2, nstart=20)
+# , Kmeans_init_iter_max=10000
+resKM <- Kmeans(sample_scaled, centers=2, nstart=20)
 resKM
 
 
@@ -330,47 +440,4 @@ fviz_cluster(resKM, sample_scaled)
 #              ellipse.type = "convex", 
 #              ggtheme = theme_bw()
 # )
-
-# 
-# ########### Et un peu de KNN
-# ran <- sample_scaled(1:nrow(data_merged), 0.9 * nrow(data_merged)) 
-# 
-# ##the normalization function is created
-# nor <-function(x) { (x -min(x))/(max(x)-min(x))   }
-# 
-# ##Run nomalization on first 4 coulumns of dataset because they are the predictors
-# data_merged_norm <- as.data.table(lapply(data_merged, nor))
-# data_merged_norm
-# data_merged_norm[, eval(c("Nb_enfants_moins_2_ans_9999", "Age_tranche_9999", "Sexe_1H_2F_2")) := NULL]
-# 
-# 
-# 
-# # summary(iris_norm)
-# ##extract training set
-# iris_train <- data_merged_norm[ran,] 
-# ##extract testing set
-# iris_test <- data_merged_norm[-ran,] 
-# 
-# library(class)
-# 
-# 
-# y_train <- iris_train$Statut_emploi_1_emploi_1
-# y_test <- iris_test$Statut_emploi_1_emploi_1
-# iris_train[, Statut_emploi_1_emploi_1 := NULL]
-# iris_test[, Statut_emploi_1_emploi_1 := NULL]
-# 
-# 
-# pr <- knn(iris_train,iris_test,cl=y_train,k=13)
-# 
-# ##create confusion matrix
-# tab <- table(pr,y_test)
-# 
-# ##this function divides the correct predictions by total number of predictions that tell us how accurate teh model is.
-# 
-# accuracy <- function(x){sum(diag(x)/(sum(rowSums(x)))) * 100}
-# accuracy(tab)
-# 
-# data_merged
-# 
-# 
 

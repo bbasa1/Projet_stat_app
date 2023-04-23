@@ -48,6 +48,7 @@ for (colonne in liste_cols_cont){
 }
 
 try(data_merged[ , Nb_enfants_moins_2_ans := as.numeric(Nb_enfants_moins_2_ans )]) ###### A DISCUTER POURQUOI CA MARCHE PAS SUR CETTE VARIABLE ????
+try(data_merged[ , Nb_enfants_entre_3_5_ans := as.numeric(Nb_enfants_entre_3_5_ans )]) ###### A DISCUTER POURQUOI CA MARCHE PAS SUR CETTE VARIABLE ????
 try(data_merged[ , Age_tranche := as.numeric(Age_tranche )]) ###### A DISCUTER POURQUOI CA MARCHE PAS SUR CETTE VARIABLE ????
 
 # data_merged

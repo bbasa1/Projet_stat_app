@@ -45,7 +45,11 @@ library(funtimes)
 library(aricode)
 library(gridExtra)
 library(psych)
-
+# install.packages("xlsx")
+library(xlsx)
+# install.packages('openxlsx') # Install just once
+library(openxlsx) # Load on each new session
+library(amap)
 
 ### Liste des pays possibles (dico sur https://www.iban.com/country-codes )###
 dico_pays <- c(

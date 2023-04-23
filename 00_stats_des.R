@@ -27,11 +27,11 @@ liste_annees <- 1998:2018
 # 2016-2018 = référence ?
 # Benjamin avait parlé de liste, on pourrait aussi pour la modélisation 
 # créer une variable indicatrice par période ou à six modalités 
-pays <- "FR"
+pays <- "DE"
 
 nom_fichier_html <- paste("Taux_activite", pays, sep = "_")
 
-creer_base <- FALSE
+creer_base <- TRUE
 mettre_coeffs_nan_a_zero <- TRUE
 
 
@@ -995,6 +995,8 @@ lprop(tab_enq_no_trav_enf_fam_se_fem)
 # Faire une analyse congé parental : regardé selon le fait d'avoir ou non des enfants de moins de trois ans + le nombre 
 # Ne travaille pas pour raison familiales (congé maternité / parental) : proportion faible dans l'enquete mais plus fréquent femme (voir les intervalle de confiance toutefois pas sur qu ece soit significatif)
 # par nombre d'enfant : les 0,2 sans enfants c'est peut être des déces, ca nuance les autres valeurs peut exploitable a mon avis
+
+# A un emploi mais ne travaille pas car en maternité ou en congé parental ou pour d'autres raisons personnelles ou familiales 
 tab_nb_enf_emp_no_trav_enf <- svytable(~ nb_enf +raisons_emp_no_trav_enf_fam, dw_tot)
 lprop(tab_nb_enf_emp_no_trav_enf)
 # Avce un enfant de moins de 3 : on voit un peu plus le congé mat/pat je pense
