@@ -59,6 +59,26 @@ age_max <- 59
 mettre_coeffs_nan_a_zero <- FALSE
 planter_si_non_specifie <- FALSE #Plante si toutes les varibales ne sont pas spécifiées (dummies, continues ou à supprimer). Autrement il supprime les non spécifiées
 
+
+
+liste_cols_cont <- c("Nb_enfants_moins_2_ans","Nb_enfants_entre_3_5_ans", "Age_tranche")
+liste_cols_dummies <- c("Niveau_education", "Temps_partiel", "Pays", "Raisons_temps_partiel", "CSP")
+liste_cols_to_delete <- c('Identifiant_menage', "Sexe_1H_2F")
+
+kmeans_sur_proj <- FALSE
+
+
+liste_var_sup <- c("Pays_HU", "Pays_DE", "Pays_DK", "Pays_ES", "Pays_FR", "Pays_IT") #Pour le cercle des corrélations
+
+n_sample <- 10000 #La taille de l'échantillon pour la PCA 
+methode <- "manhattan"
+#manhattan = distance L1
+#euclidean = distance L2
+#Chebychev = disrance L^infini
+inter_max <- 25 #Le nb de fois qu'il itère au maximum
+
+nb_axes_ACM <- 5
+
 ################################################################################
 #            B. PACKAGES              -------------------------------
 ################################################################################
@@ -92,47 +112,19 @@ data_merged <- calcul_index_conservatisme(data_merged)
 #            III. PREPARATION DE LA MODELISATION             ===============================
 ################################################################################
 
-# [] Age
-# [] Pays
-# [] Diplôme
-# [] 3 enfants et plus (à discuter sur 2 enfants et plus : Italie plus pour 2 mais Hongrie plus pour 3 )
-# [] Enfants de moins de 3 ans
-# [] Temps partiel (surtout modalité pour raisons
-# [] CSP
-# [] Poste de manager
-liste_cols_cont <- c("Nb_enfants_moins_2_ans","Nb_enfants_entre_3_5_ans", "Age_tranche")
-liste_cols_dummies <- c("Niveau_education", "Temps_partiel", "Pays", "Raisons_temps_partiel", "CSP")
-liste_cols_to_delete <- c('Identifiant_menage', "Sexe_1H_2F")
-
-
-# liste_cols_dummies <- c("Niveau_education", "Perennite_emploi", "Annee_enquete", "Temps_partiel", "Dregre_urbanisation", "Souhaite_davantage_travailler", "Souhaite_travailler", "Statut_semaine", "Statut_emploi_1_emploi", "Sexe_1H_2F", "Pays")
-# liste_cols_cont <- c("Nb_enfants_moins_2_ans", "Age_tranche", "Index_conservatisme")
-# liste_cols_to_delete <- c('Identifiant_menage', "Sexe_1H_2F")
-
-
-
-
-liste_var_sup <- c("Pays_HU", "Pays_DE", "Pays_DK", "Pays_ES", "Pays_FR", "Pays_IT") #Pour le cercle des corrélations
-
-n_sample <- 10000 #La taille de l'échantillon pour la PCA 
-methode <- "euclidean"
-#manhattan = distance L1
-#euclidean = distance L2
-#Chebychev = disrance L^infini
-inter_max <- 25 #Le nb de fois qu'il itère au maximum
-
 data_merged
 
 source(paste(repo_prgm , "07_preparation_modelisation.R" , sep = "/"))
 
 
 ################################################################################
-#            IV. MODELISATION             ===============================
+#            IV. MODELISATION    ===============================================
 ################################################################################
 data_merged
 
-
-####### LA PCA #######################
+################################################################################
+#            LA PCA   ----------------------------------------------------------
+################################################################################
 
 resultats_acp  <- PCA(data_merged, scale.unit = TRUE, ncp = 5, ind.sup = liste_indices_sup,
                       quanti.sup=NULL, quali.sup=NULL, graph=FALSE)
@@ -144,15 +136,55 @@ fviz_eig(resultats_acp, addlabels = TRUE)
 fviz_pca_var(resultats_acp,  choix = "var")
 
 
-######### Les Kmeans ######################
+################################################################################
+#            L'ACM   -----------------------------------------------------------
+################################################################################
+data_merged_non_encoded
+data_merged_non_encoded[, eval(liste_cols_to_delete) :=NULL] 
+data_merged_non_encoded[is.na(data_merged_non_encoded)] <- 9999
+data_merged_non_encoded
+
+data_merged_non_encoded <- as.data.frame(data_merged_non_encoded)
+for (i in 1:ncol(data_merged_non_encoded)){
+  data_merged_non_encoded[,i] <- as.factor(data_merged_non_encoded[,i])
+}
+
+acm_results <- dudi.acm(data_merged_non_encoded, nf = nb_axes_ACM, scannf = FALSE)
+
+fviz_screeplot(acm_results)
+summary(acm_results)
+inertia.dudi(acm_results)
+
+s.corcircle(acm_results$co, 1, 2, clabel = 0.7)
+
+fviz_mca_var(acm_results, repel = TRUE) #==> Plus visuel je trouve
+
+numero_axe <- 2
+fviz_contrib(acm_results, choice = "var", axes = numero_axe)
+
+# On récupère la projection si on veut essayer les kmeans dessus
+data_projected <- acm_results$li
+
+################################################################################
+#            LES KMEANS  -------------------------------------------------------
+################################################################################
+
+if(kmeans_sur_proj){
+  # Alors il faut modifier data_merged
+  data_kmeans <- copy(data_projected)
+}else{
+  data_kmeans <- copy(data_merged)
+}
+
+#############  PREPARATION ##################
 
 #On prépare tout d'abord un petit échantillon au cas où
-sample <- as.data.table(sapply(data_merged[], sample, n_sample))
+sample <- as.data.table(sapply(data_kmeans[], sample, n_sample))
 
 
-data_merged_scaled <- scale(data_merged)
-data_merged_scaled <- as.data.table(data_merged_scaled)
-data_merged_scaled[is.na(data_merged_scaled)] <- 0
+data_kmeans_scaled <- scale(data_kmeans)
+data_kmeans_scaled <- as.data.table(data_kmeans_scaled)
+data_kmeans_scaled[is.na(data_kmeans_scaled)] <- 0
 
 
 sample_scaled <- scale(sample)
@@ -162,48 +194,28 @@ sample_scaled[is.na(sample_scaled)] <- 0
 
 # Il faut retirer les colonnes cstes pour pas faire bug l'ACP...
 sample_scaled <- remove_constant(sample_scaled, na.rm = FALSE, quiet = FALSE)
-data_merged_scale <- remove_constant(data_merged_scaled, na.rm = FALSE, quiet = FALSE)
-
-
-# row_sub = apply(data_merged_scaled, 1, function(row) any(row !=0 )) ##Subset
-# data_merged_scale_without_zero_row <- data_merged_scaled[row_sub,]
-# data_merged_scale_without_zero_row <-
-# remove_constant(data_merged_scale_without_zero_row, na.rm = FALSE, quiet = FALSE)
-# 
-# 
-# res.mca <- MCA(data_merged_scale_without_zero_row, graph=FALSE)
-# 
-# eig.val <- res.mca$eig
-# barplot(eig.val[, 2], 
-#         names.arg = 1:nrow(eig.val), 
-#         main = "Variances Explained by Dimensions (%)",
-#         xlab = "Principal Dimensions",
-#         ylab = "Percentage of variances",
-#         col ="steelblue")
-# # Add connected line segments to the plot
-# lines(x = 1:nrow(eig.val), eig.val[, 2], 
-#       type = "b", pch = 19, col = "red")
+data_kmeans_scale <- remove_constant(data_kmeans_scaled, na.rm = FALSE, quiet = FALSE)
 
 
 ############ POUR UNE RAISON QUI M'ECHAPPE LA FONCTION kmeans A L'AIR DE FAIRE DES CLUSTERS PLUS JOLIS############
 
 
 ########## Si votre PC tient le coup : pour trouver le nombre de clusters optimal ""à la main""
-k2 <- Kmeans(data_merged_scale, centers = 2, nstart = 25, method = methode, iter.max=inter_max)
-k3 <- Kmeans(data_merged_scale, centers = 3, nstart = 25, method = methode, iter.max=inter_max)
-k4 <- Kmeans(data_merged_scale, centers = 4, nstart = 25, method = methode, iter.max=inter_max)
-k5 <- Kmeans(data_merged_scale, centers = 5, nstart = 25, method = methode, iter.max=inter_max)
+k2 <- Kmeans(data_kmeans_scale, centers = 2, nstart = 25, method = methode, iter.max=inter_max)
+k3 <- Kmeans(data_kmeans_scale, centers = 3, nstart = 25, method = methode, iter.max=inter_max)
+k4 <- Kmeans(data_kmeans_scale, centers = 4, nstart = 25, method = methode, iter.max=inter_max)
+k5 <- Kmeans(data_kmeans_scale, centers = 5, nstart = 25, method = methode, iter.max=inter_max)
 
 # plots to compare
-p1 <- fviz_cluster(k2, geom = "point", data = data_merged_scale) + ggtitle("k = 2")
-p2 <- fviz_cluster(k3, geom = "point",  data = data_merged_scale) + ggtitle("k = 3")
-p3 <- fviz_cluster(k4, geom = "point",  data = data_merged_scale) + ggtitle("k = 4")
-p4 <- fviz_cluster(k5, geom = "point",  data = data_merged_scale) + ggtitle("k = 5")
+p1 <- fviz_cluster(k2, geom = "point", data = data_kmeans_scale) + ggtitle("k = 2")
+p2 <- fviz_cluster(k3, geom = "point",  data = data_kmeans_scale) + ggtitle("k = 3")
+p3 <- fviz_cluster(k4, geom = "point",  data = data_kmeans_scale) + ggtitle("k = 4")
+p4 <- fviz_cluster(k5, geom = "point",  data = data_kmeans_scale) + ggtitle("k = 5")
 
 p <- grid.arrange(p1, p2, p3, p4, nrow = 2)
 
 
-nom_graphe <- paste("00_graphe_clustering_", methode, ".pdf", sep = "")
+nom_graphe <- paste("00_graphe_clustering_", methode,"_kmeans_sur_proj_",kmeans_sur_proj, ".pdf", sep = "")
 ggsave(paste(repo_sorties, nom_graphe, sep = "/"), p ,  width = 297, height = 210, units = "mm")
 
 ####################### VERIFICATION DU NB DE CLUSTERS OPTI ####################### 
@@ -213,13 +225,15 @@ fviz_nbclust(sample_scaled, Kmeans, method = "wss") +
   # geom_vline(xintercept = 2, linetype = 2)+
   labs(subtitle = "Elbow method")
 # For each value of K, we are calculating WCSS (Within-Cluster Sum of Square). 
-# Kopti = le point d'inflexion ==> Moyen visible ici je trouve
+# Kopti = le point d'inflexion ==> Moyen visible ici je trouve (table entière)
+# Kopti = Idem (projection ACM)
 
 # Silhouette method
 fviz_nbclust(sample_scaled, Kmeans, method = "silhouette")+
   labs(subtitle = "Silhouette method")
 # In short, the average silhouette approach measures the quality of a clustering. That is, it determines how well each object lies within its cluster. A high average silhouette width indicates a good clustering. The average silhouette method computes the average silhouette of observations for different values of k. The optimal number of clusters k is the one that maximizes the average silhouette over a range of possible values for k.
-# Donne Kopti = 6
+# Donne Kopti = 6 (table entière)
+# Kopti = 2 (projection ACM)
 
 # Gap statistic ==> Plus long à tourner attention
 # nboot = 50 to keep the function speedy. 
@@ -229,11 +243,12 @@ set.seed(123)
 fviz_nbclust(sample_scaled, Kmeans, nstart = 25,  method = "gap_stat", nboot = 50)+
   labs(subtitle = "Gap statistic method")
 # The gap statistic compares the total intracluster variation for different values of k with their expected values under null reference distribution of the data (i.e. a distribution with no obvious clustering)
-# Donne Kopti = 6
+# Donne Kopti = 6 (table entière)
+# Kopti = 6 (projection ACM)
 
 
 ####################### Une fois qu'on a trouvé le nb de clusters ####################### 
-nb_clusters <- 6
+nb_clusters <- 3
 
 
 # Sur le sample_scaled
@@ -248,10 +263,10 @@ fviz_cluster(resKM_sample_scaled, sample_scaled)
 
 
 # Sur toute la table
-resKM <- Kmeans(data_merged_scale, centers=nb_clusters, nstart=30, method = methode)
+resKM <- Kmeans(data_kmeans_scale, centers=nb_clusters, nstart=30, method = methode)
 resKM
-p <- fviz_cluster(resKM, data_merged_scale)
-nom_graphe <- paste("01_graphe_", methode,"_",nb_clusters, "_clusters", ".pdf", sep = "")
+p <- fviz_cluster(resKM, data_kmeans_scale)
+nom_graphe <- paste("01_graphe_", methode,"_",nb_clusters, "_clusters","_kmeans_sur_proj_",kmeans_sur_proj, ".pdf", sep = "")
 ggsave(paste(repo_sorties, nom_graphe, sep = "/"), p ,  width = 297, height = 210, units = "mm")
 
 
@@ -262,17 +277,17 @@ source(paste(repo_prgm , "08_analyse_modelisation.R" , sep = "/"))
 
 
 df_analyse_cluster_sample_scaled <- fonction_calcul_scoring_kmeans(sample_scaled, resKM_sample_scaled)
-df_analyse_cluster <- fonction_calcul_scoring_kmeans(data_merged_scale, resKM)
+df_analyse_cluster <- fonction_calcul_scoring_kmeans(data_kmeans_scale, resKM)
 
 df_analyse_cluster_sample_scaled
 df_analyse_cluster
 summary(df_analyse_cluster)
-titre <- paste("Analyse_cluster_score_", methode,"_",nb_clusters, "_clusters", ".xlsx", sep = "")
+titre <- paste("Analyse_cluster_score_", methode,"_",nb_clusters, "_clusters","_kmeans_sur_proj_",kmeans_sur_proj, ".xlsx", sep = "")
 write.xlsx(df_analyse_cluster, paste(repo_sorties,titre, sep = "/"))
 
 
 100*resKM_sample_scaled$size/nrow(sample_scaled) ## La taille des clusters en % de l'effectif (sample_scaled)
-100*resKM$size/nrow(data_merged_scale) ## La taille des clusters en % de l'effectif
+100*resKM$size/nrow(data_kmeans_scale) ## La taille des clusters en % de l'effectif
 
 
 ################################################################################
@@ -331,7 +346,7 @@ for (variable in liste_cols_dummies[c(-1)]){
 }
   
 counted_occurences_all
-titre <- paste("Analyse_cluster_contenu_", methode,"_",nb_clusters, "_clusters", ".xlsx", sep = "")
+titre <- paste("Analyse_cluster_contenu_", methode,"_",nb_clusters, "_clusters","_kmeans_sur_proj_",kmeans_sur_proj, ".xlsx", sep = "")
 write.xlsx(counted_occurences_all, paste(repo_sorties,titre, sep = "/"))
 # write.xlsx(counted_occurences_all, paste(repo_sorties,"Analyse_cluster_contenu_cat_0.xlsx", sep = "/"))
 
@@ -347,97 +362,129 @@ data_merged_copy %>%
   map(summary)
 
 
-
-##### Avec le package survey ==> Bon ça marche pas
-data_merged_copy
-table_survey <- svydesign(ids = ~1, data = data_merged_copy, weights = 1)
-table <- svytable(~ Niveau_education_H+clustering, table_survey)
-lprop(table)
+############### ESSAI DE LA DISTANCE GOWER ##################
 
 
+data_merged_non_encoded
+
+data_merged_non_encoded_sample <- as.data.table(sapply(data_merged_non_encoded[], sample, n_sample))
+data_merged_non_encoded_sample <- as.data.frame(data_merged_non_encoded_sample)
+for (i in 1:ncol(data_merged_non_encoded_sample)){
+  data_merged_non_encoded_sample[,i] <- as.factor(data_merged_non_encoded_sample[,i])
+}
+
+gower_dist <- daisy(data_merged_non_encoded_sample,
+                    metric = "gower")
+
+summary(gower_dist)
+
+gower_mat <- as.matrix(gower_dist)
 
 
-################################################################################
-##### BROUILLON : CLUSTERING GAP ###############################################
-################################################################################
-etude_clus <- clusGap(sample_scaled, FUNcluster=pam, K.max=7)
-etude_clus_DF <- as.data.frame(etude_clus$Tab) 
+# Choix nb clusters Kopti
+sil_width <- c(NA)
+for(i in 2:10){
+  pam_fit <- pam(gower_dist,
+                 diss = TRUE,
+                 k = i)
+  sil_width[i] <- pam_fit$silinfo$avg.width
+  
+}
 
-# Voir https://towardsdatascience.com/k-means-clustering-and-the-gap-statistics-4c5d414acd29 pour détails
+# Plot sihouette width (higher is better)
+plot(1:10, sil_width,
+     xlab = "Number of clusters",
+     ylab = "Silhouette Width")
+lines(1:10, sil_width)
 
-ggplot(etude_clus_DF, aes(x=1:nrow(etude_clus_DF))) +
-  geom_line(aes(y=logW), color="blue") +
-  geom_point(aes(y=logW), color="blue") +
-  geom_line(aes(y=E.logW), color="green") +
-  geom_point(aes(y=E.logW), color="green") +
-  labs(x="Number of Clusters", title = "Dissimilarité intra-cluster \n vert = Uniforme; bleu = Observé")
+nb_clusters <- 4
 
+pam_fit <- pam(gower_dist, diss = TRUE, k = nb_clusters)
 
-ggplot(etude_clus_DF, aes(x=1:nrow(etude_clus_DF))) +
-  geom_line(aes(y=gap), color="red") +
-  geom_point(aes(y=gap), color="red") +
-  geom_errorbar(aes(ymin=gap-SE.sim, ymax=gap+SE.sim), color="red") +
-  labs(x="Number of Clusters", y="Gap", "Ecart statistique entre les deux")
-
-
-
-########## Dendogrammes
-hclust_sample_scaled <- hclust(d=dist(sample_scaled, method="euclidean"))
-plot(hclust_sample_scaled) ##ASsez illisible...
+pam_fit$clustering
 
 
-distMatrix <- dist(sample_scaled, method="euclidean")
-groups <- hclust(distMatrix,method="ward.D")
-fviz_dend(groups, cex = 0.8, lwd = 0.8, k = 3, 
-          rect = TRUE, 
-          k_colors = "jco", 
-          rect_border = "jco", 
-          rect_fill = TRUE,
-          ggtheme = theme_gray(),labels=F)
-
-
-########## BROUILLON #######################
-
-
-# summary(sample_scaled)
-
-
-fviz_cluster(resKM, sample_scaled)
-
+# ################################################################################
+# ##### BROUILLON : CLUSTERING GAP ###############################################
+# ################################################################################
+# etude_clus <- clusGap(sample_scaled, FUNcluster=pam, K.max=7)
+# etude_clus_DF <- as.data.frame(etude_clus$Tab) 
 # 
-# data_merged_scale[, lapply(.SD, function(x) sum(is.na(x)))]
+# # Voir https://towardsdatascience.com/k-means-clustering-and-the-gap-statistics-4c5d414acd29 pour détails
 # 
-# data_merged_scale
-# str(data_merged_scale)
-
-resKM <- Kmeans(data_merged_scale, centers=3,nstart=20)
-resKM
-
-# factoextra::fviz_nbclust(data_merged_scale, FUNcluster =factoextra::hcut, method = "silhouette",hc_method = "average", hc_metric = "euclidean", stand = TRUE)
-
-sample_scaled <- as.data.table(sapply(data_merged_scale[], sample_scaled, 10000))
-
-
-# factoextra::fviz_nbclust(sample_scaled, FUNcluster =factoextra::hcut, method = "silhouette",hc_method = "average", hc_metric = "euclidean", stand = TRUE)
-
-
-# sample_scaled[, eval(c("Nb_enfants_moins_2_ans_9999", "Age_tranche_9999", "Sexe_1H_2F_2")) := NULL]
-
-sample_scaled
-# , Kmeans_init_iter_max=10000
-resKM <- Kmeans(sample_scaled, centers=2, nstart=20)
-resKM
-
-
-# summary(sample_scaled)
-
-
-fviz_cluster(resKM, sample_scaled)
+# ggplot(etude_clus_DF, aes(x=1:nrow(etude_clus_DF))) +
+#   geom_line(aes(y=logW), color="blue") +
+#   geom_point(aes(y=logW), color="blue") +
+#   geom_line(aes(y=E.logW), color="green") +
+#   geom_point(aes(y=E.logW), color="green") +
+#   labs(x="Number of Clusters", title = "Dissimilarité intra-cluster \n vert = Uniforme; bleu = Observé")
 # 
-# fviz_cluster(res.km, data = df[, -5],
-#              palette = c("#2E9FDF", "#00AFBB", "#E7B800"), 
-#              geom = "point",
-#              ellipse.type = "convex", 
-#              ggtheme = theme_bw()
-# )
-
+# 
+# ggplot(etude_clus_DF, aes(x=1:nrow(etude_clus_DF))) +
+#   geom_line(aes(y=gap), color="red") +
+#   geom_point(aes(y=gap), color="red") +
+#   geom_errorbar(aes(ymin=gap-SE.sim, ymax=gap+SE.sim), color="red") +
+#   labs(x="Number of Clusters", y="Gap", "Ecart statistique entre les deux")
+# 
+# 
+# 
+# ########## Dendogrammes
+# hclust_sample_scaled <- hclust(d=dist(sample_scaled, method="euclidean"))
+# plot(hclust_sample_scaled) ##ASsez illisible...
+# 
+# 
+# distMatrix <- dist(sample_scaled, method="euclidean")
+# groups <- hclust(distMatrix,method="ward.D")
+# fviz_dend(groups, cex = 0.8, lwd = 0.8, k = 3, 
+#           rect = TRUE, 
+#           k_colors = "jco", 
+#           rect_border = "jco", 
+#           rect_fill = TRUE,
+#           ggtheme = theme_gray(),labels=F)
+# 
+# 
+# ########## BROUILLON #######################
+# 
+# 
+# # summary(sample_scaled)
+# 
+# 
+# fviz_cluster(resKM, sample_scaled)
+# 
+# # 
+# # data_merged_scale[, lapply(.SD, function(x) sum(is.na(x)))]
+# # 
+# # data_merged_scale
+# # str(data_merged_scale)
+# 
+# resKM <- Kmeans(data_merged_scale, centers=3,nstart=20)
+# resKM
+# 
+# # factoextra::fviz_nbclust(data_merged_scale, FUNcluster =factoextra::hcut, method = "silhouette",hc_method = "average", hc_metric = "euclidean", stand = TRUE)
+# 
+# sample_scaled <- as.data.table(sapply(data_merged_scale[], sample_scaled, 10000))
+# 
+# 
+# # factoextra::fviz_nbclust(sample_scaled, FUNcluster =factoextra::hcut, method = "silhouette",hc_method = "average", hc_metric = "euclidean", stand = TRUE)
+# 
+# 
+# # sample_scaled[, eval(c("Nb_enfants_moins_2_ans_9999", "Age_tranche_9999", "Sexe_1H_2F_2")) := NULL]
+# 
+# sample_scaled
+# # , Kmeans_init_iter_max=10000
+# resKM <- Kmeans(sample_scaled, centers=2, nstart=20)
+# resKM
+# 
+# 
+# # summary(sample_scaled)
+# 
+# 
+# fviz_cluster(resKM, sample_scaled)
+# # 
+# # fviz_cluster(res.km, data = df[, -5],
+# #              palette = c("#2E9FDF", "#00AFBB", "#E7B800"), 
+# #              geom = "point",
+# #              ellipse.type = "convex", 
+# #              ggtheme = theme_bw()
+# # )
+# 

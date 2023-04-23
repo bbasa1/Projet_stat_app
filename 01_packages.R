@@ -51,6 +51,9 @@ library(xlsx)
 library(openxlsx) # Load on each new session
 library(amap)
 
+library(ade4)
+
+
 ### Liste des pays possibles (dico sur https://www.iban.com/country-codes )###
 dico_pays <- c(
   "FR" ="France",

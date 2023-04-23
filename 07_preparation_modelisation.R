@@ -25,6 +25,7 @@ data_merged <- data_merged[Age_tranche + 2 <= age_max, ]
 data_merged <- data_merged[Sexe_1H_2F == 2]
 
 
+data_merged_non_encoded <- copy(data_merged) ### Pour l'ACM
 
 # On encode les variables catégorielles en dummies, en n'oubliant pas de supprimer les colonnes initiales
 for (colonne in liste_cols_dummies){
@@ -33,9 +34,6 @@ for (colonne in liste_cols_dummies){
   for (n in names(rs)) set(data_merged, i = rs[[n]], j = paste(colonne, n, sep = "_"), v = 1)
 }
 
-data_merged
-
-data_merged_copy <- copy(data_merged)
 
 # data_merged <- copy(data_merged_copy)
 
@@ -51,7 +49,10 @@ try(data_merged[ , Nb_enfants_moins_2_ans := as.numeric(Nb_enfants_moins_2_ans )
 try(data_merged[ , Nb_enfants_entre_3_5_ans := as.numeric(Nb_enfants_entre_3_5_ans )]) ###### A DISCUTER POURQUOI CA MARCHE PAS SUR CETTE VARIABLE ????
 try(data_merged[ , Age_tranche := as.numeric(Age_tranche )]) ###### A DISCUTER POURQUOI CA MARCHE PAS SUR CETTE VARIABLE ????
 
-# data_merged
+# try(data_merged_non_encoded[ , Nb_enfants_moins_2_ans := as.numeric(Nb_enfants_moins_2_ans )]) ###### A DISCUTER POURQUOI CA MARCHE PAS SUR CETTE VARIABLE ????
+# try(data_merged_non_encoded[ , Nb_enfants_entre_3_5_ans := as.numeric(Nb_enfants_entre_3_5_ans )]) ###### A DISCUTER POURQUOI CA MARCHE PAS SUR CETTE VARIABLE ????
+# try(data_merged_non_encoded[ , Age_tranche := as.numeric(Age_tranche )]) ###### A DISCUTER POURQUOI CA MARCHE PAS SUR CETTE VARIABLE ????
+
 
 ### On vire maintenant les colonnes à supprimer, et les colonnes qu'on a passé en dummies
 data_merged[, eval(liste_cols_dummies) :=NULL]
