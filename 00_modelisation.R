@@ -15,6 +15,15 @@ repgen <- "C:/Users/Benjamin/Desktop/Ensae/Projet_statapp"#BB
 # repgen <- "C:/Users/Lenovo/Desktop/statapp22"#LP
 # repgen <- "/Users/charlottecombier/Desktop/ENSAE/Projet_statapp"
 
+### Ensemble des paramètres pour faire tourner au lundi 24 avril : 
+kmeans_sur_proj <- FALSE
+methode <- "euclidean"
+#manhattan = distance L1
+#euclidean = distance L2
+#Chebychev = disrance L^infini
+
+
+### Ca ça ne bouge pas beaucoup normalement
 
 liste_annees <- 2000:2002
 
@@ -50,9 +59,15 @@ liste_variables <- c('QHHNUM', #Identifiant ménage
                      'HHNBCH2', # Number of children [0,2] years in the household
                      'HHNBCH5',
                      'FTPTREAS',
-                     'ISCO3D'
+                     'ISCO3D',
+                     'MARSTAT', #Statut marital
+                     'MAINSTAT', #Pour savoir si au foyer #Pour indice précarité
+                     'LOOKREAS',
+                     'EXIST2J',
+                     'HHPARTNR'
                      
 )
+
 
 age_min <- 20
 age_max <- 59
@@ -62,21 +77,15 @@ planter_si_non_specifie <- FALSE #Plante si toutes les varibales ne sont pas sp�
 
 
 liste_cols_cont <- c("Nb_enfants_moins_2_ans","Nb_enfants_entre_3_5_ans", "Age_tranche")
-liste_cols_dummies <- c("Niveau_education", "Temps_partiel", "Pays", "Raisons_temps_partiel", "CSP")
+liste_cols_dummies <- c("Niveau_education", "Temps_partiel", "Pays", "Raisons_temps_partiel", "CSP", "sit_pro_foyer", "statu_marital", "indic_precarite_emp")
 liste_cols_to_delete <- c('Identifiant_menage', "Sexe_1H_2F")
 
-kmeans_sur_proj <- FALSE
 
 
 liste_var_sup <- c("Pays_HU", "Pays_DE", "Pays_DK", "Pays_ES", "Pays_FR", "Pays_IT") #Pour le cercle des corrélations
 
 n_sample <- 10000 #La taille de l'échantillon pour la PCA 
-methode <- "manhattan"
-#manhattan = distance L1
-#euclidean = distance L2
-#Chebychev = disrance L^infini
 inter_max <- 25 #Le nb de fois qu'il itère au maximum
-
 nb_axes_ACM <- 5
 
 ################################################################################
@@ -98,8 +107,6 @@ if(creer_base){
   nom_base <- paste(repo_data, "/data_intermediaire/base_", liste_annees[1],"_", liste_annees[length(liste_annees)], ".Rdata", sep = "")
   load(file = nom_base)
 }
-
-
 
 
 ################################################################################
@@ -222,33 +229,40 @@ ggsave(paste(repo_sorties, nom_graphe, sep = "/"), p ,  width = 297, height = 21
 
 # Elbow method
 fviz_nbclust(sample_scaled, Kmeans, method = "wss") +
-  # geom_vline(xintercept = 2, linetype = 2)+
   labs(subtitle = "Elbow method")
 # For each value of K, we are calculating WCSS (Within-Cluster Sum of Square). 
-# Kopti = le point d'inflexion ==> Moyen visible ici je trouve (table entière)
+# Kopti = le point d'inflexion ==> Moyen visible ici je trouve (table entière) 
 # Kopti = Idem (projection ACM)
 
 # Silhouette method
 fviz_nbclust(sample_scaled, Kmeans, method = "silhouette")+
   labs(subtitle = "Silhouette method")
 # In short, the average silhouette approach measures the quality of a clustering. That is, it determines how well each object lies within its cluster. A high average silhouette width indicates a good clustering. The average silhouette method computes the average silhouette of observations for different values of k. The optimal number of clusters k is the one that maximizes the average silhouette over a range of possible values for k.
+## Que les variables de Charlotte :
 # Donne Kopti = 6 (table entière)
 # Kopti = 2 (projection ACM)
+## En ajoutant les variables de Laurie : 
+# Donne Kopti = 4 ou 8 (table entière)? Eventuellement 2
+# Kopti = 2 (projection ACM)
+
 
 # Gap statistic ==> Plus long à tourner attention
 # nboot = 50 to keep the function speedy. 
 # recommended value: nboot= 500 for your analysis.
 # Use verbose = FALSE to hide computing progression.
 set.seed(123)
-fviz_nbclust(sample_scaled, Kmeans, nstart = 25,  method = "gap_stat", nboot = 50)+
+fviz_nbclust(sample_scaled, Kmeans, nstart = 25,  method = "gap_stat", nboot = 25)+
   labs(subtitle = "Gap statistic method")
 # The gap statistic compares the total intracluster variation for different values of k with their expected values under null reference distribution of the data (i.e. a distribution with no obvious clustering)
+## Que les variables de Charlotte :
 # Donne Kopti = 6 (table entière)
 # Kopti = 6 (projection ACM)
-
+## En ajoutant les variables de Laurie : 
+# Donne Kopti = 4 (table entière), ou de plus en plus...
+# Kopti = 5, 6 ou 7 (projection ACM)
 
 ####################### Une fois qu'on a trouvé le nb de clusters ####################### 
-nb_clusters <- 3
+nb_clusters <- 6
 
 
 # Sur le sample_scaled
