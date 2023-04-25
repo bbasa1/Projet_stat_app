@@ -17,11 +17,11 @@ repgen <- "C:/Users/Benjamin/Desktop/Ensae/Projet_statapp"#BB
 
 ### Ensemble des paramètres pour faire tourner au lundi 24 avril : 
 kmeans_sur_proj <- FALSE
-methode <- "manhattan"
+methode <- "euclidean"
 #manhattan = distance L1
 #euclidean = distance L2
 #Chebychev = disrance L^infini
-nb_clusters <- 6
+nb_clusters <- 4
 
 
 faire_traces <- FALSE #Ca prend du temps à tourner...
@@ -92,9 +92,9 @@ liste_cols_to_delete <- c('Identifiant_menage', "Sexe_1H_2F")
 
 liste_var_sup <- c("Pays_HU", "Pays_DE", "Pays_DK", "Pays_ES", "Pays_FR", "Pays_IT") #Pour le cercle des corrélations
 
-n_sample <- 100 #La taille de l'échantillon pour la PCA 
+n_sample <- 10000 #La taille de l'échantillon pour la PCA 
 inter_max <- 25 #Le nb de fois qu'il itère au maximum
-nb_axes_ACM <- 5
+nb_axes_ACM <- 8
 
 ################################################################################
 #            B. PACKAGES              -------------------------------
@@ -123,9 +123,9 @@ if(creer_base){
 source(paste(repo_prgm , "03_nettoyage.R" , sep = "/"))
 data_merged <- calcul_index_conservatisme(data_merged)
 
-table(data_merged$CSP_tot_1)
-table(data_merged$CSP_tot_2)
-table(data_merged$CSP_TOT)
+# table(data_merged$CSP_tot_1)
+# table(data_merged$CSP_tot_2)
+# table(data_merged$CSP_TOT)
 
 
 
@@ -137,9 +137,10 @@ table(data_merged$CSP_TOT)
 
 source(paste(repo_prgm , "07_preparation_modelisation.R" , sep = "/"))
 
-# 800 000 lignes pour 2000 --> 2002
-# 1 060 000 lignes pour 2017 --> 2018
-# 520 000 lignes pour 2018
+# 1061428 lignes pour 28 colonnes au final
+
+
+data_merged
 
 ################################################################################
 #            IV. MODELISATION    ===============================================
@@ -205,6 +206,7 @@ if(kmeans_sur_proj){
   data_kmeans <- copy(data_merged)
 }
 
+
 #############  PREPARATION ##################
 
 #On prépare tout d'abord un petit échantillon au cas où
@@ -262,6 +264,8 @@ if(faire_choix_k_opti){
   fviz_nbclust(sample_scaled, Kmeans, method = "silhouette")+
     labs(subtitle = "Silhouette method")
   # In short, the average silhouette approach measures the quality of a clustering. That is, it determines how well each object lies within its cluster. A high average silhouette width indicates a good clustering. The average silhouette method computes the average silhouette of observations for different values of k. The optimal number of clusters k is the one that maximizes the average silhouette over a range of possible values for k.
+  # Valeur : 0,10 au maximum (2 ou 4 clusters, éventuellement 6) après ACM
+  # valeur : 0,10 au max (4 clusters, éventuellement 3 ou 7) sans ACM
   
   ## Que les variables de Charlotte :
   # Donne Kopti = 6 (table entière)
@@ -279,6 +283,10 @@ if(faire_choix_k_opti){
   fviz_nbclust(sample_scaled, Kmeans, nstart = 25,  method = "gap_stat", nboot = 25)+
     labs(subtitle = "Gap statistic method")
   # The gap statistic compares the total intracluster variation for different values of k with their expected values under null reference distribution of the data (i.e. a distribution with no obvious clustering)
+  # Valeur : 0,35 au maximum (5 clusters) après ACM
+  # Valeur : 0,4 au maximum (6 clusters) après ACM
+  
+  
   
   ## Que les variables de Charlotte :
   # Donne Kopti = 6 (table entière)
@@ -292,9 +300,13 @@ if(faire_choix_k_opti){
 
 # Sur le sample_scaled
 # sample_scaled
-# resKM_sample_scaled <- Kmeans(sample_scaled, centers=nb_clusters, nstart=30, method = methode)
-# resKM_sample_scaled
-# fviz_cluster(resKM_sample_scaled, sample_scaled)
+resKM_sample_scaled <- Kmeans(sample_scaled, centers=nb_clusters, nstart=30, method = methode)
+resKM_sample_scaled
+fviz_cluster(resKM_sample_scaled, sample_scaled,  ellipse.type = "norm", geom = "point",
+             palette = "jco",
+             main = "",
+             ggtheme = theme_minimal())
+
 
 # summary(resKM_sample_scaled)
 # plot(sample_scaled, col = resKM_sample_scaled$cluster,pch=16,cex=1.2,main="Regroupement par les k-means")
@@ -304,9 +316,45 @@ resKM <- Kmeans(data_kmeans_scale, centers=nb_clusters, nstart=25, method = meth
 
 if(faire_traces){
   # Sur toute la table
-  p <- fviz_cluster(resKM, data_kmeans_scale)
+  p <- fviz_cluster(resKM, data_kmeans_scale,
+                    ellipse.type = "norm", geom = "point",
+                    palette = "jco",
+                    main = "",
+                    ggtheme = theme_minimal())
   nom_graphe <- paste("01_graphe_", methode,"_",nb_clusters, "_clusters","_kmeans_sur_proj_",kmeans_sur_proj, ".pdf", sep = "")
   ggsave(paste(repo_sorties, nom_graphe, sep = "/"), p ,  width = 297, height = 210, units = "mm")
+  
+  # 
+  # data_kmeans_scale_acp <- as.data.frame(data_kmeans_scale)
+  # for (i in 1:ncol(data_kmeans_scale_acp)){
+  #   data_kmeans_scale_acp[,i] <- as.factor(data_kmeans_scale_acp)
+  # }
+  # 
+  # acm_results <- dudi.acm(data_kmeans_scale_acp, nf = 3, scannf = FALSE)
+  # data_projected <- acm_results$li
+  # data_projected$cluster <- resKM_sample_scaled$cluster
+  # inertie <- as.data.frame(inertia.dudi(acm_results)[1])
+  # inertie_1 <- round(100*inertie$tot.inertia.inertia[1],2)
+  # inertie_2 <- round(100*inertie$tot.inertia.inertia[2],2)
+  # inertie_3 <- round(100*inertie$tot.inertia.inertia[3],2)
+  # 
+  # xlab <- paste("Axe 1 (",inertie_1, "%)", sep = "")
+  # ylab <- paste("Axe 2 (",inertie_2, "%)", sep = "")
+  # zlab <- paste("Axe 3 (",inertie_3, "%)", sep = "")
+  # 
+  # plot3d(x = data_projected$Axis1,
+  #        y = data_projected$Axis2,
+  #        z = data_projected$Axis3,
+  #        xlab = xlab,
+  #        ylab = ylab,
+  #        zlab = zlab,                                   
+  #        main = "Representation du clustering suivant les 3 principales dimensions",  
+  #        col = data_projected$cluster,
+  #        type = "s",
+  #        size = 1,
+  #        box = FALSE)
+  # 
+  
 }
 
 ################################################################################
@@ -337,6 +385,7 @@ data_merged_copy <- copy(data_merged)
 # On ajoute la prédiction du numéro de cluster
 data_merged_copy$clustering <- resKM$cluster
 # sample$clustering <- resKM_sample_scaled$cluster
+
 
 
 
@@ -389,8 +438,34 @@ titre <- paste("Analyse_cluster_contenu_", methode,"_",nb_clusters, "_clusters",
 write.xlsx(counted_occurences_all, paste(repo_sorties,titre, sep = "/"))
 
 
+###################### TESTE DU CHI 2
 
-# 
+sum_clustering <- data_merged_copy[, lapply(.SD,sum) ,by=clustering]
+sum_clustering <- rescale(sum_clustering)
+sum_clustering <- as.data.table(sum_clustering)
+sum_clustering <- round(sum_clustering)
+
+# sum_clustering <- round(data_merged_copy[, lapply(.SD,sum) ,by=clustering])
+sum_clustering <- remove_constant(sum_clustering, na.rm = FALSE, quiet = FALSE)
+sum_clustering <- as.data.frame(sum_clustering)
+for (i in 1:ncol(sum_clustering)){
+  sum_clustering[,i] <- as.integer(sum_clustering[,i])
+}
+
+sum_clustering <- sum_clustering[,-1]
+sum_clustering <- as.matrix(sum_clustering)
+sum_clustering = rbind(sum_clustering)
+sum_clustering
+
+khi_test = chisq.test(sum_clustering)
+khi_test
+
+# Hypothèse nulle (H0) : il n'y a pas de différence significative dans la répartition des 4 groupes étudiés
+# Hypothèse 1 (H1) : au moins 1 des 4 groupe qui ne suit pas la même distribution
+
+
+
+ 
 # ## Pour tout regarder
 # # Option 1 : 
 # describeBy(data_merged_copy, group="clustering")

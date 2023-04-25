@@ -50,7 +50,8 @@ library(psych)
 # install.packages('openxlsx') # Install just once
 library(openxlsx) # Load on each new session
 library(amap)
-
+# install.packages("rgl")
+library(rgl)
 library(ade4)
 
 
