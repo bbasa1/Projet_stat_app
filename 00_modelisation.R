@@ -37,7 +37,7 @@ liste_pays <- c("FR", "ES", "IT", "DE", "PT", "HU")
 
 nom_fichier_html <- paste("Modelisation", liste_annees[1], liste_annees[length(liste_annees)], sep = "_")
 
-creer_base <- FALSE
+creer_base <- TRUE
 
 repo_prgm <- paste(repgen, "programmes/Projet_stat_app" , sep = "/")
 
@@ -62,8 +62,6 @@ liste_variables <- c('QHHNUM', #Identifiant ménage
                      'FTPT', # 1 = Full-time. 2 = Part-time job.
                      'TEMP', # 1 = CDI. 2 = CDD
                      'HATLEV1D', # Level of education. L = low. M = Medium. H = High
-                     'HHNBCH2', # Number of children [0,2] years in the household
-                     'HHNBCH5',
                      'FTPTREAS',
                      'ISCO3D',
                      'MARSTAT', #Statut marital
@@ -72,8 +70,16 @@ liste_variables <- c('QHHNUM', #Identifiant ménage
                      'EXIST2J',
                      'HHPARTNR',
                      'SUPVISOR', #Manager
-                     "WSTAT1Y"
-                     
+                     "WSTAT1Y",
+                     'HHNBCH2', # Number of children [0,2] years in the household
+                     'HHNBCH5',
+                     "HHNBCH8",
+                     "HHNBCH11",
+                     "HHNBCH14",
+                     "HHNBCH17",
+                     "HHNBCH24",
+                     "INCDECIL",
+                     "HWUSUAL"
 )
 
 
@@ -84,8 +90,9 @@ planter_si_non_specifie <- FALSE #Plante si toutes les varibales ne sont pas sp�
 
 
 
-liste_cols_cont <- c("Age_tranche", "Index_conservatisme", "nb_enf_tot")
-liste_cols_dummies <- c("enf_m3ans","Niveau_education", "Temps_partiel", "Pays", "raisons_tp_enf_fam", "sit_pro_foyer", "indic_precarite_emp", "travail_respon")
+liste_cols_cont <- c("Age_tranche", "Index_conservatisme", "nb_enf_tot", "Decile_salaire")
+# liste_cols_cont <- c("Age_tranche", "Index_conservatisme")
+liste_cols_dummies <- c("enf_m3ans","Niveau_education", "Temps_partiel_clean", "Pays", "raisons_tp_enf_fam", "sit_pro_foyer", "indic_precarite_emp_final", "travail_respon")
 liste_cols_to_delete <- c('Identifiant_menage', "Sexe_1H_2F")
 
 
@@ -116,17 +123,25 @@ if(creer_base){
   load(file = nom_base)
 }
 
+data_merged$HWUSUAL
 
 ################################################################################
 #            II. NETTOYAGE, PREPARATION                        ===============================
 ################################################################################
 source(paste(repo_prgm , "03_nettoyage.R" , sep = "/"))
 data_merged <- calcul_index_conservatisme(data_merged)
+data_merged <- calcul_EQTP(data_merged)
 
-# table(data_merged$CSP_tot_1)
-# table(data_merged$CSP_tot_2)
-# table(data_merged$CSP_TOT)
+ 
+# table(data_merged$Decile_salaire)
+# table(data_merged[Pays == "FR"]$Decile_salaire)
+# table(data_merged[Pays == "HU"]$Decile_salaire)
+# table(data_merged[Pays == "IT"]$Decile_salaire)
+# table(data_merged[Pays == "ES"]$Decile_salaire)
+# table(data_merged[Pays == "DE"]$Decile_salaire)
+# table(data_merged[Pays == "PT"]$Decile_salaire)
 
+# table(data_merged$Pays)
 
 
 ################################################################################

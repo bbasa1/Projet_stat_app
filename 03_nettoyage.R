@@ -299,6 +299,11 @@ try(data_merged <- data_merged[, lien_pers_ref  := lien_pers_ref], silent=TRUE)
 try(data_merged <- data_merged[lien_pers_ref == 9 , lien_pers_ref  := 9999], silent=TRUE)
 try(data_merged <- data_merged[is.na(lien_pers_ref), lien_pers_ref  := 9999], silent=TRUE)
 
+try(data_merged <- data_merged[, Decile_salaire  := Decile_salaire], silent=TRUE)
+try(data_merged <- data_merged[Decile_salaire == 99 , Decile_salaire  := 9999], silent=TRUE)
+try(data_merged <- data_merged[is.na(Decile_salaire), Decile_salaire  := 9999], silent=TRUE)
+try(data_merged <- data_merged[ Decile_salaire  := as.numeric(Decile_salaire)], silent=TRUE)
+
 ################################################################################
 #         2 . Petite analyse des "valeurs manquantes" ========================
 ################################################################################
@@ -790,9 +795,12 @@ try(data_merged <- data_merged[Temps_partiel == "2", indic_precarite_emp := indi
 try(table(data_merged$indic_precarite_emp), silent=TRUE)
 # Voir si l'on fait trois est plus vu que les deux derniers sont faibles ? Oui 
 try(data_merged <- data_merged[, indic_precarite_emp_tot := indic_precarite_emp] , silent=TRUE)
-try(data_merged <- data_merged[indic_precarite_emp == 4 | indic_precarite_emp == 5, indic_precarite_emp := 3 ] , silent=TRUE)
+# try(data_merged <- data_merged[indic_precarite_emp == 4 | indic_precarite_emp == 5, indic_precarite_emp := 3 ] , silent=TRUE)
 # Ce sera donc 3 et trois ou plus 
 
+try(data_merged <- data_merged[, indic_precarite_emp_tot_final := 0] , silent=TRUE)
+try(data_merged <- data_merged[indic_precarite_emp == 4 , indic_precarite_emp_tot_final := 1] , silent=TRUE)
+        
 # Création de l'indicateur pénibilité : 
 # Pour la pénibilité on s'appuie sur les conditions de travail
 # On retient les personnes qui veulent changé de travail pour leurs conditions ou pour travailler moins 
