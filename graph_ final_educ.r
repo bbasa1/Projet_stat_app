@@ -8,7 +8,7 @@ graphique_statapp <- read_excel("/Users/charlottecombier/Desktop/graphique_stata
 View(graphique_statapp)
 
 
-plot_nams <-ggplot(data = graphique_statapp,
+plot_final <-ggplot(data = graphique_statapp,
                                     aes(x =forcats::fct_relevel(Pays),
                                         y = value, fill = forcats::fct_relevel(educ, c("Niveau d'éducation élevé", "Niveau d'éducation moyen", "Niveau d'éducation faible"), after = 1))) +
   geom_col(position = "dodge") + 
@@ -24,4 +24,4 @@ plot_nams <-ggplot(data = graphique_statapp,
         plot.title = element_text(color = "#333333", size = 18, face = "bold"),
         plot.subtitle = element_text(color = "#333333", face = "italic")) +
   scale_fill_discrete(name=NULL)
-plot_nams    
+plot_final
