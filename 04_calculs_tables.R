@@ -117,5 +117,3 @@ nettoyage_niveau_education <- function(data_loc){
   
   return(data_loc)
 }
-
-
