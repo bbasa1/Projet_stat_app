@@ -176,6 +176,23 @@ try(data_merged <- data_merged[HHLINK==1 | HHLINK==2, ], silent=TRUE)
 # on filtre aussi sur les gens qui sont sorti d'études : ie l'année d'enquête est plus grande que l'année de fin d'études
 # normalement les 9999 disparaissent et on a que 1555 cas de personnes qui finissent leurs études l'année d'enquête
 # Ca me parait ok : table(data_merged$annee_fin_etude==data_merged$Annee_enquete )
+
+### Pour voir l'étendue de ce qu'on supprime en virant les étudiants
+fini_etudes <- data_merged[YEAR > HATYEAR, .N, by = c("COUNTRY", "SEX")]
+fini_etudes
+setnames(fini_etudes, "N", "fini_etudes")
+total <- data_merged[, .N, by = c("COUNTRY", "SEX")]
+setnames(total, "N", "total")
+loc <- merge(total, fini_etudes, by = c("COUNTRY", "SEX"))
+loc
+loc[, diff := total - fini_etudes]
+loc[, ratio_supp := 100*(total - fini_etudes)/total]
+loc
+titre <- paste("etudiants_supprimes", ".xlsx", sep = "")
+write.xlsx(loc, paste(repo_sorties,titre, sep = "/"))
+
+
+
 try(data_merged <- data_merged[YEAR > HATYEAR, ], silent=TRUE)
 # La version avec les variable renommées si besoin
 # data_merged <- data_merged[Age_tranche - 2 >= age_min, ]
@@ -183,6 +200,32 @@ try(data_merged <- data_merged[YEAR > HATYEAR, ], silent=TRUE)
 # data_merged <- data_merged[menage_ordinaire==1, ]
 # data_merged <- data_merged[lien_pers_ref==1 | lien_pers_ref==2, ]
 # data_merged <- data_merged[Annee_enquete > annee_fin_etude, ]
+
+### Pour voir le biais d'âge
+fini_etudes <- data_merged[YEAR > HATYEAR, .N, by = c("COUNTRY", "SEX")]
+fini_etudes
+setnames(fini_etudes, "N", "fini_etudes")
+total <- data_merged[, .N, by = c("COUNTRY", "SEX")]
+setnames(total, "N", "total")
+loc <- merge(total, fini_etudes, by = c("COUNTRY", "SEX"))
+loc
+loc[, diff := total - fini_etudes]
+loc[, ratio_supp := 100*(total - fini_etudes)/total]
+loc
+titre <- paste("etudiants_supprimes", ".xlsx", sep = "")
+write.xlsx(loc, paste(repo_sorties,titre, sep = "/"))
+
+
+loc <- data_merged[YEAR == 2018, .N, by = c("COUNTRY", "SEX", "AGE")]
+setnames(loc, "N", "par_age")
+effectifs_pays <- data_merged[YEAR == 2018, .N, by = c("COUNTRY", "SEX")]
+setnames(effectifs_pays, "N", "total_pays")
+loc <- merge(loc, effectifs_pays, by = c("COUNTRY", "SEX"))
+loc[, ratio_age := 100*par_age/total_pays]
+loc
+titre <- paste("pyramide_age_finale", ".xlsx", sep = "")
+write.xlsx(loc, paste(repo_sorties,titre, sep = "/"))
+
 
 source(paste(repo_prgm , "03_nettoyage.R" , sep = "/"))
 # 100 * nrow(data_merged[is.na(COEFF), ])/nrow(data_merged)
