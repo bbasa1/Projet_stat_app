@@ -202,26 +202,34 @@ try(data_merged <- data_merged[YEAR > HATYEAR, ], silent=TRUE)
 # data_merged <- data_merged[Annee_enquete > annee_fin_etude, ]
 
 ### Pour voir le biais d'âge
-fini_etudes <- data_merged[YEAR > HATYEAR, .N, by = c("COUNTRY", "SEX")]
-fini_etudes
-setnames(fini_etudes, "N", "fini_etudes")
+data_merged
+fini_etudes <- data_merged[, .N, by = c("COUNTRY", "SEX", 'AGE')]
+setnames(fini_etudes, "N", "effectifs_age")
+fini_etudes$COUNTRY <- as.factor(fini_etudes$COUNTRY)
+fini_etudes$SEX <- as.factor(fini_etudes$SEX)
+
+fini_etudes_2 <- data_merged[, sum(COEFF, na.rm = TRUE), by = c("COUNTRY", "SEX", 'AGE')]
+setnames(fini_etudes_2, "V1", "Somme_coeff_age")
+fini_etudes_2$COUNTRY <- as.factor(fini_etudes_2$COUNTRY)
+fini_etudes_2$SEX <- as.factor(fini_etudes_2$SEX)
+
 total <- data_merged[, .N, by = c("COUNTRY", "SEX")]
 setnames(total, "N", "total")
-loc <- merge(total, fini_etudes, by = c("COUNTRY", "SEX"))
-loc
-loc[, diff := total - fini_etudes]
-loc[, ratio_supp := 100*(total - fini_etudes)/total]
-loc
-titre <- paste("etudiants_supprimes", ".xlsx", sep = "")
-write.xlsx(loc, paste(repo_sorties,titre, sep = "/"))
+total$COUNTRY <- as.factor(total$COUNTRY)
+total$SEX <- as.factor(total$SEX)
 
+total_2 <- data_merged[, sum(COEFF, na.rm = TRUE), by = c("COUNTRY", "SEX")]
+setnames(total_2, "V1", "Somme_coeff_total")
+total_2$COUNTRY <- as.factor(total_2$COUNTRY)
+total_2$SEX <- as.factor(total_2$SEX)
 
-loc <- data_merged[YEAR == 2018, .N, by = c("COUNTRY", "SEX", "AGE")]
-setnames(loc, "N", "par_age")
-effectifs_pays <- data_merged[YEAR == 2018, .N, by = c("COUNTRY", "SEX")]
-setnames(effectifs_pays, "N", "total_pays")
-loc <- merge(loc, effectifs_pays, by = c("COUNTRY", "SEX"))
-loc[, ratio_age := 100*par_age/total_pays]
+loc <- merge(fini_etudes, fini_etudes_2, by = c("COUNTRY", "SEX", "AGE"))
+loc <- merge(loc, total, by = c("COUNTRY", "SEX"))
+loc <- merge(loc, total_2, by = c("COUNTRY", "SEX"))
+loc
+
+loc[, ratio_age_effectifs := 100*effectifs_age/total]
+loc[, ratio_age_coeffs := 100*Somme_coeff_age/Somme_coeff_total]
 loc
 titre <- paste("pyramide_age_finale", ".xlsx", sep = "")
 write.xlsx(loc, paste(repo_sorties,titre, sep = "/"))
