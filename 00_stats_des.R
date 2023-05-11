@@ -18,17 +18,9 @@ repgen <- "C:/Users/Benjamin/Desktop/Ensae/Projet_statapp"#BB
 
 
 liste_annees <- 1998:2018
-# Proposition periode : 
-# 1998-2000
-# 2001-2003
-# 2004-2007
-# 2008-2011
-# 2012-2015
-# 2016-2018 = référence ?
-# Benjamin avait parlé de liste, on pourrait aussi pour la modélisation 
-# créer une variable indicatrice par période ou à six modalités 
+
 pays <- "HU"
-liste_pays <- c("FR", "ES", "IT", "DE", "PT", "HU")
+# liste_pays <- c("FR", "ES", "IT", "DE", "PT", "HU")
 
 
 # nom_fichier_html <- paste("Sorties_rapport_tout_pays", pays, sep = "_")
@@ -36,7 +28,8 @@ nom_fichier_html <- paste("Sortie_graphique_", pays, sep = "_")
 
 creer_base <- FALSE
 mettre_coeffs_nan_a_zero <- TRUE
-
+liste_pays <- FALSE # Si on fonctionne avec la liste des pays
+titre_sur_figure <- FALSE #Pour mettre le titre sur les figures. Sinon titre = ""
 
 repo_prgm <- paste(repgen, "programmes/Projet_stat_app" , sep = "/")
 
@@ -144,21 +137,21 @@ source(paste(repo_prgm , "02_creation_base.R" , sep = "/"))
 # Soit on créé la table, soit on l'importe...
 
 ######## SUR UN SEUL PAYS
-# if(creer_base){
-#   data_merged <- fnt_creation_base_stats_des()
-# }else{
-#   nom_base <- paste(repo_data, "/data_intermediaire/base_", pays, ".Rdata", sep = "")
-#   load(file = nom_base)
-# }
+if(creer_base){
+  data_merged <- fnt_creation_base_stats_des()
+}else{
+  nom_base <- paste(repo_data, "/data_intermediaire/base_", pays, ".Rdata", sep = "")
+  load(file = nom_base)
+}
 
 
 ######## SUR PLEIN DE PAYS
-if(creer_base){
-  data_merged <- fnt_creation_base_modelisation()
-}else{
-  nom_base <- paste(repo_data, "/data_intermediaire/base_", liste_annees[1],"_", liste_annees[length(liste_annees)], ".Rdata", sep = "")
-  load(file = nom_base)
-}
+# if(creer_base){
+#   data_merged <- fnt_creation_base_modelisation()
+# }else{
+#   nom_base <- paste(repo_data, "/data_intermediaire/base_", liste_annees[1],"_", liste_annees[length(liste_annees)], ".Rdata", sep = "")
+#   load(file = nom_base)
+# }
 
 nrow(data_merged)
 # 34 677 582
@@ -177,20 +170,21 @@ try(data_merged <- data_merged[HHLINK==1 | HHLINK==2, ], silent=TRUE)
 # normalement les 9999 disparaissent et on a que 1555 cas de personnes qui finissent leurs études l'année d'enquête
 # Ca me parait ok : table(data_merged$annee_fin_etude==data_merged$Annee_enquete )
 
-### Pour voir l'étendue de ce qu'on supprime en virant les étudiants
-fini_etudes <- data_merged[YEAR > HATYEAR, .N, by = c("COUNTRY", "SEX")]
-fini_etudes
-setnames(fini_etudes, "N", "fini_etudes")
-total <- data_merged[, .N, by = c("COUNTRY", "SEX")]
-setnames(total, "N", "total")
-loc <- merge(total, fini_etudes, by = c("COUNTRY", "SEX"))
-loc
-loc[, diff := total - fini_etudes]
-loc[, ratio_supp := 100*(total - fini_etudes)/total]
-loc
-titre <- paste("etudiants_supprimes", ".xlsx", sep = "")
-write.xlsx(loc, paste(repo_sorties,titre, sep = "/"))
-
+if(liste_pays){
+  ### Pour voir l'étendue de ce qu'on supprime en virant les étudiants
+  fini_etudes <- data_merged[YEAR > HATYEAR, .N, by = c("COUNTRY", "SEX")]
+  fini_etudes
+  setnames(fini_etudes, "N", "fini_etudes")
+  total <- data_merged[, .N, by = c("COUNTRY", "SEX")]
+  setnames(total, "N", "total")
+  loc <- merge(total, fini_etudes, by = c("COUNTRY", "SEX"))
+  loc
+  loc[, diff := total - fini_etudes]
+  loc[, ratio_supp := 100*(total - fini_etudes)/total]
+  loc
+  titre <- paste("etudiants_supprimes", ".xlsx", sep = "")
+  write.xlsx(loc, paste(repo_sorties,titre, sep = "/"))
+}
 
 
 try(data_merged <- data_merged[YEAR > HATYEAR, ], silent=TRUE)
@@ -201,39 +195,40 @@ try(data_merged <- data_merged[YEAR > HATYEAR, ], silent=TRUE)
 # data_merged <- data_merged[lien_pers_ref==1 | lien_pers_ref==2, ]
 # data_merged <- data_merged[Annee_enquete > annee_fin_etude, ]
 
-### Pour voir le biais d'âge
-data_merged
-fini_etudes <- data_merged[, .N, by = c("COUNTRY", "SEX", 'AGE')]
-setnames(fini_etudes, "N", "effectifs_age")
-fini_etudes$COUNTRY <- as.factor(fini_etudes$COUNTRY)
-fini_etudes$SEX <- as.factor(fini_etudes$SEX)
-
-fini_etudes_2 <- data_merged[, sum(COEFF, na.rm = TRUE), by = c("COUNTRY", "SEX", 'AGE')]
-setnames(fini_etudes_2, "V1", "Somme_coeff_age")
-fini_etudes_2$COUNTRY <- as.factor(fini_etudes_2$COUNTRY)
-fini_etudes_2$SEX <- as.factor(fini_etudes_2$SEX)
-
-total <- data_merged[, .N, by = c("COUNTRY", "SEX")]
-setnames(total, "N", "total")
-total$COUNTRY <- as.factor(total$COUNTRY)
-total$SEX <- as.factor(total$SEX)
-
-total_2 <- data_merged[, sum(COEFF, na.rm = TRUE), by = c("COUNTRY", "SEX")]
-setnames(total_2, "V1", "Somme_coeff_total")
-total_2$COUNTRY <- as.factor(total_2$COUNTRY)
-total_2$SEX <- as.factor(total_2$SEX)
-
-loc <- merge(fini_etudes, fini_etudes_2, by = c("COUNTRY", "SEX", "AGE"))
-loc <- merge(loc, total, by = c("COUNTRY", "SEX"))
-loc <- merge(loc, total_2, by = c("COUNTRY", "SEX"))
-loc
-
-loc[, ratio_age_effectifs := 100*effectifs_age/total]
-loc[, ratio_age_coeffs := 100*Somme_coeff_age/Somme_coeff_total]
-loc
-titre <- paste("pyramide_age_finale", ".xlsx", sep = "")
-write.xlsx(loc, paste(repo_sorties,titre, sep = "/"))
-
+if(liste_pays){
+  ### Pour voir le biais d'âge
+  data_merged
+  fini_etudes <- data_merged[, .N, by = c("COUNTRY", "SEX", 'AGE')]
+  setnames(fini_etudes, "N", "effectifs_age")
+  fini_etudes$COUNTRY <- as.factor(fini_etudes$COUNTRY)
+  fini_etudes$SEX <- as.factor(fini_etudes$SEX)
+  
+  fini_etudes_2 <- data_merged[, sum(COEFF, na.rm = TRUE), by = c("COUNTRY", "SEX", 'AGE')]
+  setnames(fini_etudes_2, "V1", "Somme_coeff_age")
+  fini_etudes_2$COUNTRY <- as.factor(fini_etudes_2$COUNTRY)
+  fini_etudes_2$SEX <- as.factor(fini_etudes_2$SEX)
+  
+  total <- data_merged[, .N, by = c("COUNTRY", "SEX")]
+  setnames(total, "N", "total")
+  total$COUNTRY <- as.factor(total$COUNTRY)
+  total$SEX <- as.factor(total$SEX)
+  
+  total_2 <- data_merged[, sum(COEFF, na.rm = TRUE), by = c("COUNTRY", "SEX")]
+  setnames(total_2, "V1", "Somme_coeff_total")
+  total_2$COUNTRY <- as.factor(total_2$COUNTRY)
+  total_2$SEX <- as.factor(total_2$SEX)
+  
+  loc <- merge(fini_etudes, fini_etudes_2, by = c("COUNTRY", "SEX", "AGE"))
+  loc <- merge(loc, total, by = c("COUNTRY", "SEX"))
+  loc <- merge(loc, total_2, by = c("COUNTRY", "SEX"))
+  loc
+  
+  loc[, ratio_age_effectifs := 100*effectifs_age/total]
+  loc[, ratio_age_coeffs := 100*Somme_coeff_age/Somme_coeff_total]
+  loc
+  titre <- paste("pyramide_age_finale", ".xlsx", sep = "")
+  write.xlsx(loc, paste(repo_sorties,titre, sep = "/"))
+}
 
 source(paste(repo_prgm , "03_nettoyage.R" , sep = "/"))
 # 100 * nrow(data_merged[is.na(COEFF), ])/nrow(data_merged)
@@ -277,6 +272,7 @@ calculs_age
 
 # Puis de tracé
 titre <- paste("Taux d'activité par âge et par sexe,\n moyenne entre", toString(liste_annees[1]), "et", toString(tail(liste_annees, n=1)), "\n (", dico_pays[pays], ")")
+titre <- ""
 titre_save <- paste(pays, "Taux_activite_age_sexe.pdf", sep ='_')
 titre_save <- paste(repo_sorties, titre_save, sep ='/')
 x <-"Age_tranche"
@@ -294,6 +290,9 @@ longueur_liste <- longueur_liste + 1
 
 # Second tracé 
 titre <- paste("Taux d'emploi par âge et par sexe,\n moyenne entre", toString(liste_annees[1]), "et", toString(tail(liste_annees, n=1)), "\n (", dico_pays[pays], ")")
+if(! titre_sur_figure){
+titre <- ""
+}
 titre_save <- paste(pays, "Taux_emploi_age_sexe.pdf", sep ='_')
 titre_save <- paste(repo_sorties, titre_save, sep ='/')
 x <-"Age_tranche"
@@ -311,6 +310,9 @@ longueur_liste <- longueur_liste + 1
 
 # Troisième
 titre <- paste("Taux d'emploi ETP par âge et par sexe,\n moyenne entre", toString(liste_annees[1]), "et", toString(tail(liste_annees, n=1)), "\n (", dico_pays[pays], ")")
+if(! titre_sur_figure){
+  titre <- ""
+}
 titre_save <- paste(pays, "Taux_emploi_etp_age_sexe.pdf", sep ='_')
 titre_save <- paste(repo_sorties, titre_save, sep ='/')
 x <-"Age_tranche"
@@ -356,6 +358,9 @@ calculs_annee <- nettoyage_sexe(calculs_annee)
 
 # Puis de tracé
 titre <- paste("Taux d'activité par âge, sexe et année d'enquête", "\n (", dico_pays[pays], ")")
+if(! titre_sur_figure){
+  titre <- ""
+}
 titre_save <- paste(pays, "Taux_activite_age_sexe_annee_enqu.pdf", sep ='_')
 titre_save <- paste(repo_sorties, titre_save, sep ='/')
 x <-"Annee_enquete"
@@ -377,6 +382,9 @@ longueur_liste <- longueur_liste + 1
 
 # Second tracé 
 titre <- paste("Taux d'emploi par âge, sexe et année d'enquête", "\n (", dico_pays[pays], ")")
+if(! titre_sur_figure){
+  titre <- ""
+}
 titre_save <- paste(pays, "Taux_emploi_age_sexe_annee_enqu.pdf", sep ='_')
 titre_save <- paste(repo_sorties, titre_save, sep ='/')
 x <-"Annee_enquete"
@@ -396,6 +404,9 @@ longueur_liste <- longueur_liste + 1
 
 # Troisième tracé 
 titre <- paste("Taux d'emploi ETP par âge, sexe et année d'enquête", "\n (", dico_pays[pays], ")")
+if(! titre_sur_figure){
+  titre <- ""
+}
 titre_save <- paste(pays, "Taux_emploi_etp_age_sexe_annee_enqu.pdf", sep ='_')
 titre_save <- paste(repo_sorties, titre_save, sep ='/')
 x <-"Annee_enquete"
@@ -433,6 +444,9 @@ sous_calculs_annee <- ff_interaction(sous_calculs_annee, Niveau_education, Sexe)
 
 # Puis de tracé
 titre <- paste("Taux d'activité par niveau d'éducation,\n sexe et année d'enquête (entre", age_min, "et", age_max, "ans)", "\n (", dico_pays[pays], ")", sep = " ")
+if(! titre_sur_figure){
+  titre <- ""
+}
 titre_save <- paste(pays, "Taux_activite_educ_sexe_annee_enqu.pdf", sep ='_')
 titre_save <- paste(repo_sorties, titre_save, sep ='/')
 x <-"Annee_enquete"
@@ -452,6 +466,9 @@ longueur_liste <- longueur_liste + 1
 
 
 titre <- paste("Taux d'emploi par niveau d'éducation,\n sexe et année d'enquête (entre", age_min, "et", age_max, "ans)", "\n (", dico_pays[pays], ")", sep = " ")
+if(! titre_sur_figure){
+  titre <- ""
+}
 titre_save <- paste(pays, "Taux_emploi_educ_sexe_annee_enqu.pdf", sep ='_')
 titre_save <- paste(repo_sorties, titre_save, sep ='/')
 x <-"Annee_enquete"
@@ -472,6 +489,9 @@ longueur_liste <- longueur_liste + 1
 
 
 titre <- paste("Taux d'emploi ETP par niveau d'éducation,\n sexe et année d'enquête (entre", age_min, "et", age_max, "ans)", "\n (", dico_pays[pays], ")", sep = " ")
+if(! titre_sur_figure){
+  titre <- ""
+}
 titre_save <- paste(pays, "Taux_emploi_etp_educ_sexe_annee_enqu.pdf", sep ='_')
 titre_save <- paste(repo_sorties, titre_save, sep ='/')
 x <-"Annee_enquete"
@@ -614,10 +634,15 @@ sous_pop_melted[, Mesure := factor(
 
 sous_pop_melted
 
+titre <- 'Salaires en fonction du sexe et du niveau d\'études'
+if(! titre_sur_figure){
+  titre <- ""
+}
+
 ### Le graphe n'est pas encore passé sous forme de fnt car les déciles sont entre 0 et 10 et pas 0 et 100... A voir si c'est intéressant de le faire ?
 graph <- ggplot(data = sous_pop_melted, aes(x = reorder(Niveau_education, Niveau_education_chiffre), y = value, fill = Sexe)) +
   geom_bar(stat="identity", position=position_dodge()) +
-  labs(title= 'Salaires en fonction du sexe et du niveau d\'études',
+  labs(title= titre,
        x= 'Niveau d\'études',
        y= 'Décile de salaire') +
   scale_y_continuous(limits = c(0, 10), labels = function(y) format(y, scientific = FALSE)) +
@@ -657,6 +682,9 @@ sous_calculs_annee
 
 ### Pour compter les effectifs = On somme les COEFFS ETP
 titre <- paste("Effectifs par déciles de salaires et par année d'enquête (entre", age_min, "et", age_max, "ans)", "\n (", dico_pays[pays], ")", sep = " ")
+if(! titre_sur_figure){
+  titre <- ""
+}
 titre_save <- paste(pays, "deciles_salaires_annees", sep ='_')
 titre_save <- paste(repo_sorties, titre_save, sep ='/')
 x <-"Annee_enquete"
@@ -704,33 +732,34 @@ source(paste(repo_prgm,"06_page_html.R",sep="/") ,
 #         VII. Brouillon à mettre en forme ========================
 ################################################################################
 
-colnames(data_merged)
-
-liste_var <- c("Age_tranche", "Sexe_1H_2F", "Pays", "Annee_enquete")
-liste_var <- c("Sexe_1H_2F", "Pays", "Annee_enquete")
-
-
-df_plot <- calcul_taux_emplois_activite(liste_var_groupby = liste_var, data_loc = data_merged)
-df_plot
-
-
-
-df_plot <- nettoyage_sexe(df_plot)
-try(df_plot <- nettoyage_tranche_age(df_plot, age_min, age_max))
-df_plot
-
-fnt_label_pays <- function(pays){
-  return(dico_pays[pays])
+if(liste_pays){
+  colnames(data_merged)
+  
+  liste_var <- c("Age_tranche", "Sexe_1H_2F", "Pays", "Annee_enquete")
+  liste_var <- c("Sexe_1H_2F", "Pays", "Annee_enquete")
+  
+  
+  df_plot <- calcul_taux_emplois_activite(liste_var_groupby = liste_var, data_loc = data_merged)
+  df_plot
+  
+  
+  
+  df_plot <- nettoyage_sexe(df_plot)
+  try(df_plot <- nettoyage_tranche_age(df_plot, age_min, age_max))
+  df_plot
+  
+  fnt_label_pays <- function(pays){
+    return(dico_pays[pays])
+  }
+  
+  df_plot[, Pays_label := lapply(df_plot$Pays, fnt_label_pays)]
+  # df_plot$Pays_label <-  as.factor(df_plot$Pays_label)
+  df_plot$Sexe <-  as.factor(df_plot$Sexe)
+  
+  titre_var <- paste(liste_var,collapse = '_')
+  titre <- paste("tableau_tx_acti_emp_pour_", titre_var, ".xlsx", sep = "")
+  write.xlsx(df_plot, paste(repo_sorties,titre, sep = "/"))
 }
-
-df_plot[, Pays_label := lapply(df_plot$Pays, fnt_label_pays)]
-# df_plot$Pays_label <-  as.factor(df_plot$Pays_label)
-df_plot$Sexe <-  as.factor(df_plot$Sexe)
-
-titre_var <- paste(liste_var,collapse = '_')
-titre <- paste("tableau_tx_acti_emp_pour_", titre_var, ".xlsx", sep = "")
-write.xlsx(df_plot, paste(repo_sorties,titre, sep = "/"))
-
 
 
 # 
