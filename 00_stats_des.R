@@ -309,7 +309,7 @@ longueur_liste <- longueur_liste + 1
 
 
 # Troisième
-titre <- paste("Taux d'emploi ETP par âge et par sexe,\n moyenne entre", toString(liste_annees[1]), "et", toString(tail(liste_annees, n=1)), "\n (", dico_pays[pays], ")")
+titre <- paste("Taux d'emploi EQTP par âge et par sexe,\n moyenne entre", toString(liste_annees[1]), "et", toString(tail(liste_annees, n=1)), "\n (", dico_pays[pays], ")")
 if(! titre_sur_figure){
   titre <- ""
 }
