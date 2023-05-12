@@ -37,7 +37,7 @@ liste_pays <- c("FR", "ES", "IT", "DE", "PT", "HU")
 
 nom_fichier_html <- paste("Modelisation", liste_annees[1], liste_annees[length(liste_annees)], sep = "_")
 
-creer_base <- TRUE
+creer_base <- FALSE
 
 repo_prgm <- paste(repgen, "programmes/Projet_stat_app" , sep = "/")
 
@@ -50,6 +50,7 @@ repo_inter <- paste(repgen, "bases_intermediaires" , sep = "/")
 rep_html <- paste(repgen, "pages_html" , sep="/")
 
 liste_variables <- c('QHHNUM', #Identifiant mÃ©nage
+                     "COEFF",
                      'COUNTRY',
                      'SEX',
                      'YEAR',
@@ -92,7 +93,7 @@ planter_si_non_specifie <- FALSE #Plante si toutes les varibales ne sont pas spÃ
 
 liste_cols_cont <- c("Age_tranche", "Index_conservatisme", "nb_enf_tot", "Decile_salaire")
 # liste_cols_cont <- c("Age_tranche", "Index_conservatisme")
-liste_cols_dummies <- c("enf_m3ans","Niveau_education", "Temps_partiel_clean", "Pays", "raisons_tp_enf_fam", "sit_pro_foyer", "indic_precarite_emp_final", "travail_respon")
+liste_cols_dummies <- c("enf_m3ans","Niveau_education", "Temps_partiel_clean", "Pays", "raisons_tp_enf_fam", "sit_pro_foyer", "indic_precarite_emp_tot_final", "travail_respon")
 liste_cols_to_delete <- c('Identifiant_menage', "Sexe_1H_2F")
 
 
@@ -123,7 +124,7 @@ if(creer_base){
   load(file = nom_base)
 }
 
-data_merged$HWUSUAL
+# data_merged$HWUSUAL
 
 ################################################################################
 #            II. NETTOYAGE, PREPARATION                        ===============================
@@ -156,6 +157,29 @@ source(paste(repo_prgm , "07_preparation_modelisation.R" , sep = "/"))
 
 
 data_merged
+
+
+# ####### Stat des sur les colonnes
+# data_merged[is.na(data_merged$COEFF)] <- 0
+# 
+# liste_cols <- colnames(data_merged)[-1]
+# colnames(data_merged)
+# 
+# dw_tot <- svydesign(ids = ~1, data = data_merged, weights = ~ data_merged$COEFF)
+# 
+# i <- "enf_m3ans_1"
+# 
+# for(i in liste_cols){
+#   print(i)
+#   print(freq(svytable(~ get(i) , dw_tot )))
+# }
+# 
+# 
+# table1<- svytable(~ Age_tranche , dw_tot )
+# table1
+# lprop(table1)
+# 
+
 
 ################################################################################
 #            IV. MODELISATION    ===============================================
@@ -192,6 +216,8 @@ if(kmeans_sur_proj){
   }
   
   acm_results <- dudi.acm(data_merged_non_encoded, nf = nb_axes_ACM, scannf = FALSE)
+
+  inertia.dudi(acm_results)
 
   
   # A EXECUTER POUR AVOIR DES GRAPHES SUR L'ACM 
