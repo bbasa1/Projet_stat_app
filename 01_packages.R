@@ -39,6 +39,21 @@ library(janitor)
 library(survey)
 # install.packages("questionr")
 library(questionr)
+# install.packages("funtimes")
+library(funtimes)
+# install.packages("aricode")
+library(aricode)
+library(gridExtra)
+library(psych)
+# install.packages("xlsx")
+# library(xlsx)
+# install.packages('openxlsx') # Install just once
+library(openxlsx) # Load on each new session
+library(amap)
+# install.packages("rgl")
+library(rgl)
+library(ade4)
+
 
 ### Liste des pays possibles (dico sur https://www.iban.com/country-codes )###
 dico_pays <- c(

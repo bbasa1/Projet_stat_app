@@ -73,7 +73,10 @@ fnt_creation_base_stats_des <- function(){
 
 fnt_creation_base_modelisation <- function(){
   
-  liste_pathes <- paste(repo_data, "/YearlyFiles_1998_2018/", liste_pays, liste_annees,"_y.csv", sep = "")
+  liste_combinaisons <- apply(expand.grid(liste_pays, liste_annees), 1, paste, collapse="")
+  
+
+  liste_pathes <-   paste(repo_data, "/YearlyFiles_1998_2018/", liste_combinaisons,"_y.csv", sep = "")
   
   # Première importation
   data_merged <- read_csv(liste_pathes[1], 
