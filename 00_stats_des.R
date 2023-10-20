@@ -12,15 +12,29 @@
 ################################################################################
 #            A. PARAMETRES              -------------------------------
 ################################################################################
-repgen <- "C:/Users/Benjamin/Desktop/Ensae/Projet_statapp"#BB
+
+# repgen <- "C:/Users/Benjamin/Desktop/Ensae/Projet_statapp"#BB
+
 # repgen <- "C:/Users/Lenovo/Desktop/statapp22"#LP
-# repgen <- "/Users/charlottecombier/Desktop/ENSAE/Projet_statapp"
+repgen <- "/Users/charlottecombier/Desktop/ENSAE/Projet_statapp"
 
 
 liste_annees <- 1998:2018
+# Proposition periode : 
+# 1998-2000
+# 2001-2003
+# 2004-2007
+# 2008-2011
+# 2012-2015
+# 2016-2018 = référence ?
+# Benjamin avait parlé de liste, on pourrait aussi pour la modélisation 
+# créer une variable indicatrice par période ou à six modalités 
+pays <- "HU"
 
-pays <- "FR"
-liste_pays <- c("FR", "ES", "IT", "DE", "PT", "HU")
+nom_fichier_html <- paste("Taux_activite", pays, sep = "_")
+
+creer_base <- TRUE
+mettre_coeffs_nan_a_zero <- TRUE
 
 
 # nom_fichier_html <- paste("Sorties_rapport_tout_pays", pays, sep = "_")
