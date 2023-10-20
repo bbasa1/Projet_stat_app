@@ -826,3 +826,14 @@ try(data_merged <- data_merged[indic_penibilite_emp == 0.5 | indic_penibilite_em
 try(data_merged <- data_merged[indic_penibilite_emp == 1.5 | indic_penibilite_emp == 2, indic_penibilite_emp := 2 ] , silent=TRUE)
 try(data_merged <- data_merged[indic_penibilite_emp == 2.5 | indic_penibilite_emp == 3, indic_penibilite_emp := 3 ] , silent=TRUE)
 try(data_merged <- data_merged[indic_penibilite_emp == 3.5 | indic_penibilite_emp == 4 | indic_penibilite_emp == 4.5 | indic_penibilite_emp == 5 | indic_penibilite_emp == 5.5 | indic_penibilite_emp == 6, indic_penibilite_emp := 4 ], silent=TRUE) 
+
+
+
+################################################################################
+#              7 .  Création des régions NUTS-1          =======================
+################################################################################
+# table(data_merged[Pays == "FR" & Annee_enquete == 2018]$REGION)
+data_merged$Region_new <- paste(data_merged$Pays, data_merged$REGION, sep = "") # On concatène pour pas avoir 2 régions de 2 pays différents sous le même nom
+# table(data_merged$Region_new) 
+data_merged$Region_new <- str_sub(data_merged$Region_new, end = -2) # On coupe le dernier caractère pour passer de NUTS-2 à NUTS-1
+# table(data_merged$Region_new) 

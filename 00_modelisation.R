@@ -11,7 +11,7 @@
 ################################################################################
 #            A. PARAMETRES              -------------------------------
 ################################################################################
-repgen <- "C:/Users/Benjamin/Desktop/Ensae/Projet_statapp"#BB
+repgen <- "C:/Users/Benjamin/Desktop/Ensae/2A/Projet_statapp"#BB
 # repgen <- "C:/Users/Lenovo/Desktop/statapp22"#LP
 # repgen <- "/Users/charlottecombier/Desktop/ENSAE/Projet_statapp"
 
@@ -80,20 +80,22 @@ liste_variables <- c('QHHNUM', #Identifiant ménage
                      "HHNBCH17",
                      "HHNBCH24",
                      "INCDECIL",
-                     "HWUSUAL"
+                     "HWUSUAL",
+                     "REGION",
+                     "HATYEAR" # Pour filtre sur la sortie d'étude
 )
 
 
-age_min <- 20
-age_max <- 59
+age_min <- 25
+age_max <- 55
 mettre_coeffs_nan_a_zero <- FALSE
 planter_si_non_specifie <- FALSE #Plante si toutes les varibales ne sont pas spécifiées (dummies, continues ou à supprimer). Autrement il supprime les non spécifiées
 
 
 
-liste_cols_cont <- c("Age_tranche", "Index_conservatisme", "nb_enf_tot", "Decile_salaire")
+liste_cols_cont <- c("Age_tranche", "nb_enf_tot", "Decile_salaire")
 # liste_cols_cont <- c("Age_tranche", "Index_conservatisme")
-liste_cols_dummies <- c("enf_m3ans","Niveau_education", "Temps_partiel_clean", "Pays", "raisons_tp_enf_fam", "sit_pro_foyer", "indic_precarite_emp_tot_final", "travail_respon")
+liste_cols_dummies <- c("enf_m3ans","Niveau_education", "Temps_partiel_clean", "Pays", "raisons_tp_enf_fam", "sit_pro_foyer", "indic_precarite_emp_tot_final", "travail_respon", "Region_new")
 liste_cols_to_delete <- c('Identifiant_menage', "Sexe_1H_2F")
 
 
@@ -124,8 +126,6 @@ if(creer_base){
   load(file = nom_base)
 }
 
-# data_merged$HWUSUAL
-
 ################################################################################
 #            II. NETTOYAGE, PREPARATION                        ===============================
 ################################################################################
@@ -133,58 +133,14 @@ source(paste(repo_prgm , "03_nettoyage.R" , sep = "/"))
 data_merged <- calcul_index_conservatisme(data_merged)
 data_merged <- calcul_EQTP(data_merged)
 
- 
-# table(data_merged$Decile_salaire)
-# table(data_merged[Pays == "FR"]$Decile_salaire)
-# table(data_merged[Pays == "HU"]$Decile_salaire)
-# table(data_merged[Pays == "IT"]$Decile_salaire)
-# table(data_merged[Pays == "ES"]$Decile_salaire)
-# table(data_merged[Pays == "DE"]$Decile_salaire)
-# table(data_merged[Pays == "PT"]$Decile_salaire)
-
-# table(data_merged$Pays)
-
-
 ################################################################################
 #            III. PREPARATION DE LA MODELISATION             ===============================
 ################################################################################
-
-# table(data_merged$travail_respon)
-
 source(paste(repo_prgm , "07_preparation_modelisation.R" , sep = "/"))
-
-# 1061428 lignes pour 28 colonnes au final
-
-
-data_merged
-
-
-# ####### Stat des sur les colonnes
-# data_merged[is.na(data_merged$COEFF)] <- 0
-# 
-# liste_cols <- colnames(data_merged)[-1]
-# colnames(data_merged)
-# 
-# dw_tot <- svydesign(ids = ~1, data = data_merged, weights = ~ data_merged$COEFF)
-# 
-# i <- "enf_m3ans_1"
-# 
-# for(i in liste_cols){
-#   print(i)
-#   print(freq(svytable(~ get(i) , dw_tot )))
-# }
-# 
-# 
-# table1<- svytable(~ Age_tranche , dw_tot )
-# table1
-# lprop(table1)
-# 
-
 
 ################################################################################
 #            IV. MODELISATION    ===============================================
 ################################################################################
-# data_merged
 
 ################################################################################
 #            LA PCA   ----------------------------------------------------------
@@ -253,12 +209,14 @@ if(kmeans_sur_proj){
 #On prépare tout d'abord un petit échantillon au cas où
 sample <- as.data.table(sapply(data_kmeans[], sample, n_sample))
 
-
+data_kmeans <- sapply(data_kmeans, as.numeric)
 data_kmeans_scaled <- scale(data_kmeans)
 data_kmeans_scaled <- as.data.table(data_kmeans_scaled)
 data_kmeans_scaled[is.na(data_kmeans_scaled)] <- 0
 
 
+
+sample <- sapply(sample, as.numeric)
 sample_scaled <- scale(sample)
 sample_scaled <- as.data.table(sample_scaled)
 sample_scaled[is.na(sample_scaled)] <- 0
@@ -348,11 +306,6 @@ fviz_cluster(resKM_sample_scaled, sample_scaled,  ellipse.type = "norm", geom = 
              main = "",
              ggtheme = theme_minimal())
 
-
-# summary(resKM_sample_scaled)
-# plot(sample_scaled, col = resKM_sample_scaled$cluster,pch=16,cex=1.2,main="Regroupement par les k-means")
-
-
 resKM <- Kmeans(data_kmeans_scale, centers=nb_clusters, nstart=25, method = methode)
 
 if(faire_traces){
@@ -364,38 +317,6 @@ if(faire_traces){
                     ggtheme = theme_minimal())
   nom_graphe <- paste("01_graphe_", methode,"_",nb_clusters, "_clusters","_kmeans_sur_proj_",kmeans_sur_proj, ".pdf", sep = "")
   ggsave(paste(repo_sorties, nom_graphe, sep = "/"), p ,  width = 297, height = 210, units = "mm")
-  
-  # 
-  # data_kmeans_scale_acp <- as.data.frame(data_kmeans_scale)
-  # for (i in 1:ncol(data_kmeans_scale_acp)){
-  #   data_kmeans_scale_acp[,i] <- as.factor(data_kmeans_scale_acp)
-  # }
-  # 
-  # acm_results <- dudi.acm(data_kmeans_scale_acp, nf = 3, scannf = FALSE)
-  # data_projected <- acm_results$li
-  # data_projected$cluster <- resKM_sample_scaled$cluster
-  # inertie <- as.data.frame(inertia.dudi(acm_results)[1])
-  # inertie_1 <- round(100*inertie$tot.inertia.inertia[1],2)
-  # inertie_2 <- round(100*inertie$tot.inertia.inertia[2],2)
-  # inertie_3 <- round(100*inertie$tot.inertia.inertia[3],2)
-  # 
-  # xlab <- paste("Axe 1 (",inertie_1, "%)", sep = "")
-  # ylab <- paste("Axe 2 (",inertie_2, "%)", sep = "")
-  # zlab <- paste("Axe 3 (",inertie_3, "%)", sep = "")
-  # 
-  # plot3d(x = data_projected$Axis1,
-  #        y = data_projected$Axis2,
-  #        z = data_projected$Axis3,
-  #        xlab = xlab,
-  #        ylab = ylab,
-  #        zlab = zlab,                                   
-  #        main = "Representation du clustering suivant les 3 principales dimensions",  
-  #        col = data_projected$cluster,
-  #        type = "s",
-  #        size = 1,
-  #        box = FALSE)
-  # 
-  
 }
 
 ################################################################################
@@ -403,13 +324,20 @@ if(faire_traces){
 ################################################################################
 source(paste(repo_prgm , "08_analyse_modelisation.R" , sep = "/"))
 
+##### Première étape : On ajoute la prédiction du numéro de cluster et on sauvegarde la base obtenue !
+data_merged_copy$clustering <- resKM$cluster
+length(resKM$cluster)
+nrow(data_merged_copy)
+nrow(data_merged)
+
+# sample$clustering <- resKM_sample_scaled$cluster
+save(data_merged_copy, file = paste(repo_sorties, "/Base_finale_post_clustering.RData", sep = ""))
+
+
 
 # df_analyse_cluster_sample_scaled <- fonction_calcul_scoring_kmeans(sample_scaled, resKM_sample_scaled)
 df_analyse_cluster <- fonction_calcul_scoring_kmeans(data_kmeans_scale, resKM)
 
-# df_analyse_cluster_sample_scaled
-# df_analyse_cluster
-# summary(df_analyse_cluster)
 titre <- paste("Analyse_cluster_score_", methode,"_",nb_clusters, "_clusters","_kmeans_sur_proj_",kmeans_sur_proj, ".xlsx", sep = "")
 write.xlsx(df_analyse_cluster, paste(repo_sorties,titre, sep = "/"))
 
@@ -421,23 +349,18 @@ write.xlsx(df_analyse_cluster, paste(repo_sorties,titre, sep = "/"))
 ################################################################################
 #### Distribution par cluster ===> Pour faire des profils-types de femmes !!! ##
 ################################################################################
-data_merged_copy <- copy(data_merged)
-
-# On ajoute la prédiction du numéro de cluster
-data_merged_copy$clustering <- resKM$cluster
-# sample$clustering <- resKM_sample_scaled$cluster
-
-
+data_merged_copy_2 <- copy(data_merged)
+data_merged_copy_2$clustering <- resKM$cluster
 
 
 ## Analyse d'une variable continue
 variable <- "Age_tranche"
-tapply(data_merged_copy[[variable]] , data_merged_copy$clustering, summary)
+tapply(data_merged_copy_2[[variable]] , data_merged_copy_2$clustering, summary)
 
 
 ## Analyse d'une variable catégorielle
 variable <- "Niveau_education_H"
-counted_occurences <- as.data.table(data_merged_copy %>% count(clustering, !! rlang::sym(variable)))
+counted_occurences <- as.data.table(data_merged_copy_2 %>% count(clustering, !! rlang::sym(variable)))
 counted_occurences[, n_norm_by_cluster := 100*n/sum(n), by = clustering]
 counted_occurences[, n_norm_by_var := 100*n/sum(n), by = variable]
 counted_occurences
@@ -445,7 +368,7 @@ counted_occurences
 
 
 ## Analyse de toutes les variables catégorielles
-liste_cols_dummies <- colnames(data_merged_copy)
+liste_cols_dummies <- colnames(data_merged_copy_2)
 
 # On ne garde que les cols catégorielles avec leurs modalités
 # liste_cols_dummies <- liste_cols_dummies[! liste_cols_dummies %in% liste_cols_cont]
@@ -455,7 +378,7 @@ liste_cols_dummies
 
 # Initialisation
 variable <- liste_cols_dummies[1]
-counted_occurences <- as.data.table(data_merged_copy %>% count(clustering, !! rlang::sym(variable)))
+counted_occurences <- as.data.table(data_merged_copy_2 %>% count(clustering, !! rlang::sym(variable)))
 counted_occurences[, Pourcent_by_cluster := 100*n/sum(n), by = clustering]
 counted_occurences[, Pourcent_by_modalite_var := 100*n/sum(n), by = variable]
 setnames(counted_occurences, variable, "valeur_variable")
@@ -465,7 +388,7 @@ counted_occurences_all <- counted_occurences
 # Boucle sur toutes les colonnes
 for (variable in liste_cols_dummies[c(-1)]){
   # print(variable)
-  counted_occurences <- as.data.table(data_merged_copy %>% count(clustering, !! rlang::sym(variable)))
+  counted_occurences <- as.data.table(data_merged_copy_2 %>% count(clustering, !! rlang::sym(variable)))
   counted_occurences[, Pourcent_by_cluster := 100*n/sum(n), by = clustering]
   counted_occurences[, Pourcent_by_modalite_var := 100*n/sum(n), by = variable]
   setnames(counted_occurences, variable, "valeur_variable")
@@ -481,12 +404,12 @@ write.xlsx(counted_occurences_all, paste(repo_sorties,titre, sep = "/"))
 
 ###################### TESTE DU CHI 2
 
-sum_clustering <- data_merged_copy[, lapply(.SD,sum) ,by=clustering]
+sum_clustering <- data_merged_copy_2[, lapply(.SD,sum) ,by=clustering]
 sum_clustering <- rescale(sum_clustering)
 sum_clustering <- as.data.table(sum_clustering)
 sum_clustering <- round(sum_clustering)
 
-# sum_clustering <- round(data_merged_copy[, lapply(.SD,sum) ,by=clustering])
+# sum_clustering <- round(data_merged_copy_2[, lapply(.SD,sum) ,by=clustering])
 sum_clustering <- remove_constant(sum_clustering, na.rm = FALSE, quiet = FALSE)
 sum_clustering <- as.data.frame(sum_clustering)
 for (i in 1:ncol(sum_clustering)){
