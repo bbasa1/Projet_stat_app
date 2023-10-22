@@ -11,9 +11,12 @@ data_merged <- data_merged[Age_tranche + 2 <= age_max, ]
 data_merged <- data_merged[Sexe_1H_2F == 2]
 
 ### Puis sur la sortie d'étude
-data_merged <- data_merged[YEAR > HATYEAR, ]
+data_merged <- data_merged[Annee_enquete > annee_fin_etude, ]
 
 ### Puis sur la non retraite ???
+data_merged <- data_merged[statut_travail != "4", ]
+# statut_travail
+# Poids_final
 
 ### Maintenant qu'on a terminé de filtrer sur les lignes on peut faire une copie de la base
 data_merged_copy <- copy(data_merged) ###### IMPORTANT penser à faire un copie avant de faire le clustering, pour pouvoir étudier les résultats après
