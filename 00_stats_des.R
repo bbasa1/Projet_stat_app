@@ -13,10 +13,9 @@
 #            A. PARAMETRES              -------------------------------
 ################################################################################
 
-# repgen <- "C:/Users/Benjamin/Desktop/Ensae/Projet_statapp"#BB
-
+repgen <- "C:/Users/Benjamin/Desktop/Ensae/2A/Projet_statapp"#BB
 # repgen <- "C:/Users/Lenovo/Desktop/statapp22"#LP
-repgen <- "/Users/charlottecombier/Desktop/ENSAE/Projet_statapp"
+# repgen <- "/Users/charlottecombier/Desktop/ENSAE/Projet_statapp"
 
 
 liste_annees <- 1998:2018
