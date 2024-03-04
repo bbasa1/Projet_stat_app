@@ -34,7 +34,7 @@ nom_fichier_html <- paste("Taux_activite", pays, sep = "_")
 # nom_fichier_html <- paste("Sorties_rapport_tout_pays", pays, sep = "_")
 nom_fichier_html <- paste("Sortie_graphique_", pays, sep = "_")
 
-creer_base <- TRUE
+creer_base <- FALSE
 mettre_coeffs_nan_a_zero <- TRUE
 faire_liste_pays <- TRUE # Si on fonctionne avec la liste des pays
 titre_sur_figure <- FALSE #Pour mettre le titre sur les figures. Sinon titre = ""
@@ -163,6 +163,7 @@ if(creer_base & faire_liste_pays){
 
 nrow(data_merged)
 # 34 677 582
+table(data_merged[COUNTRY == "FR"]$YEAR)
 
 ################################################################################
 #            II. NETTOYAGE, PREPARATION                        ===============================
@@ -244,6 +245,11 @@ source(paste(repo_prgm , "03_nettoyage.R" , sep = "/"))
 data_merged <- calcul_EQTP(data_merged)
 
 
+
+# colnames(data_merged)
+# calcul_annees <- calcul_taux_emplois_activite(liste_var_groupby = c('Pays', 'Sexe_1H_2F', 'Annee_enquete', "Age_tranche"), data_loc = data_merged)
+# titre <- paste("calcul_annees_age_sexe_pays", ".xlsx", sep = "")
+# write.xlsx(calcul_annees, paste("C:/Users/Benjamin/Desktop/Ensae/2A/Projet_statapp/Data/data_intermediaire",titre, sep = "/"))
 
 ################################################################################
 #            III. CALCULS TAUX D'EMPLOIS ET ACTIVITE PAR ÂGE ET SEXE  ===============================
