@@ -28,20 +28,15 @@ liste_annees <- 1998:2018
 # 2016-2018 = référence ?
 # Benjamin avait parlé de liste, on pourrait aussi pour la modélisation 
 # créer une variable indicatrice par période ou à six modalités 
-pays <- "HU"
+pays <- c("HU", "FR", "IT", "DE", "ES", "PT")
 
 nom_fichier_html <- paste("Taux_activite", pays, sep = "_")
-
-creer_base <- TRUE
-mettre_coeffs_nan_a_zero <- TRUE
-
-
 # nom_fichier_html <- paste("Sorties_rapport_tout_pays", pays, sep = "_")
 nom_fichier_html <- paste("Sortie_graphique_", pays, sep = "_")
 
 creer_base <- TRUE
 mettre_coeffs_nan_a_zero <- TRUE
-liste_pays <- FALSE # Si on fonctionne avec la liste des pays
+faire_liste_pays <- TRUE # Si on fonctionne avec la liste des pays
 titre_sur_figure <- FALSE #Pour mettre le titre sur les figures. Sinon titre = ""
 
 repo_prgm <- paste(repgen, "programmes/Projet_stat_app" , sep = "/")
@@ -150,7 +145,7 @@ source(paste(repo_prgm , "02_creation_base.R" , sep = "/"))
 # Soit on créé la table, soit on l'importe...
 
 # ######## SUR UN SEUL PAYS
-if(creer_base & !liste_pays){
+if(creer_base & !faire_liste_pays){
   data_merged <- fnt_creation_base_stats_des()
 }else{
   nom_base <- paste(repo_data, "/data_intermediaire/base_", pays, ".Rdata", sep = "")
@@ -159,7 +154,7 @@ if(creer_base & !liste_pays){
 
 
 ######## SUR PLEIN DE PAYS
-if(creer_base & liste_pays){
+if(creer_base & faire_liste_pays){
   data_merged <- fnt_creation_base_modelisation()
 }else{
   nom_base <- paste(repo_data, "/data_intermediaire/base_", liste_annees[1],"_", liste_annees[length(liste_annees)], ".Rdata", sep = "")
@@ -258,6 +253,7 @@ data_merged <- calcul_EQTP(data_merged)
 
 # On récupère les fonctions
 source(paste(repo_prgm , "04_calculs_tables.R" , sep = "/"))
+#  calcul annee pour les 6 pays avec donc age, annee enquete, sexe et les tx d’emmploi etc
 
 # On initialise une liste de graphes vides
 list_graph <- list()
